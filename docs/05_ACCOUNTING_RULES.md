@@ -20,6 +20,10 @@ Define posting, corrections, cash and period reconciliations for review by Accou
 
 Session upload deletion does not remove or reverse approved transactions, journals, company details, evidence or historical statement extraction registers. Removing a recognised or registered bank statement revokes bank balance confirmation and requires review again; stored balance amounts remain. Correct accounting entries through the existing editors. Exact duplicate content is proposed for import once, while retaining both uploaded filenames for user review. No posting, rounding, cutoff or accounting policy changes are introduced.
 
+## Issue tracker and stage indicators
+
+Progress notes and Open/In progress status do not modify or approve accounting entries. Live checks clear issues when their condition is no longer detected; cleared history is retained and recurrence reopens the issue. Answering a clarification closes that question, while any independent ledger validation remains open. Missing bank source files require rechecking rather than silently clearing historical source findings. Green stage labels describe current readiness checks, not professional certification. Existing posting, rounding, reconciliation and report-download rules remain in force.
+
 ## To-be requirements
 
 Fictional SGD posting patterns subject to evidence and policy review:

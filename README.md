@@ -8,6 +8,12 @@ Otto helps Singapore businesses and their preparers assemble bookkeeping records
 
 In Guided **Upload** or **Bank**, review the **Flagged files — your decision** list. Open **Review or delete uploaded files**, select files, then choose **Retain selected files** or **Delete selected files**. Flags include exact duplicates, possible overlapping statement coverage, financial-year mismatches, different company UENs and uncertain relevance. Nothing is deleted automatically; supporting documents may still be useful. Retain choices last for this session. Deletion keeps saved accounting/evidence records and original disk files, and requires bank balances to be rechecked when a statement is removed.
 
+## Follow issues through to clearance
+
+The five Guided sections are tabs: green **Cleared**, amber **Needs attention**, grey **Not started**. Text and symbols accompany the colours. Each tab lists every current issue with its priority and next action. Select **Issue to handle** to read the full details, open the relevant tab or Advanced editor, and save progress notes as **Open** or **In progress**. Checks clear resolved items automatically, retain cleared history and reopen recurring problems. Missing source files leave historical bank-source issues in **Needs recheck**. Save the workspace ZIP to retain notes/history, or download the issue-list CSV. Progress and green labels do not approve accounting entries.
+
+Requires Streamlit 1.50 or later. The launcher installs the updated requirements. Streamlit's developer controls occupy their own top strip above Otto branding.
+
 ## Run locally
 
 On macOS, unzip the release, open `START_ON_MAC.command` and keep Terminal open. Open <http://localhost:8501>. The launcher creates a local virtual environment and installs dependencies when needed. See the [original Quick Start](QUICK_START_v1.2.4.md) for setup and troubleshooting.

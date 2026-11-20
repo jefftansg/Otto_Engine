@@ -24,6 +24,12 @@ New tests exercise renamed exact duplicates, stable retry identities, overlappin
 
 Scope: synthetic fixtures, Python backend and Streamlit AppTest. Real browser file selection, previous-release ZIP archives and manual launcher/offline checks remain unverified; existing cutoff/reconciliation/report tests passed. Streamlit's existing container-width deprecation warnings are not failures.
 
+## Issue tracker, tabs and stage status verification
+
+20 November 2026; macOS arm64 / Python 3.9.6 / Streamlit 1.50.0. `/private/tmp/otto-delete-venv/bin/python -m unittest discover -s tests -v`: **86 passed, 0 failures, 0 errors, 0 skips**. New `test_issue_tracker` and `test_stages` cases cover all lifecycle states, recurrence, invalid clear without mutation, missing bank source recheck after ZIP restore, notes/events/CSV persistence, initialization from the older bundled package, report/ledger equality, every generated question, full validation details, more than eight uncategorised questions, native tab rendering, exact question routing, issue progress, status colours/text and ready-to-attention regression. Existing Guided/Advanced entry, import retry, deletion, cutoff, reconciliation and report tests passed.
+
+Local in-app browser at port 8511 verified tab selection, an issue action opening Company, synthetic sample loading and header clearance below Streamlit controls. This does not establish keyboard-only or narrow-screen coverage, every historical ZIP, or independent professional approval.
+
 ## To-be requirements
 
 Use frozen synthetic ledgers, hand-calculated expected SGD results, explicit evidence locations, and permission-reviewed/redacted bank layout samples. Keep hashes and version metadata for golden fixtures. Unit tests cover date, decimals and rules, integration covers staged approvals through export, browser E2E covers state and downloads, and UAT covers Mac and accounting review.

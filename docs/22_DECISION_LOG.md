@@ -32,6 +32,12 @@ Use stable filename/content identities for session file selections and content h
 
 Evidence: `engine/intake_review.py`, `guided._delete_uploads`, `guided._upload_deletion_controls`, `tests/test_intake_review.py`, `tests/test_upload_deletion.py`; 73 passing tests including AppTest. Limitation: retention decisions are session-only, and detection does not establish semantic duplicates across unrelated layouts or prove that supporting evidence is irrelevant.
 
+## Decision 009 — persistent issue handling and native stage tabs
+
+20 November 2026; Engineering; implemented at the user's request. Show every generated issue with an action and lifecycle, retain notes and cleared history in the optional workspace `issue_register`, and reopen recurring conditions. Permit manual Open/In progress only; no manual accounting-clear override. Preserve source-dependent findings as Needs recheck when original bank files are unavailable. Use native tabs with accessible colour/text statuses. Streamlit 1.50 retains tab selection across reruns, so explicit navigation changes an invisible tab-label identity suffix to apply the requested default; ordinary reruns preserve the selected tab. Place developer controls in a separate toolbar strip above branding.
+
+Evidence: `engine/issue_tracker.py`, `engine/stages.py`, `engine/attention.py`, `guided.py`, `app.py`, `tests/test_issue_tracker.py`, `tests/test_stages.py`; 86 passing tests plus local browser verification. Issue history is client-supplied workspace metadata, not a tamper-proof audit log or authorised certification. No accounting-policy or deployment change.
+
 ## To-be requirements
 
 Record owner, date, state, decision, rationale, alternatives, consequences, validation evidence and successor ADR. Preserve old decisions when superseded. Require affected teams to sign architecture/accounting/compliance decisions before implementation.

@@ -17,7 +17,8 @@ st.set_page_config(
     layout='wide',
 )
 st.markdown("""<style>
-.block-container {padding-top:1.0rem; max-width:1500px}
+.block-container {padding-top:5.5rem; max-width:1500px}
+header[data-testid="stHeader"] {background-color:#fff; border-bottom:1px solid #edf2f5}
 [data-testid="stMetric"] {background-color:#eff7f8; border-radius:9px; padding:13px}
 small {color:#607080}
 div[data-testid="stForm"] {border:1px solid #d7e9e9}

@@ -18,10 +18,11 @@ ADVANCED_PAGES = [
 
 
 def _item(key, title, explanation, question, *, severity='Needs attention', stage=3,
-          advanced_page=7, affected=0):
+          advanced_page=7, affected=0, details=(), question_id='', source_required=False):
     return {'id': key, 'title': title, 'why': explanation, 'question': question,
             'severity': severity, 'guided_stage': stage,
-            'advanced_page': advanced_page, 'affected': affected}
+            'advanced_page': advanced_page, 'affected': affected,
+            'details':list(details), 'question_id':question_id, 'source_required':source_required}
 
 
 def _route_error(message):
@@ -70,14 +71,16 @@ def build_attention(pkg, questions=(), result=None, bank_batch=None):
             items.append(_item('bank-source-issues','Check incomplete or inconsistent bank statements',
                 'Some statement periods, transactions or totals need checking. No unverified rows should be posted.',
                 'Can you provide the missing statements or a bank-exported CSV/Excel file?',
-                severity='Required',stage=2,advanced_page=0,affected=len(problems)))
+                severity='Required',stage=2,advanced_page=0,affected=len(problems),
+                details=problems,source_required=True))
 
     uncoded=[r for r in pkg.bank if str(r.get('account_code','') or '9999').strip() in ('','9999')]
     if uncoded:
         items.append(_item('bank-uncoded',f'{len(uncoded)} bank transaction(s) need a category',
            'The engine cannot determine whether these transactions are sales, transfers, loans or expenses.',
            'What was each payment or receipt for? Check an invoice, receipt or the person who made the transfer.',
-           severity='Required',stage=2,advanced_page=2,affected=len(uncoded)))
+           severity='Required',stage=2,advanced_page=2,affected=len(uncoded),
+           details=[f"{r.get('date','')} · {r.get('reference','')} · {r.get('description','')} · Received S${r.get('deposit') or '0'} / Paid S${r.get('withdrawal') or '0'}" for r in uncoded]))
 
     responses=cfg.get('simple_questions',{})
     if responses.get('director_expenses')=='Yes' and not pkg.claims:
@@ -105,21 +108,18 @@ def build_attention(pkg, questions=(), result=None, bank_batch=None):
                 continue
             items.append(_item('validation-'+str(page)+'-'+label.lower().replace(' ','-'),
                 f'{len(errors)} {label.lower()} check(s) need correction',
-                'The accounting engine flagged: '+'; '.join(errors[:2]) + ('…' if len(errors)>2 else ''),
+                'The accounting engine flagged the checks listed below.',
                 'Can you verify the source records and correct the affected entries?',
                 severity='Required',stage=2 if page in (0,2) else 3,
-                advanced_page=page,affected=len(errors)))
+                advanced_page=page,affected=len(errors),details=errors))
 
-    open_q=[q for q in questions if q.get('priority')=='Required']
-    normal_q=[q for q in questions if q.get('priority')!='Required']
-    if open_q:
-        items.append(_item('required-questions',f'{len(open_q)} important question(s) are unanswered',
-            'These questions require information or documentation from the director or client.',
-            open_q[0]['question'],severity='Required',stage=3,advanced_page=7,affected=len(open_q)))
-    if normal_q:
-        items.append(_item('general-questions',f'{len(normal_q)} other question(s) to clarify',
-           'Some notes, confirmations or supporting documents are still needed.',
-           normal_q[0]['question'],severity='Follow up',stage=3,advanced_page=7,affected=len(normal_q)))
+    for q in questions:
+        items.append(_item('question-'+q['id'],q['question'],q['why'],q['request'],
+            severity='Required' if q.get('priority')=='Required' else 'Follow up',
+            stage=3,advanced_page=SECTIONS.get(q.get('section'),(3,7))[1],affected=1,
+            question_id=q['id'],details=[q['source']] if q.get('source') else [],
+            source_required=q['id'].startswith(('statement-coverage-', 'statement-mismatch-',
+                'transaction-extraction-', 'multiple-bank-accounts-', 'outside-year-'))))
 
     # Sort by priority, retaining actionable grouping, and stable IDs.
     return sorted(items,key=lambda x:(0 if x['severity']=='Required' else 1,x['id']))

@@ -39,6 +39,17 @@ User-requested changes on `codex/delete-uploaded-files`, based on commit `838565
 
 Verification: macOS arm64, Python 3.9.6, Streamlit 1.50.0, isolated temporary virtual environment. `/private/tmp/otto-delete-venv/bin/python -m unittest discover -s tests -v`: **73 passed, 0 failures, 0 errors, 0 skips**. Includes Streamlit AppTest for Guided Upload/Bank deletion, retain-then-delete and Advanced entry. Synthetic fixtures only; no real client uploads inspected. Browser file-picker interactions and older release ZIP archives have not been manually verified. Existing Streamlit width deprecation warnings remain.
 
+## Unreleased — issue tracker and stage navigation (20 November 2026)
+
+- Replace five command-style stage buttons with native Upload, Company, Bank, Other records and Reports tabs. Existing Continue and issue actions select their destination tab. Streamlit minimum is now 1.50 for the supported tab default parameter.
+- Tab labels include both colour and text: green/Cleared, amber/Needs attention and grey/Not started. Status derives from current data, confirmations, outstanding questions, document-review decisions and existing checks. Regression reopens a stage. These indicators do not grant approval or change existing report-download gates.
+- Every clarification question is listed individually; extraction and uncategorised question caps are removed. Grouped validation and source issues expose all details, with no two-message truncation.
+- All five tabs show the full issue list, priority, status and next action. Select an issue to see its details, route to the correct tab or Advanced editor, record Open/In progress notes, recheck or export CSV. No manual Clear bypass is provided.
+- `company.json` stores optional `issue_register` with first/last observation, notes, transition history and cleared timestamps. Current checks clear issues; recurrence reopens them. Missing bank source files leave previously raised source-dependent issues in Needs recheck. Older ZIPs acquire the register on first Guided use; existing source PDFs remain excluded.
+- Reserve a separate top toolbar strip with 5.5rem of main-content clearance so Streamlit developer controls do not overlap Otto branding. Browser bookmark tooltips are outside the app.
+
+Validation: macOS arm64, Python 3.9.6, Streamlit 1.50.0. `/private/tmp/otto-delete-venv/bin/python -m unittest discover -s tests -v`: **86 passed, 0 failures, 0 errors, 0 skips**. Covers lifecycle/reopen, rejected manual clear, missing-source restore, legacy package initialization, ZIP/CSV persistence, unchanged accounting totals, complete question/detail lists, tab rendering, progress/action routing, and green-to-amber regression. A local browser preview verified native tab switching, issue-to-Company routing and logo clearance. Synthetic fixtures only. Manual keyboard, narrow-screen and every supported historical release archive remain unverified. Existing Streamlit container-width deprecation warnings remain.
+
 ## To-be requirements
 
 Release update template: version/date, supported platform, scope and associated requirements, verified user-visible changes, migration/restore implications, exact verification commands/results, known gaps, authority version impacts, archive digest and reviewer approvals.

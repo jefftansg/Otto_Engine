@@ -36,6 +36,10 @@ No versioned source registry or regulatory rule engine was observed. This regist
 
 The upload review/deletion change introduces no regulatory eligibility decision, source-version update or filing behaviour. Relevance flags are local review suggestions based on content hashes, extracted statement periods/account IDs, UEN and recognition status. They are not regulatory determinations. No new legal or accounting source claims are made by this change.
 
+## Issue tracker and navigation — 20 November 2026
+
+Issue lifecycle, coloured readiness labels and toolbar spacing introduce no regulatory-source update, eligibility determination or filing action. Green status denotes application checks only. No external legal or accounting source claim is added.
+
 ## To-be requirements
 
 Version rules by authority, section, publication, effective interval, entity/period applicability and retrieval date. Record amendments, transitional cases, approved interpretation and date, next review and fixture impacts. Monitor ACRA, ASC, Singapore Statutes Online, government gazettes and PDPC at release/review intervals. When changes appear, check enactment and commencement independently. Preserve previously approved decisions and version-tag reproductions. Review copyright and licences before embedding standards wording or ACRA taxonomy. Use summaries and links for this documentation.
