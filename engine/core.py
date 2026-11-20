@@ -341,6 +341,8 @@ def generate(pkg:Package):
             'profit':profit,'assets':assets,'liabilities':liabilities,'equity':equity,
             'booked_equity':booked_equity,'opening_profit':opening_profit,'bank_open':bank_open,
             'bank_close':bank_end,'bank_delta':bank_total,'ledger_open':ledger_open,'ledger_end':ledger_end,
+            'bank_open_missing': opening_missing,
+            'bank_close_missing': closing_missing,
             'trial_debit':debits,'trial_credit':credits,'errors':errors,'warnings':warnings,'package':pkg}
 
 
