@@ -32,6 +32,16 @@ Use stable filename/content identities for session file selections and content h
 
 Evidence: `engine/intake_review.py`, `guided._delete_uploads`, `guided._upload_deletion_controls`, `tests/test_intake_review.py`, `tests/test_upload_deletion.py`; 73 passing tests including AppTest. Limitation: retention decisions are session-only, and detection does not establish semantic duplicates across unrelated layouts or prove that supporting evidence is irrelevant.
 
+## Decision 009 — lean outsourced accountant and independent auditor model (20 November 2026)
+
+**Owner:** Product. **Business-scope decision:** operate Otto as a bookkeeping, management accounts and draft UFS preparation service without initially employing a full-time accountant or auditor. A contracted appropriately qualified Singapore financial reporting accountant may perform optional per-client quality review; the client company separately appoints an independent ACRA-registered auditor if statutory or voluntary audit is required. Directors remain responsible for financial statements. The accounting review alone does not confer assurance. **Implementation status:** Planned; no v1.2.4 feature change.
+
+**Alternatives:** hire in-house professionals (not chosen initial model); same firm prepares and audits (may create ethical self-review restrictions and requires the proposed auditor's own independence assessment). **Consequences:** OTTO-SVC-001/002, OTTO-UFS-003 and documented responsibilities, confidentiality and contractual terms.
+
+## Decision 010 — audit-ready evidence is not an audit (20 November 2026)
+
+**Owner:** Product / Accounting. **Business-scope decision:** planned read-only, versioned, consent-controlled audit-handoff ZIP with statements, books, reconciliations, source evidence, adjustments and exceptions. An independent auditor performs all procedures and issues any auditor's report; Otto never generates, signs or implies an audit opinion. **Implementation status:** Planned; OTTO-AUD-001/002.
+
 ## To-be requirements
 
 Record owner, date, state, decision, rationale, alternatives, consequences, validation evidence and successor ADR. Preserve old decisions when superseded. Require affected teams to sign architecture/accounting/compliance decisions before implementation.
