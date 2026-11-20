@@ -269,17 +269,21 @@ def generate(pkg:Package):
     opening_missing = opening_value is None or not str(opening_value).strip()
     if opening_missing:
         errors.append('Bank statement opening balance is required.')
+    closing_value = cfg.get('bank_statement_closing')
+    closing_missing = closing_value is None or not str(closing_value).strip()
+    if closing_missing:
+        errors.append('Bank statement closing balance is required.')
     try:
         bank_open = D('0') if opening_missing else money(opening_value, 'bank opening balance')
-        bank_end=money(cfg.get('bank_statement_closing','0'),'bank closing balance')
+        bank_end = D('0') if closing_missing else money(closing_value, 'bank closing balance')
     except ValueError as e:
         errors.append(str(e));bank_open=bank_end=D('0')
     ledger_open=prev['1000']
     ledger_end=balances['1000']
     if not opening_missing and bank_open != ledger_open: errors.append(f'Opening bank statement {money_str(bank_open)} differs from opening ledger {money_str(ledger_open)}.')
-    if not opening_missing and bank_end != bank_open + bank_total:
+    if not (opening_missing or closing_missing) and bank_end != bank_open + bank_total:
         errors.append(f'Bank statement closing does not reconcile with imported bank transactions: {money_str(bank_open+bank_total)} expected, {money_str(bank_end)} entered.')
-    if bank_end!=ledger_end: errors.append(f'Closing bank statement {money_str(bank_end)} differs from bank ledger {money_str(ledger_end)}.')
+    if not closing_missing and bank_end != ledger_end: errors.append(f'Closing bank statement {money_str(bank_end)} differs from bank ledger {money_str(ledger_end)}.')
     cashflows=defaultdict(lambda:D('0'))
     for f in flow_items: cashflows[f['category']]+=f['cash_movement']
     for category in ('Operating','Investing','Financing','Unallocated'):
