@@ -26,6 +26,28 @@ The core validates framework label and internal accounts. It records confirmatio
 
 Keep accounting records sufficient to explain transactions and financial position and enable true and fair statements. Directors review and authorise issue and remain accountable when preparation is outsourced. Confirm prescribed signature and timing duties against primary provisions. Hand filing, audit, tax and secretarial matters to the responsible professional. Escalate uncertain group perimeter, solvency, unsupported frameworks, contested audit rights, comparatives and missing statutory evidence.
 
+## Outsourcing and independent audit boundary
+
+ACRA guidance allows companies to outsource bookkeeping and financial-statement preparation while company **directors retain their statutory duties and accountability**. Otto's provider may engage an external accountant by contract, subject to competence, clear engagement scope, confidentiality, client authority, record access and professional liability.
+
+A company that needs or elects an audit must arrange proper engagement/appointment of an **ACRA-registered public accountant through an appropriate registered accounting entity**, subject to applicable legal provisions. The auditor independently performs procedures under **Singapore Standards on Auditing** and issues the opinion. Otto performs neither auditor functions nor audit certification.
+
+Do not conflate:
+- preparer's ordinary financial reporting quality review (non-assurance);
+- separately commissioned **SSRS 4410 compilation** (no assurance);
+- formal **SSRE review engagement** (limited assurance where applicable);
+- **SSA financial statement audit** (reasonable assurance and independent auditor's report).
+
+Auditor independence, including any potential self-review threat when the same firm prepares and audits accounts, must be judged by the appointed professional under relevant Singapore ethics rules. Otto can recommend separate providers but must not pronounce independence or registration valid without evidence.
+
+**Official references to verify at implementation/release time:**
+- [ACRA — Financial reporting duties for directors](https://www.acra.gov.sg/manage/companies/legal-requirements-common-offences/preparing-financial-statements/financial-reporting-duties-for-directors/)
+- [ACRA — Public accountant eligibility](https://www.acra.gov.sg/register/public-accountant/requirements-eligibility/)
+- [ISCA — Singapore Standards on Auditing](https://www.isca.org.sg/standards-guidance/audit-assurance/standards-and-guidance/singapore-standards-on-auditing-%28ssas%29)
+- [ISCA — Singapore Standards on Related Services](https://www.isca.org.sg/standards-guidance/audit-assurance/standards-and-guidance/singapore-standards-on-related-services-%28ssrss%29)
+
+These statements describe planned service handoffs, not implemented integration, professional assurance or regulator endorsement.
+
 ## Acceptance criteria / verification
 
 Demonstrate independently that audit exemption, accounting-framework eligibility and filing relief can differ for the same entity. Record reasons and dated authority for decisions. Confirm a preparation draft cannot be marked audited or filed.
