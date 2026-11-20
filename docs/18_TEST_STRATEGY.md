@@ -52,6 +52,20 @@ Use frozen synthetic ledgers, hand-calculated expected SGD results, explicit evi
 | 20 Missing disclosures | UFS-001 | Unsupported framework, absent comparatives and omitted required notes block authorisation. Proposed. |
 | 21 Recovery and malicious input handling | SEC-001 | Bounded local parse, rejected restore retains original and export safely escapes untrusted text. Proposed. |
 
+## Proposed external-review and audit-handoff tests (not yet executed)
+
+| Test ID | Scenario | Required result |
+| --- | --- | --- |
+| TEST-OTTO-SVC-001 | Accountant reviews draft, recommends adjustment | Review and qualifications/scope recorded; corrections require explicit authorised journal; no assurance wording |
+| TEST-OTTO-SVC-002 | Audit required but auditor registration or appointment missing | Block audited-status claim; request separate audit engagement and registration evidence |
+| TEST-OTTO-AUD-001 | Fictional client exports audit-ready package | Frozen consistent ledger/TB/UFS, all relevant schedules, evidence index, manifest hashes and missing-item register |
+| TEST-OTTO-AUD-001-NEG | Missing statement month or related-party confirmation | Incomplete status and exception visibility; no assertion of audit readiness |
+| TEST-OTTO-AUD-002 | Consent denied/revoked or wrong recipient | No unauthorised export; immutable sharing log; no cross-client access |
+| TEST-OTTO-UFS-003 | Draft → accountant-reviewed → director-authorised | Status transitions tied to particular immutable report revisions; no automatic audited promotion |
+| TEST-OTTO-UFS-003-NEG | Accountant quality check or SSRS 4410 compilation completed | No audit assurance claim, no Otto-generated auditor's opinion |
+
+These are planned automated/UAT scenarios; do not count as passed baseline tests. Test registration and independence records against legitimate professional evidence, not fabricated fixtures alone.
+
 ## Acceptance criteria / verification
 
 Retain exact command, interpreter, dependencies, commit/archive identity and pass/fail/skip per run. Regression gates require arithmetic and release tests green, malformed input and duplicate coverage, layout/visual checks and Accounting/Compliance sign-off for mapped requirements. Balance evidence is independent of production readiness.
