@@ -4,6 +4,10 @@ Otto helps Singapore businesses and their preparers assemble bookkeeping records
 
 ![Otto original logo](assets/otto_original_logo.png)
 
+## Review or remove uploaded files
+
+In Guided **Upload** or **Bank**, review the **Flagged files — your decision** list. Open **Review or delete uploaded files**, select files, then choose **Retain selected files** or **Delete selected files**. Flags include exact duplicates, possible overlapping statement coverage, financial-year mismatches, different company UENs and uncertain relevance. Nothing is deleted automatically; supporting documents may still be useful. Retain choices last for this session. Deletion keeps saved accounting/evidence records and original disk files, and requires bank balances to be rechecked when a statement is removed.
+
 ## Run locally
 
 On macOS, unzip the release, open `START_ON_MAC.command` and keep Terminal open. Open <http://localhost:8501>. The launcher creates a local virtual environment and installs dependencies when needed. See the [original Quick Start](QUICK_START_v1.2.4.md) for setup and troubleshooting.

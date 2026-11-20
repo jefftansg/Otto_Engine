@@ -16,6 +16,10 @@ Define posting, corrections, cash and period reconciliations for review by Accou
 
 `money` quantises to SGD cents with ROUND_HALF_UP. Bank transactions debit/credit 1000 and mirror the counter-account. Exactly one positive inflow or outflow is required. Suspense 9999 raises an error while preserving draft lines. Claims debit an expense or asset and credit a configured director liability. Invoices compute outstanding and ageing, and tie to 1100. Recognition and settlement use separate entries. Manual journals check debit/credit equality by ID and permit dates before the start, supporting opening balances. Bank and claims require in-period dates. Validation ties journal, net trial balance, position equation, imported movement, opening and closing book cash, cash flow and AR. Missing evidence or confirmations can be warnings. The app applies separate Guided and Advanced draft download gates.
 
+## Upload removal and retained accounting records
+
+Session upload deletion does not remove or reverse approved transactions, journals, company details, evidence or historical statement extraction registers. Removing a recognised or registered bank statement revokes bank balance confirmation and requires review again; stored balance amounts remain. Correct accounting entries through the existing editors. Exact duplicate content is proposed for import once, while retaining both uploaded filenames for user review. No posting, rounding, cutoff or accounting policy changes are introduced.
+
 ## To-be requirements
 
 Fictional SGD posting patterns subject to evidence and policy review:

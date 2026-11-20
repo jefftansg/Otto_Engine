@@ -56,6 +56,7 @@ with st.sidebar:
         st.session_state.upload_hash=''
         st.session_state.is_demo=False
         st.session_state['guided_files']=[]
+        st.session_state['guided_file_decisions']={}
         st.session_state['guided_stage']=0
         st.session_state['app_mode']='Guided'
         st.session_state['advanced_page']=0
@@ -78,6 +79,7 @@ with st.sidebar:
                     st.session_state.upload_hash=h
                     st.session_state.is_demo=False
                     st.session_state['guided_files']=[]
+                    st.session_state['guided_file_decisions']={}
                     st.session_state['guided_stage']=0
                     st.session_state['app_mode']='Guided'
                     st.session_state['advanced_page']=0
@@ -90,6 +92,7 @@ with st.sidebar:
             st.session_state.upload_hash=''
             st.session_state.is_demo=True
             st.session_state['guided_files']=[]
+            st.session_state['guided_file_decisions']={}
             st.session_state['guided_stage']=0
             st.session_state['app_mode']='Guided'
             st.session_state['advanced_page']=0
