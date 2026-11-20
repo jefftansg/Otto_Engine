@@ -39,6 +39,28 @@ class EngineTests(unittest.TestCase):
                 visible_movement, result["ledger_end"] - result["ledger_open"]
             )
 
+    def test_bank_and_manual_journal_id_collision_is_flagged(self):
+        package = Package.from_directory(BASE)
+        journal = {
+            "journal_id": "BANK-0001",
+            "date": package.config["fy_end"],
+            "description": "Fictional manual adjustment",
+        }
+        package.journals.extend([
+            {**journal, "account_code": "5600", "debit": "10.00", "credit": "0"},
+            {**journal, "account_code": "2200", "debit": "0", "credit": "10.00"},
+        ])
+
+        result = generate(package)
+
+        self.assertTrue(
+            any(
+                "BANK-0001" in message and "collision" in message.lower()
+                for message in result["errors"]
+            ),
+            result["errors"],
+        )
+
     def test_demo_balances(self):
         r=generate(self.p)
         self.assertEqual(r['errors'],[])
