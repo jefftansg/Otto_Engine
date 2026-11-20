@@ -31,6 +31,18 @@ The archive supplies sample inputs/outputs and historical release notes. It cont
 | P1 | What evidence retention, backup, restore, authorised access and client separation apply? | Product and Privacy | Assign DPO/legal review and approve operational requirements before pilot. |
 | P1 | Can prior ZIP versions or source tags verify compatibility and history? | Engineering | Test actual representative restores and attach dated evidence. |
 
+## Questions on outsourcing and audit readiness
+
+| Priority | Question | Responsible party | Evidence needed |
+| --- | --- | --- | --- |
+| P0 | Which qualifications, contractual obligations, review procedures and sign-off are required for a per-client accountant? | Product / Accounting | Scope, credentials, liability, confidentiality and escalation policy |
+| P0 | What if an audit firm also supplied bookkeeping or financial statement preparation? | Independent auditor / Compliance | Case-specific assessment against Singapore professional ethics and independence restrictions |
+| P0 | Is this client's audit legally required, requested by lenders/investors, or voluntary? | Client / Compliance | Evidence of audit-exemption evaluation, group status, notices and contractual terms |
+| P1 | Who contracts with and appoints the auditor? | Client / Product | Direct engagement letter and valid auditor appointment |
+| P1 | Which documents may be shared in the audit package and with whom? | Client / Privacy | Specific consent, redaction, access/revocation, retention and disclosure log |
+| P1 | How is an authentic external signed auditor's report verified and linked? | Product / Auditor | Provenance and immutable status rules; no Otto-generated opinion |
+| P1 | Should future partner offers include SSRS 4410 compilation or SSRE review? | Product / Practitioner | Independent engagement and marketing/assurance terminology approval |
+
 ## Acceptance criteria / verification
 
 Each closure identifies evidence, named reviewer, dated decision, impacted requirements and a regression case when applicable. P0 issues gate the relevant milestone rather than document publication.

@@ -43,6 +43,18 @@ Track implementation and evidence for the v1.2.4 baseline and milestones. Test i
 | OTTO-SEC-002 | app.py:31; no tenant store | Cross-tenant access is denied and logged for users, documents, report downloads and administrator actions. | TEST-OTTO-SEC-002 | None | Planned | M8 |
 | OTTO-REP-002 | demo_output/; no matching example supplied | Compare against authorised redacted source packages and sign off section, terminology and A4 layout differences. | TEST-OTTO-REP-002 | None | Blocked | M6 |
 
+## Addendum — lean external professional support and audit-ready handoff (20 November 2026)
+
+| Requirement | Documentation evidence | Acceptance | Test ID | Existing verification | State | Milestone |
+| --- | --- | --- | --- | --- | --- | --- |
+| OTTO-SVC-001 | PRD / UFS preparation | Contracted accountant review scope, reviewer identity, documented findings and explicit adjustments | TEST-OTTO-SVC-001 | None | Planned | M6 |
+| OTTO-SVC-002 | PRD / compliance | Client appoints qualified independent auditor via separate engagement; no Otto audit opinion | TEST-OTTO-SVC-002 | None | Planned | M5/M8 |
+| OTTO-AUD-001 | Report specifications | Read-only frozen statements/ledger/schedules/source-evidence ZIP with manifest and exceptions | TEST-OTTO-AUD-001 | None | Planned | M7 |
+| OTTO-AUD-002 | UX / security | Client-controlled recipient consent, disclosure log and audit-query tracking | TEST-OTTO-AUD-002 | None | Planned | M7 |
+| OTTO-UFS-003 | UFS preparation | Separate draft, accountant quality-reviewed, director-authorised and independently audited provenance statuses | TEST-OTTO-UFS-003 | None | Planned | M6/M7 |
+
+Baseline implementation counts above describe the original v1.2.4 requirements, not these proposed new requirements. No implementation or passing automated tests are claimed.
+
 ## To-be requirements
 
 Update this register and the PRD with each approved change. Link independently defined acceptance evidence and retain historical release decisions. Keep proposed test cases listed in the test strategy until run.
