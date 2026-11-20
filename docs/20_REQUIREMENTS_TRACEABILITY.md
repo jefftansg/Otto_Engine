@@ -18,7 +18,7 @@ Track implementation and evidence for the v1.2.4 baseline and milestones. Test i
 
 | Requirement | Evidence | Acceptance | Test ID | Existing verification | State | Milestone |
 | --- | --- | --- | --- | --- | --- | --- |
-| OTTO-BASE-001 | START_ON_MAC.command; app.py; tests/test_branding.py | Launcher identifies v1.2.4 and source titles and required brand assets pass regression checks. | TEST-OTTO-BASE-001 | test_branding (52-test run) | Implemented | M0 |
+| OTTO-BASE-001 | START_ON_MAC.command; app.py; tests/test_branding.py | Current app header, sidebar, launcher and Quick Start identify v1.3.0; historical v1.2.4 evidence remains unchanged. | TEST-OTTO-BASE-001 | test_branding (86-test v1.3.0 run; 52-test baseline retained) | Implemented | M0 |
 | OTTO-UX-001 | guided.py:21,87,220; app.py:31,165 | Route from bank, director and journal issues to their editors and back with an identical ledger before edits, including keyboard-only use. | TEST-OTTO-UX-001 | test_attention; test_guided (52-test run) | Partial | M1 |
 | OTTO-UX-002 | app.py:67–85; engine/core.py:87–125 | Round-trip company and all five tables plus answers through ZIP. | TEST-OTTO-UX-002 | test_engine.test_package_roundtrip; test_clarifications.test_status_answers_survive_workspace_zip (52-test run) | Implemented | M1 |
 | OTTO-UX-003 | engine/issue_tracker.py; engine/stages.py; guided._attention_panel; native tabs | List all issues, retain progress until checks clear, preserve/reopen history through ZIP, show tab status colours with text, and reserve toolbar clearance. | TEST-OTTO-UX-003 | test_issue_tracker; test_stages (86 tests passed; local browser tab/action/header check) | Implemented; keyboard/mobile verification pending | M1 |

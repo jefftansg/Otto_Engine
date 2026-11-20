@@ -30,6 +30,10 @@ Scope: synthetic fixtures, Python backend and Streamlit AppTest. Real browser fi
 
 Local in-app browser at port 8511 verified tab selection, an issue action opening Company, synthetic sample loading and header clearance below Streamlit controls. This does not establish keyboard-only or narrow-screen coverage, every historical ZIP, or independent professional approval.
 
+## v1.3.0 version-display verification
+
+20 November 2026: all 86 tests pass after updating the header badge, bold sidebar label, launcher and current release documentation to v1.3.0. Existing branding tests assert the visible version labels and consistency with the launcher, README, Quick Start and release note. Local browser preview confirmed both Engine version 1.3.0 labels are visible and clear of the developer toolbar. Historical v1.2.4 documents remain unchanged.
+
 ## To-be requirements
 
 Use frozen synthetic ledgers, hand-calculated expected SGD results, explicit evidence locations, and permission-reviewed/redacted bank layout samples. Keep hashes and version metadata for golden fixtures. Unit tests cover date, decimals and rules, integration covers staged approvals through export, browser E2E covers state and downloads, and UAT covers Mac and accounting review.

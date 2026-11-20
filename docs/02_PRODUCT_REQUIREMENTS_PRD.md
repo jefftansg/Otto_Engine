@@ -20,7 +20,7 @@ See the matched code and test evidence in the traceability register. Implemented
 
 | Requirement | Priority | State | User story | Acceptance check | Test |
 | --- | --- | --- | --- | --- | --- |
-| OTTO-BASE-001 | P0 | Implemented | As an operator I can identify the release from launcher and application and run backend checks. | Launcher identifies v1.2.4 and source titles and required brand assets pass regression checks. | TEST-OTTO-BASE-001 |
+| OTTO-BASE-001 | P0 | Implemented | As an operator I can identify the release from launcher and application and run backend checks. | App header, sidebar, launcher and current release documentation consistently identify v1.3.0; original branding assets remain present. | TEST-OTTO-BASE-001 |
 | OTTO-UX-001 | P0 | Partial | As a preparer I can navigate five stages and relevant Advanced editors in one workspace. | Route from bank, director and journal issues to their editors and back with an identical ledger before edits, including keyboard-only use. | TEST-OTTO-UX-001 |
 | OTTO-UX-002 | P0 | Implemented | As a preparer I can save and reopen the active workspace including answers. | Round-trip company and all five tables plus answers through ZIP. | TEST-OTTO-UX-002 |
 | OTTO-DOC-001 | P0 | Partial | As a preparer I can inspect PDF, XLSX, XLS and CSV evidence before importing. | Map rows with preview and rejection reasons, and preserve scan-only evidence without creating rows. | TEST-OTTO-DOC-001 |

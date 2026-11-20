@@ -6,7 +6,7 @@
 - Status: Verified
 - Owner: Engineering
 - Related requirements: OTTO-BASE-001, OTTO-QA-001
-- Sources/evidence: RELEASE_NOTES_v1.2.4.md, docs/previous_releases/, START_ON_MAC.command, app.py, assets/, tests/
+- Sources/evidence: RELEASE_NOTES_v1.3.0.md, RELEASE_NOTES_v1.2.4.md, docs/previous_releases/, START_ON_MAC.command, app.py, assets/, tests/
 
 ## Purpose and scope
 
@@ -14,7 +14,7 @@ Record what the supplied release verifies and what shipped historical notes repo
 
 ## As-is implementation (evidence-backed)
 
-Launcher and current release notes identify v1.2.4. Source confirms Otto page title, PNG branding assets, default Guided path, Otto ZIP download name and branded PDF code. README and [release note](../RELEASE_NOTES_v1.2.4.md) describe the branding release as based on v1.2.3. Independent historical source trees were unavailable, so the stated change history is attributed to the bundled notes.
+The current app, sidebar, launcher, README and Quick Start identify v1.3.0. The v1.2.4 baseline audit and historical release notes are retained below. Source confirms Otto page title, PNG branding assets, default Guided path, Otto ZIP download name and branded PDF code. README and [release note](../RELEASE_NOTES_v1.2.4.md) describe the branding release as based on v1.2.3. Independent historical source trees were unavailable, so the stated change history is attributed to the bundled notes.
 
 | Release | Archive record and described focus |
 | --- | --- |
@@ -23,9 +23,10 @@ Launcher and current release notes identify v1.2.4. Source confirms Otto page ti
 | v1.2.1 | [Release note](previous_releases/RELEASE_NOTES_v1.2.1.md) for Guided Mode. |
 | v1.2.2 | [Release note](previous_releases/RELEASE_NOTES_v1.2.2.md) for clarification questions. |
 | v1.2.3 | [Release note](previous_releases/RELEASE_NOTES_v1.2.3.md) for attention routing and checks. |
+| v1.3.0 | [Release note](../RELEASE_NOTES_v1.3.0.md): upload review/deletion, persistent issue tracker, coloured native tabs, toolbar clearance and prominent engine-version labels. |
 | v1.2.4 | [Release note](../RELEASE_NOTES_v1.2.4.md) and current inspected source for branding and local drafts. |
 
-## Unreleased — upload review and deletion (20 November 2026)
+## v1.3.0 — upload review and deletion (20 November 2026)
 
 User-requested changes on `codex/delete-uploaded-files`, based on commit `838565d`:
 
@@ -39,7 +40,7 @@ User-requested changes on `codex/delete-uploaded-files`, based on commit `838565
 
 Verification: macOS arm64, Python 3.9.6, Streamlit 1.50.0, isolated temporary virtual environment. `/private/tmp/otto-delete-venv/bin/python -m unittest discover -s tests -v`: **73 passed, 0 failures, 0 errors, 0 skips**. Includes Streamlit AppTest for Guided Upload/Bank deletion, retain-then-delete and Advanced entry. Synthetic fixtures only; no real client uploads inspected. Browser file-picker interactions and older release ZIP archives have not been manually verified. Existing Streamlit width deprecation warnings remain.
 
-## Unreleased — issue tracker and stage navigation (20 November 2026)
+## v1.3.0 — issue tracker and stage navigation (20 November 2026)
 
 - Replace five command-style stage buttons with native Upload, Company, Bank, Other records and Reports tabs. Existing Continue and issue actions select their destination tab. Streamlit minimum is now 1.50 for the supported tab default parameter.
 - Tab labels include both colour and text: green/Cleared, amber/Needs attention and grey/Not started. Status derives from current data, confirmations, outstanding questions, document-review decisions and existing checks. Regression reopens a stage. These indicators do not grant approval or change existing report-download gates.

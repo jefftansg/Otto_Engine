@@ -1,4 +1,4 @@
-# Otto Financial Report Engine v1.2.4
+# Otto Financial Report Engine v1.3.0
 
 Otto helps Singapore businesses and their preparers assemble bookkeeping records, management accounts and draft unaudited financial statements (UFS). Lighthouse Studio Works Pte. Ltd. owns the product. **Clear Numbers for a Brighter Tomorrow.**
 
@@ -16,7 +16,7 @@ Requires Streamlit 1.50 or later. The launcher installs the updated requirements
 
 ## Run locally
 
-On macOS, unzip the release, open `START_ON_MAC.command` and keep Terminal open. Open <http://localhost:8501>. The launcher creates a local virtual environment and installs dependencies when needed. See the [original Quick Start](QUICK_START_v1.2.4.md) for setup and troubleshooting.
+On macOS, unzip the release, open `START_ON_MAC.command` and keep Terminal open. Open <http://localhost:8501>. The launcher creates a local virtual environment and installs dependencies when needed. See the [v1.3.0 Quick Start](QUICK_START_v1.3.0.md) for setup and troubleshooting.
 
 For explicit local setup, use a supported Python 3 environment. Check compatibility with the selected dependency versions.
 
@@ -63,7 +63,7 @@ assets/                                   Four supplied Otto PNGs
 docs/                                     Documentation and archived release notes
 ```
 
-The [original v1.2.4 release note](RELEASE_NOTES_v1.2.4.md) and [earlier releases](docs/previous_releases/RELEASE_NOTES_v1.2.3.md) remain available.
+The [v1.3.0 release note](RELEASE_NOTES_v1.3.0.md) covers upload review, the persistent issue tracker and coloured stage tabs. The [original v1.2.4 release note](RELEASE_NOTES_v1.2.4.md) and [earlier releases](docs/previous_releases/RELEASE_NOTES_v1.2.3.md) remain available.
 
 ## Documentation
 

@@ -1,4 +1,4 @@
-"""Otto Financial Report Engine v1.2.4: branded, issue-driven guided mode."""
+"""Otto Financial Report Engine v1.3.0: branded, issue-driven guided mode."""
 from pathlib import Path
 from datetime import date, datetime
 import hashlib
@@ -25,6 +25,7 @@ div[data-testid="stForm"] {border:1px solid #d7e9e9}
 .otto-app-title {font-size:2.35rem; font-weight:800; color:#003b57; line-height:1.12; margin:0.04rem 0 0}
 .otto-app-subtitle {font-size:1.22rem; font-weight:700; color:#09556c; margin-top:0.12rem}
 .otto-app-tagline {font-size:.8rem; text-transform:uppercase; letter-spacing:.13em; font-weight:650; color:#1d9b9c; margin-top:.38rem}
+.otto-version {display:inline-block; font-size:.95rem; font-weight:750; color:#003b57; background:#e4f5f5; border:1px solid #afd9dc; border-radius:6px; padding:.22rem .6rem; margin:.45rem 0 .15rem}
 .otto-app-caption {font-size:.77rem; color:#667783; margin:.5rem 0 .9rem}
 </style>""",unsafe_allow_html=True)
 
@@ -42,14 +43,15 @@ with hero_text:
     st.markdown('''<div class="otto-app-title">Otto</div>
 <div class="otto-app-subtitle">Financial Report Engine</div>
 <div class="otto-app-tagline">Clear numbers for a brighter tomorrow</div>
-<div class="otto-app-caption">Version 1.2.4 · Bookkeeping · Management Accounts · Financial Statements</div>''',unsafe_allow_html=True)
+<div class="otto-version">Engine version 1.3.0</div>
+<div class="otto-app-caption">Bookkeeping · Management Accounts · Financial Statements</div>''',unsafe_allow_html=True)
 st.info('Upload your documents, review the details we find, and generate draft reports. Nothing is recorded from an upload without your approval.')
 if st.session_state.is_demo:
     st.warning('You are viewing a FICTIONAL demonstration company. Use **Create blank client** in the sidebar to start with your own company.')
 
 with st.sidebar:
     st.image(str(ASSETS / 'otto_wordmark.png'), width=235)
-    st.caption('Financial Report Engine · v1.2.4')
+    st.markdown('**Engine version 1.3.0**')
     st.divider()
     st.header('Your client')
     if st.button('＋ Start a new company',use_container_width=True,type='primary'):

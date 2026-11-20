@@ -38,6 +38,10 @@ Evidence: `engine/intake_review.py`, `guided._delete_uploads`, `guided._upload_d
 
 Evidence: `engine/issue_tracker.py`, `engine/stages.py`, `engine/attention.py`, `guided.py`, `app.py`, `tests/test_issue_tracker.py`, `tests/test_stages.py`; 86 passing tests plus local browser verification. Issue history is client-supplied workspace metadata, not a tamper-proof audit log or authorised certification. No accounting-policy or deployment change.
 
+## Decision 010 — engine version v1.3.0
+
+20 November 2026; Engineering; implemented at the user's request. Identify the feature update as v1.3.0. Display a prominent Engine version 1.3.0 badge below the product title and repeat it in bold in the sidebar; align the Mac launcher and current README/Quick Start/release notes. Retain historical v1.2.4 release and audit evidence. No accounting or regulatory-policy change. Verification: 86 passing tests and local browser confirmation of both labels.
+
 ## To-be requirements
 
 Record owner, date, state, decision, rationale, alternatives, consequences, validation evidence and successor ADR. Preserve old decisions when superseded. Require affected teams to sign architecture/accounting/compliance decisions before implementation.
