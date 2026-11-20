@@ -31,6 +31,23 @@ Confirm entity type and reporting dates, applicable standard edition, audit deci
 
 Separate preparation, in-review and authorised snapshots with named approvals. Keep directors’ assertions, solvency, going concern, tax treatment, comparatives and approval dates open until supported. Review statutory signature requirements under s201(16) and the Twelfth Schedule before issue. Indexed SSO text identifies the two-director rule. Confirm the treatment where the company has a sole director, and any relief or special circumstances, against the complete current Act.
 
+## External accountant review and conversion pathway to audited financial statements
+
+**Otto's deliverable remains a draft UFS.** A service operator may outsource financial statement preparation/review to an appropriately experienced contracted accountant rather than employ an in-house accountant. The company's directors remain responsible for the accounts and their approval.
+
+| Stage | Responsible actor | Evidence or output |
+| --- | --- | --- |
+| Bookkeeping and draft statements | Otto preparer | Reconciled bookkeeping, TB, supporting schedules, draft UFS and open issues |
+| Optional financial reporting quality review | Contracted external accountant | Engagement scope, reviewer notes, disclosure/recognition checks, recommendations and sign-off; **no assurance** unless formally engaged otherwise |
+| Financial statement authorisation | Client directors/management | Specific report version, approval date, requisite director confirmations/signatures |
+| Separate audit engagement (if required or elected) | Client and independent ACRA-registered auditor/accounting entity | Valid appointment and engagement, independent risk assessment and information requests |
+| Audit fieldwork and resolution | External auditor, client and preparer | Auditor performs applicable SSAs; management accepts or rejects proposed entries, and preparer preserves adjustment history |
+| Audited financial statements | External auditor issues opinion; client approves statements | Genuine signed independent auditor's report attached or linked; Otto must not issue, invent or merely rename a UFS as audited |
+
+A professional compilation under **SSRS 4410 provides no assurance**. An actual review engagement under the relevant **SSRE** provides a different type of assurance from an audit. An ordinary accountant quality check does not constitute either formal engagement. If an audit partner also performs preparation work, **that auditor** must evaluate Singapore professional independence and self-review restrictions; no automatic clearance or universal prohibition should be coded.
+
+Do not confuse shareholder/statutory audit obligations with UFS accounting framework eligibility. Record unresolved audit status separately and refer to the independent review requirements in the PRD.
+
 ## Acceptance criteria / verification
 
 Missing required notes or comparatives create review blockers for authorisation. Submission readiness requires independent duty/eligibility checks. Confirm PDF generated for sole proprietor through normal UI cannot contain company directors' statement. Verify the signatory placeholders are blank until authorised.

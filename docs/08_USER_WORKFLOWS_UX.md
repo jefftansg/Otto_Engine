@@ -38,6 +38,17 @@ Continue buttons, issue routes, missing-source recheck, status colours and the s
 
 Show each stage as empty, in review, action required or ready. Display short issue messages, next action, provenance and return destination. Use keyboard-operable controls with visible focus, error descriptions independent of colour and readable progress. Offer undo via staged changes/reversals and prompt before replacing unsaved work. Advanced adds controlled COA, payables, permissions and period actions. Use plain questions such as “Who paid this bill?” and “Which statement shows the first day of your reporting period?”
 
+## Planned guided workflow: external review and audit handoff
+
+1. Otto generates **Draft UFS** and the outstanding clarification list.
+2. If contracted, the independent external financial reporting accountant reviews the draft and proposes corrections. A preparer posts approved adjustments with a dated revision record.
+3. The client directors/management review and authorise the specific updated financial statement version; responsibility for financial statements remains with the directors.
+4. Guided Mode asks whether an audit is legally required, contractually requested or voluntary; it never infers this only from current-year revenue.
+5. Where an audit is required, the **client appoints an independent registered auditor under a separate engagement**. Otto prepares an evidence pack with client consent and tracks audit queries and management-approved adjustments.
+6. Otto displays an externally audited status only after linking and verifying an independently issued signed auditor's report, without producing an opinion itself.
+
+Use plain-language actions such as **Request an accountant review**, **Prepare records for the auditor**, and **Answer auditor questions**. These are feature proposals, not current UI controls. A normal accountant's quality review, a professional SSRS 4410 compilation, an SSRE review and a statutory SSA audit are different engagements.
+
 ## Acceptance criteria / verification
 
 In a Chrome and Safari Mac session load a blank workspace, complete fictional intake, route an unmatched claim to Advanced and return, compare entries before/after navigation, and restore ZIP in a fresh session. Test keyboard order, empty/material error states, cancelling actions and corrective undo.

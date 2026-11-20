@@ -10,6 +10,16 @@ Otto is for an SME service provider offering **bookkeeping and draft unaudited f
 
 Corporate-secretarial workflows, audit services/automated audit-exemption assessment, tax preparation/filing and ACRA/XBRL submission are future scope, not current deliverables. Bookkeeping adjustments, reconciliation and the particulars needed for draft UFS remain supported. Audit exemption is informational guidance, separate from preparation and filing requirements.
 
+## Future service model: external review and audit handoff (planned)
+
+Otto is a **bookkeeping and financial statement preparation tool**, not an audit service. A small Singapore service provider may operate without employing an accountant or auditor, while engaging an external suitably experienced Singapore financial-reporting accountant on a case-by-case contract. Company directors remain responsible for the records, financial statements and approval of the final accounts.
+
+For clients that require an audit, the **client company appoints an independent ACRA-registered public accountant / appropriate registered accounting entity** under a separate audit engagement. A future Otto workflow may supply an evidence-linked **audit-ready handoff package** (planned); the auditor independently decides the procedures, evidence requests and opinion. Otto must not issue or imitate an auditor's opinion, mark its reports `Audited`, or represent itself as an audit firm.
+
+A professional **SSRS 4410 compilation engagement**, if commissioned, is separately scoped and reported by the engaged practitioner and provides **no audit assurance**. A formal assurance review under SSRE is also different from a preparer's quality-control check. Auditor independence must be evaluated by the appointed practitioner before accepting any combined preparation/audit arrangement; Otto does not decide independence automatically.
+
+See [UFS preparation](docs/11_UFS_PREPARATION_AND_DISCLOSURES.md), [report specifications](docs/10_REPORT_SPECIFICATIONS.md), [Singapore compliance](docs/12_SINGAPORE_COMPLIANCE.md) and [roadmap](docs/19_DEVELOPMENT_ROADMAP.md). **Partner onboarding, professional sign-off workflow and audit-ready export are proposed features, not implemented in the current v1.3.1 release.**
+
 ## Review or remove uploaded files
 
 In Guided **Documents** or **Bank**, review the **Flagged files — your decision** list. Open **Review or delete uploaded files**, select files, then choose **Retain selected files** or **Delete selected files**. Flags include exact duplicates, possible overlapping statement coverage, financial-year mismatches, different company UENs and uncertain relevance. Nothing is deleted automatically; supporting documents may still be useful. Retain choices last for this session. Deletion keeps saved accounting/evidence records and original disk files, and requires bank balances to be rechecked when a statement is removed.
@@ -76,6 +86,12 @@ docs/                                     Documentation and archived release not
 ```
 
 The [v1.3.1 release note](RELEASE_NOTES_v1.3.1.md) covers Company-first setup and the focused service scope. The [v1.3.0 release note](RELEASE_NOTES_v1.3.0.md) covers upload review, the persistent issue tracker and coloured stage tabs. The [original v1.2.4 release note](RELEASE_NOTES_v1.2.4.md) and [earlier releases](docs/previous_releases/RELEASE_NOTES_v1.2.3.md) remain available.
+
+## M0 baseline stabilisation — in progress
+
+The canonical source baseline is GitHub `main` at commit `23e5b92def48a8d01a222fac8f1c570118a5c24d`, not the older v1.2.4 downloadable ZIP. The latest [GitHub Actions test run](https://github.com/jefftansg/Otto_Engine/actions/runs/44747199264) passed **73 automated tests**; however Mac/browser acceptance, reproducible release packaging, and accountant review of financial reports remain pending. **Do not describe M0 as complete or the draft UFS as approved.**
+
+See [M0 Baseline Audit — Kickoff and Initial Findings](docs/milestones/M0_BASELINE_AUDIT_2026-11-20.md) for test evidence, risks, and acceptance checklist.
 
 ## Documentation
 

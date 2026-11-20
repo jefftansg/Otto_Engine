@@ -2,6 +2,10 @@
 
 Date: 20 November 2026 (Singapore). Scope: an engineering baseline for local bookkeeping and draft UFS preparation. This record does not certify UFS, audit exemption, filing compliance or commercial readiness.
 
+## Relationship to the baseline audit
+
+The [M0 baseline audit](milestones/M0_BASELINE_AUDIT_2026-11-20.md) defines the acceptance gates and remains in progress, not signed off. This document supplements its initial evidence with separately requested engineering changes and checks. It does not close professional UFS, independent golden-ledger, Finder/keyboard/mobile or Product-acceptance gates. Newer main-branch professional-partner and audit-handoff documentation is preserved as planned scope, with AGENTS.md's preparation/review/audit boundaries retained.
+
 ## Source and release identity
 
 `scripts/build_release.py` builds from committed `HEAD`, not the working directory. Each release contains `SOURCE_MANIFEST.json` with its exact commit, version, file sizes and SHA-256 hashes; a sibling `.zip.sha256` file identifies the archive. The source-only ZIP excludes local environments, untracked files and saved client data. Launcher executable permissions are preserved. Two builds from the same commit are compared for byte identity during release verification. Prior release documentation remains historical evidence.
