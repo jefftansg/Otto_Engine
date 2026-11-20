@@ -317,10 +317,20 @@ def xlsx_report(result):
         [['','Revenue',result['revenue']],['','Expenses',result['expenses']],['','Profit / loss',result['profit']]], [14,55,24])
     sheet('General Ledger',[['Date','Journal ID','Account code','Description','Debit','Credit','Source','Evidence ref']]+
         [[e['date'],e['journal_id'],e['account_code'],e['description'],e['debit'],e['credit'],e['source'],e['evidence_ref']] for e in result['entries']],[16,20,16,70,22,22,20,25])
-    br=sheet('Bank Reconciliation',[['Item','SGD'],['Statement opening',result['bank_open']],
-        ['Imported bank movement',result['bank_delta']],['Statement closing',result['bank_close']],
-        ['Bank general ledger closing',result['ledger_end']],['Difference',result['bank_close']-result['ledger_end']]], [49,25])
-    br.write_formula('B6','=B4-B5',fmt_num,float(result['bank_close']-result['ledger_end']))
+    opening = 'Not provided' if result.get('bank_open_missing') else result['bank_open']
+    closing_missing = result.get('bank_close_missing', False)
+    closing = 'Not provided' if closing_missing else result['bank_close']
+    br = sheet('Bank Reconciliation', [
+        ['Item', 'SGD'],
+        ['Statement opening', opening],
+        ['Imported bank movement', result['bank_delta']],
+        ['Statement closing', closing],
+        ['Bank general ledger closing', result['ledger_end']],
+        ['Difference'],
+    ], [49, 25])
+    if not closing_missing:
+        difference = result['bank_close'] - result['ledger_end']
+        br.write_formula('B6', '=B4-B5', fmt_num, float(difference))
     cf=sheet('Cash Flows',[['Classification','SGD']]+[[key,result['cashflows'].get(key,0)]
         for key in ('Operating','Investing','Financing','Unallocated')]+
         [['Opening bank',result['ledger_open']],['Closing bank',result['ledger_end']]], [40,24])

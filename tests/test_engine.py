@@ -136,6 +136,35 @@ class EngineTests(unittest.TestCase):
         with self.subTest("visible cash movement agrees with the ledger"):
             self.assertEqual(visible, result["ledger_end"] - result["ledger_open"])
 
+    def test_bank_workpapers_distinguish_missing_balances_from_zero(self):
+        from io import BytesIO
+
+        from openpyxl import load_workbook
+
+        from engine.reports import xlsx_report
+
+        cases = (
+            ("", "0.00", "Not provided", 0, "=B4-B5"),
+            ("0.00", "", 0, "Not provided", None),
+            ("0.00", "0.00", 0, 0, "=B4-B5"),
+        )
+        for opening, closing, expected_opening, expected_closing, expected_difference in cases:
+            with self.subTest(opening=opening, closing=closing):
+                package = Package.from_directory(BASE)
+                package.config["bank_statement_opening"] = opening
+                package.config["bank_statement_closing"] = closing
+
+                with BytesIO(xlsx_report(generate(package))) as output:
+                    workbook = load_workbook(output, data_only=False)
+                    try:
+                        sheet = workbook["Bank Reconciliation"]
+                        self.assertEqual(
+                            (sheet["B2"].value, sheet["B4"].value, sheet["B6"].value),
+                            (expected_opening, expected_closing, expected_difference),
+                        )
+                    finally:
+                        workbook.close()
+
     def test_demo_balances(self):
         r=generate(self.p)
         self.assertEqual(r['errors'],[])
