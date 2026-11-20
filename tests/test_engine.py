@@ -61,6 +61,26 @@ class EngineTests(unittest.TestCase):
             result["errors"],
         )
 
+    def test_missing_bank_opening_balance_requires_review(self):
+        for opening in ("", None):
+            with self.subTest(opening=opening):
+                package = Package.from_directory(BASE)
+                if opening is None:
+                    package.config.pop("bank_statement_opening")
+                else:
+                    package.config["bank_statement_opening"] = opening
+
+                result = generate(package)
+
+                self.assertIn(
+                    "Bank statement opening balance is required.",
+                    result["errors"],
+                )
+
+        package = Package.from_directory(BASE)
+        package.config["bank_statement_opening"] = "0.00"
+        self.assertEqual(generate(package)["errors"], [])
+
     def test_demo_balances(self):
         r=generate(self.p)
         self.assertEqual(r['errors'],[])
