@@ -6,7 +6,7 @@
 - Status: Verified
 - Owner: Engineering
 - Related requirements: OTTO-BASE-001, OTTO-QA-001
-- Sources/evidence: RELEASE_NOTES_v1.3.0.md, RELEASE_NOTES_v1.2.4.md, docs/previous_releases/, START_ON_MAC.command, app.py, assets/, tests/
+- Sources/evidence: RELEASE_NOTES_v1.3.1.md, RELEASE_NOTES_v1.3.0.md, RELEASE_NOTES_v1.2.4.md, docs/previous_releases/, START_ON_MAC.command, app.py, assets/, tests/
 
 ## Purpose and scope
 
@@ -14,7 +14,7 @@ Record what the supplied release verifies and what shipped historical notes repo
 
 ## As-is implementation (evidence-backed)
 
-The current app, sidebar, launcher, README and Quick Start identify v1.3.0. The v1.2.4 baseline audit and historical release notes are retained below. Source confirms Otto page title, PNG branding assets, default Guided path, Otto ZIP download name and branded PDF code. README and [release note](../RELEASE_NOTES_v1.2.4.md) describe the branding release as based on v1.2.3. Independent historical source trees were unavailable, so the stated change history is attributed to the bundled notes.
+The current app, sidebar, launcher, README and Quick Start identify v1.3.1. The v1.2.4 baseline audit and historical release notes are retained below. Source confirms Otto page title, PNG branding assets, default Guided path, Otto ZIP download name and branded PDF code. README and [release note](../RELEASE_NOTES_v1.2.4.md) describe the branding release as based on v1.2.3. Independent historical source trees were unavailable, so the stated change history is attributed to the bundled notes.
 
 | Release | Archive record and described focus |
 | --- | --- |
@@ -23,6 +23,7 @@ The current app, sidebar, launcher, README and Quick Start identify v1.3.0. The 
 | v1.2.1 | [Release note](previous_releases/RELEASE_NOTES_v1.2.1.md) for Guided Mode. |
 | v1.2.2 | [Release note](previous_releases/RELEASE_NOTES_v1.2.2.md) for clarification questions. |
 | v1.2.3 | [Release note](previous_releases/RELEASE_NOTES_v1.2.3.md) for attention routing and checks. |
+| v1.3.1 | [Release note](../RELEASE_NOTES_v1.3.1.md): Company-first SME setup and M0 startup/dependency/release stabilization. |
 | v1.3.0 | [Release note](../RELEASE_NOTES_v1.3.0.md): upload review/deletion, persistent issue tracker, coloured native tabs, toolbar clearance and prominent engine-version labels. |
 | v1.2.4 | [Release note](../RELEASE_NOTES_v1.2.4.md) and current inspected source for branding and local drafts. |
 
@@ -50,6 +51,14 @@ Verification: macOS arm64, Python 3.9.6, Streamlit 1.50.0, isolated temporary vi
 - Reserve a separate top toolbar strip with 5.5rem of main-content clearance so Streamlit developer controls do not overlap Otto branding. Browser bookmark tooltips are outside the app.
 
 Validation: macOS arm64, Python 3.9.6, Streamlit 1.50.0. `/private/tmp/otto-delete-venv/bin/python -m unittest discover -s tests -v`: **86 passed, 0 failures, 0 errors, 0 skips**. Covers lifecycle/reopen, rejected manual clear, missing-source restore, legacy package initialization, ZIP/CSV persistence, unchanged accounting totals, complete question/detail lists, tab rendering, progress/action routing, and green-to-amber regression. A local browser preview verified native tab switching, issue-to-Company routing and logo clearance. Synthetic fixtures only. Manual keyboard, narrow-screen and every supported historical release archive remain unverified. Existing Streamlit container-width deprecation warnings remain.
+
+## v1.3.1 — Company-first SME preparation
+
+Company is the first/default tab, followed by Documents, Bank, Other records and Reports. Company accepts manual setup and an optional ACRA PDF; extraction still requires an explicit apply action and date confirmation. Initial Company clearance depends on name, UEN and confirmed dates. Document flags, issue actions, source-recheck links, navigation colours and the sidebar follow the new order. Company forms precede the issue list. Service scope is bookkeeping and draft UFS preparation; broader corporate-secretarial, audit, tax and filing services remain future scope. The audit-exemption link is informational only. Header, sidebar, launcher and current docs identify v1.3.1. See [release note](../RELEASE_NOTES_v1.3.1.md) and [Quick Start](../QUICK_START_v1.3.1.md).
+
+## M0 stabilization evidence — v1.3.1
+
+95 tests passed locally and from a clean temporary installation on macOS 14.6 arm64 / Python 3.9.6 / Streamlit 1.50.0. Fresh launch, offline relaunch without reinstall, exact dependency-pin matching, active-port refusal and legacy workspace/report compatibility passed. Startup now checks before dependency installation, supports an explicit alternate port, and allows immediate restart after connections close. Requirements and constraints are fingerprinted together; deprecated width arguments are removed. CI covers Linux 3.9/3.12 and macOS 3.12. Committed-source releases use a deterministic ZIP builder with per-file SHA-256 manifest and checksum sidecar. See [M0 record](24_M0_STABILIZATION.md) for scope and remaining manual acceptance.
 
 ## To-be requirements
 

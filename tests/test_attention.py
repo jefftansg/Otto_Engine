@@ -37,7 +37,7 @@ class AttentionTests(unittest.TestCase):
         p=Package(empty_company())
         items=build_attention(p)
         issue=next(x for x in items if x['id']=='company-setup')
-        self.assertEqual(issue['guided_stage'],1)
+        self.assertEqual(issue['guided_stage'],0)
         self.assertEqual(issue['advanced_page'],0)
         self.assertEqual(issue['severity'],'Required')
 

@@ -24,6 +24,14 @@ Session upload deletion does not remove or reverse approved transactions, journa
 
 Progress notes and Open/In progress status do not modify or approve accounting entries. Live checks clear issues when their condition is no longer detected; cleared history is retained and recurrence reopens the issue. Answering a clarification closes that question, while any independent ledger validation remains open. Missing bank source files require rechecking rather than silently clearing historical source findings. Green stage labels describe current readiness checks, not professional certification. Existing posting, rounding, reconciliation and report-download rules remain in force.
 
+## v1.3.1 Company-first setup
+
+Moving company/date setup ahead of general document intake changes navigation only. No entry is posted by company setup, ACRA upload or colour status. Name/UEN/date confirmation clears the initial Company stage independently of later document-review questions; report readiness still considers outstanding questions, reconciliation and existing report-download gates. Audit exemption is not inferred from SME size or from choosing UFS preparation.
+
+## M0 stabilization boundary
+
+Startup, dependency pinning, deprecated UI argument replacement and source packaging do not alter posting, rounding or reporting gates. A baseline synthetic workspace is restored with identical generated entries, balances, cash flows, profit and validation errors after tracker initialization and ZIP round-trip. M0 tests retain the existing bank-opening, journal-ID collision and cash/noncash regression checks; partial accounting capabilities in the requirements register remain partial.
+
 ## To-be requirements
 
 Fictional SGD posting patterns subject to evidence and policy review:

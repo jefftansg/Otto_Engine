@@ -104,7 +104,7 @@ class UploadDeletionUITests(unittest.TestCase):
         self.assertEqual(at.session_state['pkg'].bank, [])
 
     def test_upload_page_deletes_one_file_and_clear_removes_rest(self):
-        at = self.app(0)
+        at = self.app(1)
         self.assertFalse(at.exception)
         original = list(at.session_state['guided_files'])
         at.multiselect[0].set_value([upload_id(original[0])]).run()
@@ -117,14 +117,14 @@ class UploadDeletionUITests(unittest.TestCase):
         self.assertFalse(at.multiselect)
 
     def test_advanced_entry_still_renders(self):
-        at = self.app(0)
+        at = self.app(1)
         at.session_state['app_mode'] = 'Advanced'
         at.run()
         self.assertFalse(at.exception)
         self.assertTrue(any('Smart document intake' in h.value for h in at.header))
 
     def test_flagged_copy_can_be_retained_then_deleted_independently(self):
-        at = self.app(0)
+        at = self.app(1)
         original = list(at.session_state['guided_files'])
         copy = dict(original[0], name='duplicate.pdf')
         at.session_state['guided_files'] = original + [copy]

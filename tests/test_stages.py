@@ -37,7 +37,7 @@ class StageStatusTests(unittest.TestCase):
         states=stage_statuses(p,docs,batch,files)
         self.assertEqual(states[2], 'Needs attention')
         self.assertEqual(states[4], 'Needs attention')
-        self.assertEqual(states[1], 'Cleared')
+        self.assertEqual(states[0], 'Cleared')
 
     def test_unreviewed_duplicate_requires_decision_before_upload_is_green(self):
         p,docs,files = self.ready()
@@ -49,9 +49,9 @@ class StageStatusTests(unittest.TestCase):
         docs=docs+[(d,original[1],original[2])]
         files=files+[copy]
         batch=_bank_batch(docs,p.config,p.bank)
-        self.assertEqual(stage_statuses(p,docs,batch,files)[0],'Needs attention')
+        self.assertEqual(stage_statuses(p,docs,batch,files)[1],'Needs attention')
         decisions={f['file_id']:f['reasons'] for f in flag_uploads(files,docs,p.config)}
-        self.assertEqual(stage_statuses(p,docs,batch,files,decisions)[0],'Cleared')
+        self.assertEqual(stage_statuses(p,docs,batch,files,decisions)[1],'Cleared')
 
     def test_labels_include_symbols_text_and_colour(self):
         labels=tab_labels(['Upload','Company','Bank'],['Cleared','Needs attention','Not started'])

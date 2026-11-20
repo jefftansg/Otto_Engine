@@ -8,7 +8,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 SECTIONS = {
-    'Company': (1, 0), 'Bank': (2, 0), 'Transactions': (2, 2),
+    'Company': (0, 0), 'Bank': (2, 0), 'Transactions': (2, 2),
     'Accounting': (3, 4), 'Other records': (3, 3),
 }
 ADVANCED_PAGES = [
@@ -53,7 +53,7 @@ def build_attention(pkg, questions=(), result=None, bank_batch=None):
         items.append(_item('company-setup','Confirm the company and financial year',
               'The reports need an exact registered name, UEN and financial year that you have checked.',
               'Can you confirm the registered company details and the financial year-end?',
-              severity='Required',stage=1,advanced_page=0))
+              severity='Required',stage=0,advanced_page=0))
 
     bank_present = bool(pkg.bank or (bank_batch and bank_batch.get('detected_banks')))
     if bank_present and not cfg.get('bank_balances_confirmed'):
@@ -110,7 +110,7 @@ def build_attention(pkg, questions=(), result=None, bank_batch=None):
                 f'{len(errors)} {label.lower()} check(s) need correction',
                 'The accounting engine flagged the checks listed below.',
                 'Can you verify the source records and correct the affected entries?',
-                severity='Required',stage=2 if page in (0,2) else 3,
+                severity='Required',stage=0 if label=='Company details' else 2 if page in (0,2) else 3,
                 advanced_page=page,affected=len(errors),details=errors))
 
     for q in questions:

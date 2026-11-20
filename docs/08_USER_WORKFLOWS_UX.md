@@ -24,6 +24,16 @@ Give non-accountants an upload-first journey and preparers direct access to deta
 
 `engine/attention.py` builds stage and Advanced page routes. Both modes share `st.session_state.pkg`. Advanced exposes company/period setup, intake, bank/claims/journals, AR/evidence, ledger/TB and checks. Save ZIP before starting another client or closing the session. Demo can be loaded from the sidebar or by using the fictional Guided uploads.
 
+## Current Company-first workflow — v1.3.1
+
+1. Company: manually enter identity and confirm financial-year dates, or optionally upload an ACRA Business Profile, explicitly apply extracted proposals and confirm the dates. Keep the setup form above the issue tracker.
+2. Documents: collect bank statements, receipts, invoices and accounting spreadsheets. Review flags before retaining or deleting.
+3. Bank: review coverage, balances, extraction, approved import and categories.
+4. Other records: answer client questions and record supporting claims, receivables and adjustments as needed.
+5. Reports: review remaining issues and prepare draft management accounts/UFS and workpapers.
+
+Continue buttons, issue routes, missing-source recheck, status colours and the sidebar use this order. General document review is not required before initial company confirmation. Advanced remains a detailed bookkeeping workspace shared with Guided Mode. No audit-assessment, corporate-secretarial or filing workflow is introduced.
+
 ## To-be requirements
 
 Show each stage as empty, in review, action required or ready. Display short issue messages, next action, provenance and return destination. Use keyboard-operable controls with visible focus, error descriptions independent of colour and readable progress. Offer undo via staged changes/reversals and prompt before replacing unsaved work. Advanced adds controlled COA, payables, permissions and period actions. Use plain questions such as “Who paid this bill?” and “Which statement shows the first day of your reporting period?”

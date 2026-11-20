@@ -16,6 +16,10 @@ Lighthouse Studio Works Pte. Ltd., Singapore owns Otto Financial Report Engine. 
 
 The Python/Streamlit bundle prepares local SGD management reports and company-form draft UFS. The four supplied Otto PNG assets include the original logo and assets used for the mascot, sidebar and favicon. The brand direction is navy and teal. Settings, rules and manual review drive computation.
 
+## Current operator and release focus — v1.3.1
+
+The user operates an SME service offering bookkeeping and UFS preparation first, rather than a corporate-secretarial practice with an audit/accounting team. Keep the initial workflow Company → Documents → Bank → Other records → Reports. Company name, UEN and financial year precede general accounting intake; optional ACRA extraction can assist setup without requiring a secretarial workflow. Keep reconciliation, adjustments, disclosures and client questions needed for draft UFS. Corporate-secretarial workflows, audit services and automated audit-exemption assessment, tax filing and ACRA/XBRL submission are deferred capabilities requiring a separate future scope decision.
+
 ## To-be requirements
 
 Position Otto as a preparation tool for two services: bookkeeping and management accounts, and preparation of UFS from accounting records. Exclude corporate income tax computations, ECI, Form C-S, GST returns, IRAS submissions, ACRA annual returns, XBRL filing, corporate secretarial work, assurance and automatic SSRS 4410 reports. AI assistance, if approved, proposes classifications or evidence requests subject to human review.

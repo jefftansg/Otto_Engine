@@ -34,6 +34,14 @@ Local in-app browser at port 8511 verified tab selection, an issue action openin
 
 20 November 2026: all 86 tests pass after updating the header badge, bold sidebar label, launcher and current release documentation to v1.3.0. Existing branding tests assert the visible version labels and consistency with the launcher, README, Quick Start and release note. Local browser preview confirmed both Engine version 1.3.0 labels are visible and clear of the developer toolbar. Historical v1.2.4 documents remain unchanged.
 
+## v1.3.1 Company-first and M0 verification
+
+`python -m unittest discover -s tests -v`: **95 passed, 0 failures, 0 errors, 0 skips** on macOS 14.6 arm64 / Python 3.9.6 / Streamlit 1.50.0. The existing installed environment and a fresh temporary environment both passed. `pip check` found no broken requirements, and normalized package metadata matched every pinned version. Fresh `START_ON_MAC.command` launch and `PIP_NO_INDEX=1` relaunch on isolated port 8513 returned healthy Streamlit endpoints. Relaunch did not reinstall dependencies. A second launch refused an occupied port before installation, and the existing server remained healthy. A TIME_WAIT restart failure was found and fixed by matching Tornado's address-reuse behaviour; offline restart and active-port refusal were retested.
+
+New tests cover company setup/continuation, explicitly applied optional ACRA fields, reordered issue routes, runtime boundaries, incomplete releases, unavailable ports, loopback probing and a ZIP containing only the fictional sample files from baseline commit `838565d`. Legacy restore/tracker/save preserved journal, balances, cash flows, profit, errors and all tables. Existing duplicate, rejection, cutoff, reconciliation and report regressions passed. Old width-deprecation messages are eliminated; AppTest's expected missing-ScriptRunContext notices remain confined to tests.
+
+Browser preview verified Company as the first selected tab, optional synthetic ACRA PDF upload and explicit field application. The browser date-confirmation checkbox was not clicked: automatic approval review rejected its attestation wording. Synthetic AppTest covers that form; no real director verification is asserted. Manual keyboard/mobile coverage and operator acceptance remain pending. CI matrix results are reported separately in GitHub. [M0 verification record](24_M0_STABILIZATION.md).
+
 ## To-be requirements
 
 Use frozen synthetic ledgers, hand-calculated expected SGD results, explicit evidence locations, and permission-reviewed/redacted bank layout samples. Keep hashes and version metadata for golden fixtures. Unit tests cover date, decimals and rules, integration covers staged approvals through export, browser E2E covers state and downloads, and UAT covers Mac and accounting review.

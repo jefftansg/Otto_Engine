@@ -16,11 +16,15 @@ Scope each requirement against v1.2.4. P0 denotes an operating or correctness ga
 
 See the matched code and test evidence in the traceability register. Implemented applies to the scoped behaviour, Partial to a working subset, Planned to a proposed capability, Blocked to a missing prerequisite and Unverified to behaviour lacking sufficient validation.
 
+## Current release priority — v1.3.1
+
+The current service scope is bookkeeping and draft UFS preparation for SME clients operated by a small preparer. Company setup comes first, with optional ACRA profile intake or manual details, followed by Documents, Bank, Other records and Reports. Company-stage clearance covers the initial name/UEN/date gate; further UFS particulars remain tracked as questions. Automated audit eligibility (OTTO-COMP-001) and filing handoff (OTTO-COMP-003) are future enhancements, not prerequisites or promised functionality in this release. Existing reconciliation, supporting-record and UFS checks remain. The historical milestone table below is a backlog, not a requirement to build the whole corporate-services suite now.
+
 ## To-be requirements
 
 | Requirement | Priority | State | User story | Acceptance check | Test |
 | --- | --- | --- | --- | --- | --- |
-| OTTO-BASE-001 | P0 | Implemented | As an operator I can identify the release from launcher and application and run backend checks. | App header, sidebar, launcher and current release documentation consistently identify v1.3.0; original branding assets remain present. | TEST-OTTO-BASE-001 |
+| OTTO-BASE-001 | P0 | Implemented | As an operator I can identify the release from launcher and application and run backend checks. | App header, sidebar, launcher and current release documentation consistently identify v1.3.1; original branding assets remain present. | TEST-OTTO-BASE-001 |
 | OTTO-UX-001 | P0 | Partial | As a preparer I can navigate five stages and relevant Advanced editors in one workspace. | Route from bank, director and journal issues to their editors and back with an identical ledger before edits, including keyboard-only use. | TEST-OTTO-UX-001 |
 | OTTO-UX-002 | P0 | Implemented | As a preparer I can save and reopen the active workspace including answers. | Round-trip company and all five tables plus answers through ZIP. | TEST-OTTO-UX-002 |
 | OTTO-DOC-001 | P0 | Partial | As a preparer I can inspect PDF, XLSX, XLS and CSV evidence before importing. | Map rows with preview and rejection reasons, and preserve scan-only evidence without creating rows. | TEST-OTTO-DOC-001 |
@@ -33,9 +37,9 @@ See the matched code and test evidence in the traceability register. Implemented
 | OTTO-ACCT-003 | P0 | Planned | As a reviewer I can lock and reopen a period while preserving prior issued versions. | Closing freezes input and mapping versions. Authorised reopen records reviewer, reason and new report revision. | TEST-OTTO-ACCT-003 |
 | OTTO-ACCT-004 | P0 | Partial | As a reviewer I can verify opening balances and classify cash flows. | Unknown opening counterpart blocks readiness, mixed journals allocate cash appropriately and noncash items never affect cash flow. | TEST-OTTO-ACCT-004 |
 | OTTO-CLAR-001 | P0 | Partial | As a preparer I can request, save and review evidence-linked client answers. | Answer persists after restore, leaves entries unchanged, and reviewed resolution records action, reviewer and dates. | TEST-OTTO-CLAR-001 |
-| OTTO-COMP-001 | P0 | Planned | As a reviewer I can assess audit exemption and retain dated evidence. | First/second-year, historical, continuing and group cases return Eligible, Not eligible or Requires verification with evidence and reviewer. | TEST-OTTO-COMP-001 |
+| OTTO-COMP-001 | Future | Planned | As a reviewer I can assess audit exemption and retain dated evidence. | First/second-year, historical, continuing and group cases return Eligible, Not eligible or Requires verification with evidence and reviewer. | TEST-OTTO-COMP-001 |
 | OTTO-COMP-002 | P0 | Partial | As a reviewer I can choose and substantiate a reporting framework for a dated period. | Validate eligibility independently of audit status and select the edition using period start, transition and approved early application. | TEST-OTTO-COMP-002 |
-| OTTO-COMP-003 | P1 | Planned | As a reviewer I can document filing obligations for handoff. | Record preparation and filing decisions independently with official version and leave submission with the client or appointed filer. | TEST-OTTO-COMP-003 |
+| OTTO-COMP-003 | Future | Planned | As a reviewer I can document filing obligations for handoff. | Record preparation and filing decisions independently with official version and leave submission with the client or appointed filer. | TEST-OTTO-COMP-003 |
 | OTTO-REP-001 | P0 | Partial | As a preparer I can export management accounts and reconcile working papers. | A4 and XLSX tie every total to the same snapshot, including source rows and reconciliations, with exceptions visible. | TEST-OTTO-REP-001 |
 | OTTO-UFS-001 | P0 | Partial | As a reviewer I can prepare a complete entity-appropriate draft UFS. | Supported company statements tie to ledger and comparative evidence, blank attestations require review, and sole-proprietor workflow omits company UFS. | TEST-OTTO-UFS-001 |
 | OTTO-UFS-002 | P0 | Planned | As a reviewer I can authorise a specific report snapshot after blocking issues are resolved. | Snapshot hash, signer and approval timestamp are persisted. Advanced working drafts visibly retain unresolved findings and cannot be marked authorised. | TEST-OTTO-UFS-002 |

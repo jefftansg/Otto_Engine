@@ -87,7 +87,7 @@ class IssueTrackerUITests(unittest.TestCase):
         at = self.app()
         self.assertFalse(at.exception)
         self.assertEqual(len(at.tabs), 5)
-        for tab,label in zip(at.tabs, ['1  Upload','2  Company','3  Bank','4  Other records','5  Reports']):
+        for tab,label in zip(at.tabs, ['1  Company','2  Documents','3  Bank','4  Other records','5  Reports']):
             self.assertIn(label, tab.label)
             self.assertIn('Not started', tab.label)
         self.assertFalse(any(str(b.key).startswith('guided_nav_') for b in at.button))
@@ -104,7 +104,7 @@ class IssueTrackerUITests(unittest.TestCase):
         self.assertFalse(at.exception)
         self.assertEqual(at.session_state['pkg'].config['issue_register']['company-setup']['status'], 'In progress')
         at.button(key='issue_fix_0').click().run()
-        self.assertEqual(at.session_state['guided_stage'], 1)
+        self.assertEqual(at.session_state['guided_stage'], 0)
         at.session_state['pkg'].config.update(company_name='TEST PTE LTD',uen='202600001A',fy_confirmed=True)
         at.run()
         r = at.session_state['pkg'].config['issue_register']['company-setup']
