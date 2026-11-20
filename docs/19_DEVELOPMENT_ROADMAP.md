@@ -30,6 +30,15 @@ v1.2.4 is a local single-account SGD preparation tool. 52 existing backend tests
 | M7 Reliability/security/UAT | M6 | Recovery, dependency control, confidentiality, Mac/browser and professional UAT | Verified restore, privacy and accessibility gates and signed acceptance | Software-vendor data and version drift. Hosting excluded. |
 | M8 Commercial evaluation | M7 | Tenant/role model, licensing, identity, subscription and hosting assessment | Tenant isolation and privacy/licensing review before deployment decision | Concurrent access and commercial risk. Production rollout requires its own authorisation. |
 
+## Additions to milestones: external review and audit handoff (planned)
+
+- **M5 — Compliance design:** define role/engagement distinctions, contractor competence, directors' duties, auditor registration/independence escalation, and the difference between ordinary accountant quality review, SSRS 4410 compilation, SSRE assurance review and SSA audit.
+- **M6 — Reporting controls:** optional contracted accountant review and findings, management-approved adjusting entries, disclosure review and immutable directors' approval of financial statement revisions (OTTO-SVC-001 and OTTO-UFS-003).
+- **M7 — Audit-ready output:** consent-restricted read-only evidence bundle, hashes, ledger-to-document traceability, reconciliation/exception completeness, auditor requests and disclosed data log (OTTO-AUD-001/002); external Singapore accountant and registered auditor UAT.
+- **M8 — Commercial partnership:** optional fixed-fee outsourced accountant review and auditor referral/coordination, appropriate professional contracts, and **separate client engagement** of the independent auditor (OTTO-SVC-002). No Otto audit opinion, formal compilation issuance, tax filing or XBRL filing.
+
+Do not infer deployment or commercial-service readiness from these documented plans. Human review and assurance responsibilities remain with the respective professionals.
+
 ## Acceptance criteria / verification
 
 For each release record archive integrity and unchanged/changed inputs, compatibility and migration effects, executed test matrix and environment, redacted sample reports, security and source review, residual risks and owner sign-off. At M0 prioritise bank opening evidence, journal ID collisions, cash/noncash mapping, draft gates and official authority retrieval.
