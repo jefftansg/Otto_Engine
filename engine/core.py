@@ -265,15 +265,19 @@ def generate(pkg:Package):
     debits=sum((v for v in balances.values() if v>0),D('0'))
     credits=sum((-v for v in balances.values() if v<0),D('0'))
     if debits!=credits: errors.append('Trial balance totals are unequal.')
+    opening_value = cfg.get('bank_statement_opening')
+    opening_missing = opening_value is None or not str(opening_value).strip()
+    if opening_missing:
+        errors.append('Bank statement opening balance is required.')
     try:
-        bank_open=money(cfg.get('bank_statement_opening','0'),'bank opening balance')
+        bank_open = D('0') if opening_missing else money(opening_value, 'bank opening balance')
         bank_end=money(cfg.get('bank_statement_closing','0'),'bank closing balance')
     except ValueError as e:
         errors.append(str(e));bank_open=bank_end=D('0')
     ledger_open=prev['1000']
     ledger_end=balances['1000']
-    if bank_open!=ledger_open: errors.append(f'Opening bank statement {money_str(bank_open)} differs from opening ledger {money_str(ledger_open)}.')
-    if bank_end != bank_open+bank_total:
+    if not opening_missing and bank_open != ledger_open: errors.append(f'Opening bank statement {money_str(bank_open)} differs from opening ledger {money_str(ledger_open)}.')
+    if not opening_missing and bank_end != bank_open + bank_total:
         errors.append(f'Bank statement closing does not reconcile with imported bank transactions: {money_str(bank_open+bank_total)} expected, {money_str(bank_end)} entered.')
     if bank_end!=ledger_end: errors.append(f'Closing bank statement {money_str(bank_end)} differs from bank ledger {money_str(ledger_end)}.')
     cashflows=defaultdict(lambda:D('0'))
