@@ -39,6 +39,12 @@ v1.2.4 is a local single-account SGD preparation tool. 52 existing backend tests
 
 Do not infer deployment or commercial-service readiness from these documented plans. Human review and assurance responsibilities remain with the respective professionals.
 
+## M0 execution status — started 20 November 2026
+
+**Status: In progress; not signed off.** GitHub `main` commit `23e5b92` is the technical source baseline. The latest Ubuntu/Python 3.12 CI run passed 73 automated tests, but live Mac UAT, current-main PDF/XLSX visual checks, versioned package provenance, and independent accounting sign-off remain outstanding.
+
+See the [M0 Baseline Audit](milestones/M0_BASELINE_AUDIT_2026-11-20.md) for the reproducible test evidence, 10 prioritised findings, acceptance gates and Mac manual test checklist. No source changes, accounting policy decisions or feature implementation are authorised by starting M0.
+
 ## Acceptance criteria / verification
 
 For each release record archive integrity and unchanged/changed inputs, compatibility and migration effects, executed test matrix and environment, redacted sample reports, security and source review, residual risks and owner sign-off. At M0 prioritise bank opening evidence, journal ID collisions, cash/noncash mapping, draft gates and official authority retrieval.
