@@ -69,6 +69,12 @@ docs/                                     Documentation and archived release not
 
 The [original v1.2.4 release note](RELEASE_NOTES_v1.2.4.md) and [earlier releases](docs/previous_releases/RELEASE_NOTES_v1.2.3.md) remain available.
 
+## M0 baseline stabilisation — in progress
+
+The canonical source baseline is GitHub `main` at commit `23e5b92def48a8d01a222fac8f1c570118a5c24d`, not the older v1.2.4 downloadable ZIP. The latest [GitHub Actions test run](https://github.com/jefftansg/Otto_Engine/actions/runs/44747199264) passed **73 automated tests**; however Mac/browser acceptance, reproducible release packaging, and accountant review of financial reports remain pending. **Do not describe M0 as complete or the draft UFS as approved.**
+
+See [M0 Baseline Audit — Kickoff and Initial Findings](docs/milestones/M0_BASELINE_AUDIT_2026-11-20.md) for test evidence, risks, and acceptance checklist.
+
 ## Documentation
 
 - [Product Vision](docs/01_PRODUCT_VISION.md)
