@@ -25,6 +25,20 @@ Launcher and current release notes identify v1.2.4. Source confirms Otto page ti
 | v1.2.3 | [Release note](previous_releases/RELEASE_NOTES_v1.2.3.md) for attention routing and checks. |
 | v1.2.4 | [Release note](../RELEASE_NOTES_v1.2.4.md) and current inspected source for branding and local drafts. |
 
+## Unreleased — upload review and deletion (20 November 2026)
+
+User-requested changes on `codex/delete-uploaded-files`, based on commit `838565d`:
+
+- Guided Upload and Bank steps show a flagged-file list and let the user retain or delete selected files. No automatic deletion.
+- Exact byte duplicates are flagged, including renamed copies. Retrying the same filename/content is idempotent. Overlapping same-account statement periods are flagged as possible duplicates, not proven duplicates.
+- Flag statements wholly or partly outside a confirmed financial year, ACRA profiles with a different UEN, and unreadable/unrecognised documents. Uncertain relevance is explicitly labelled; supporting, opening and comparative evidence may be useful.
+- Retaining records the decision for the current reasons in this session. A changed reason requires a fresh decision. Decisions and source files are not included in workspace ZIPs.
+- Deletion removes only selected session uploads, resets the uploader to prevent automatic restoration, clears cached inspections, and refreshes proposals. Saved company details, transactions, evidence and historical extraction registers remain. Removing a recognised/registered bank statement revokes balance confirmation. Bank amounts remain available for review.
+- Exact duplicate statement content contributes only one set of proposed bank rows. Existing duplicate, cutoff, reconciliation and approval gates still apply.
+- No workspace schema migration, accounting policy change, external publishing or deployment. Advanced retains its existing uploader removal controls.
+
+Verification: macOS arm64, Python 3.9.6, Streamlit 1.50.0, isolated temporary virtual environment. `/private/tmp/otto-delete-venv/bin/python -m unittest discover -s tests -v`: **73 passed, 0 failures, 0 errors, 0 skips**. Includes Streamlit AppTest for Guided Upload/Bank deletion, retain-then-delete and Advanced entry. Synthetic fixtures only; no real client uploads inspected. Browser file-picker interactions and older release ZIP archives have not been manually verified. Existing Streamlit width deprecation warnings remain.
+
 ## To-be requirements
 
 Release update template: version/date, supported platform, scope and associated requirements, verified user-visible changes, migration/restore implications, exact verification commands/results, known gaps, authority version impacts, archive digest and reviewer approvals.

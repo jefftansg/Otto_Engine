@@ -17,6 +17,7 @@ from engine.reports import management_pdf, financial_statements_pdf, xlsx_report
 from engine.autofill import extract_acra_profile, extract_bank_statement, consolidate_statement_balances, suggested_start, propose_bank_rows
 from engine.clarifications import OTHER_RECORDS, build_questions, outstanding, questions_csv, questions_pdf
 from engine.attention import build_attention, counts, ADVANCED_PAGES
+from engine.intake_review import upload_id, merge_uploads, flag_uploads
 
 STAGES = ['1  Upload', '2  Company', '3  Bank', '4  Other records', '5  Reports']
 
@@ -43,6 +44,65 @@ def _load_documents(inspect):
     return parsed
 
 
+def _delete_uploads(pkg, file_ids, bank_hashes=()):
+    """Remove session uploads without deleting approved accounting/evidence records."""
+    files = st.session_state.get('guided_files', [])
+    selected = set(file_ids)
+    if not selected or not selected.issubset({upload_id(f) for f in files}):
+        return False
+    removed = [f for f in files if upload_id(f) in selected]
+    removed_hashes = {f['sha256'] for f in removed}
+    register = pkg.config.get('statement_register', [])
+    removed_names = {f['name'] for f in removed}
+    linked = any(s.get('sha256') in removed_hashes or
+                 (not s.get('sha256') and s.get('source') in removed_names)
+                 for s in register)
+    if removed_hashes.intersection(bank_hashes) or linked:
+        pkg.config['bank_balances_confirmed'] = False
+        pkg.config['bank_balance_source'] = 'Uploaded bank statement deleted: reconfirm bank balances'
+    # Saved evidence and statement registers retain their historical provenance.
+    st.session_state['guided_files'] = [f for f in files if upload_id(f) not in selected]
+    decisions = st.session_state.get('guided_file_decisions', {})
+    st.session_state['guided_file_decisions'] = {k: v for k, v in decisions.items() if k not in selected}
+    # Remount the uploader so its old selection cannot silently restore a deleted file.
+    st.session_state['guided_upload_version'] = st.session_state.get('guided_upload_version', 0) + 1
+    st.session_state.pop('guided_import_checked', None)
+    st.session_state['guided_deleted_notice'] = f'{len(removed)} uploaded file(s) deleted. Saved transactions and evidence were retained.'
+    return True
+
+
+def _upload_deletion_controls(pkg, parsed, inspect):
+    bank_hashes = {doc.sha256 for doc, acra, bank in parsed if bank.get('detected')}
+    files = st.session_state.get('guided_files', [])
+    if not files:
+        return
+    names = {upload_id(f): f['name'] for f in files}
+    flagged = [f for f in flag_uploads(st.session_state.get('guided_files', []), parsed, pkg.config)
+               if f['file_id'] in names]
+    decisions = st.session_state.setdefault('guided_file_decisions', {})
+    if flagged:
+        st.markdown('**Flagged files — your decision**')
+        st.caption('Flags are suggestions for review. No file is deleted automatically. Retained files stay visible, and accounting import checks still apply.')
+        st.dataframe([{'File': f['name'], 'Flag': ' | '.join(f['reasons']),
+                       'Decision': 'Retained' if decisions.get(f['file_id']) == f['reasons'] else 'Awaiting your decision'}
+                      for f in flagged], hide_index=True, use_container_width=True)
+    with st.expander('Review or delete uploaded files', expanded=bool(flagged)):
+        st.caption('Remove files from this session and refresh extracted summaries. Saved transactions, company details and evidence remain. Bank balances must be rechecked after deleting a statement. Original files on your computer are kept.')
+        selected = st.multiselect('Select files to retain or delete', list(names),
+                                 format_func=lambda h: names[h] + ' · ' + h[:8],
+                                 key='guided_delete_all_'+str(st.session_state.get('guided_upload_version', 0)))
+        if st.button('Retain selected files', key='guided_retain_button_all', disabled=not selected):
+            for f in flagged:
+                if f['file_id'] in selected:
+                    decisions[f['file_id']] = f['reasons']
+            st.rerun()
+        if st.button('Delete selected files', key='guided_delete_button_all', disabled=not selected):
+            if _delete_uploads(pkg, selected, bank_hashes):
+                if hasattr(inspect, 'clear'):
+                    inspect.clear()
+                st.rerun()
+
+
 def _money_sum(rows, field):
     return sum((Decimal(str(r.get(field,'') or '0')) for r in rows), Decimal('0'))
 
@@ -50,8 +110,11 @@ def _money_sum(rows, field):
 def _bank_batch(parsed, cfg, existing):
     rows=[]; issues=[]; mismatches=[]
     detected_banks=[]
+    seen=set()
     for doc, acra, bank in parsed:
         if bank.get('detected'):
+            if doc.sha256 in seen:continue
+            seen.add(doc.sha256)
             detected_banks.append(bank)
             proposed, warnings = propose_bank_rows(doc)
             rows.extend(proposed)
@@ -232,6 +295,9 @@ def render(p, inspect, register_evidence, suggest):
             st.button(label, type='primary' if idx==stage else 'secondary', use_container_width=True,
                       on_click=_go, args=(idx,), key=f'guided_nav_{idx}')
     st.divider()
+    notice = st.session_state.pop('guided_deleted_notice', None)
+    if notice:
+        st.success(notice)
     parsed=_load_documents(inspect)
     profiles=[(doc,acra) for doc,acra,bank in parsed if acra.get('detected') and acra.get('fields')]
     banks=[bank for doc,acra,bank in parsed if bank.get('detected')]
@@ -246,17 +312,18 @@ def render(p, inspect, register_evidence, suggest):
         upload=st.file_uploader('Choose files or drag them here',type=['pdf','xlsx','xls','csv'],accept_multiple_files=True,
                                 key='guided_upload_'+str(st.session_state.get('guided_upload_version',0)),help='Maximum 25 MB per file. Your documents are processed on this Mac, not uploaded to ACRA.')
         if upload:
-            existing={x['sha256']:x for x in st.session_state['guided_files']}
+            incoming=[]
             for f in upload:
                 b=f.getvalue();h=hashlib.sha256(b).hexdigest()
-                existing.setdefault(h,{'name':f.name,'bytes':b,'sha256':h})
-            st.session_state['guided_files']=list(existing.values())
+                incoming.append({'name':f.name,'bytes':b,'sha256':h})
+            st.session_state['guided_files']=merge_uploads(st.session_state['guided_files'],incoming)
             parsed=_load_documents(inspect)
             profiles=[(doc,acra) for doc,acra,bank in parsed if acra.get('detected') and acra.get('fields')]
             banks=[bank for doc,acra,bank in parsed if bank.get('detected')]
         with st.expander('Want to practice? Load a fictional example instead'):
             st.caption('Two small PDFs: a pretend ACRA profile and a pretend bank statement for a company with a first-year opening balance of S$0. These are NOT real government or bank records.')
             if st.button('Load fictional sample documents'):
+                st.session_state['guided_file_decisions']={}
                 sample_dir=Path(__file__).parent/'example_imports'/'guided_demo'
                 st.session_state['guided_files']=[{'name':f.name,'bytes':f.read_bytes(),
                         'sha256':hashlib.sha256(f.read_bytes()).hexdigest()} for f in sorted(sample_dir.glob('*.pdf'))]
@@ -271,13 +338,15 @@ def render(p, inspect, register_evidence, suggest):
             st.dataframe(statuses,hide_index=True,use_container_width=True)
         else:
             st.info('No documents added yet. You can still set up the company manually in Step 2.')
+        _upload_deletion_controls(p, parsed, inspect)
         a,b=st.columns([3,1])
         with a:st.button('Continue to company details',type='primary',use_container_width=True,on_click=_go,args=(1,))
         with b:
             if st.button('Clear uploaded files',use_container_width=True):
-                st.session_state['guided_files']=[]
-                st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
-                st.rerun()
+                bank_hashes={doc.sha256 for doc,acra,bank in parsed if bank.get('detected')}
+                if _delete_uploads(p, [upload_id(f) for f in st.session_state['guided_files']], bank_hashes):
+                    if hasattr(inspect, 'clear'):inspect.clear()
+                    st.rerun()
         st.caption('Uploads are stored temporarily in this running session. Use **Save client workspace ZIP** for the accounting data; keep original PDFs/receipts separately.')
 
     elif stage==1:
@@ -343,6 +412,7 @@ def render(p, inspect, register_evidence, suggest):
                              'Account':b.get('masked_account'),'From':b.get('period_start'),'To':b.get('period_end'),
                              'Opening (S$)':b.get('opening'),'Closing (S$)':b.get('closing')})
             st.dataframe(info,hide_index=True,use_container_width=True)
+        _upload_deletion_controls(p, parsed, inspect)
         batch=_bank_batch(parsed,cfg,p.bank)
         proposal=batch['balances']
         if banks and cfg.get('fy_confirmed') and proposal['ready']:

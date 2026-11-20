@@ -24,6 +24,14 @@ Record decisions and unresolved alternatives with owners and dates where known.
 | 006 | Proposed, 20 Nov 2026 | Compliance | Independent, evidence-linked regulatory decisions. A single eligibility flag cannot represent distinct obligations. |
 | 007 | Unresolved, 20 Nov 2026 | Product and Accounting | Keep materially incomplete Advanced drafts available for reviewers or introduce a controlled review-only distribution step. Evaluate diagnostic usefulness and risk of accidental circulation. |
 
+## Decision 008 — user-controlled upload review (20 November 2026)
+
+Owner: Engineering. State: Implemented locally at the user's request to delete uploads and review duplicate/non-relevant documents before deciding to retain or delete.
+
+Use stable filename/content identities for session file selections and content hashes for exact-duplicate detection. Keep renamed copies visible for decisions, but propose identical bank content once. Label overlap and unclear relevance conservatively. Record retention for the current reason set in session memory. Deletion affects session uploads and cache only; preserve saved evidence and historical provenance, invalidate bank balance confirmation when a statement is removed, and keep existing accounting import gates. No accounting-policy or deployment decision is included.
+
+Evidence: `engine/intake_review.py`, `guided._delete_uploads`, `guided._upload_deletion_controls`, `tests/test_intake_review.py`, `tests/test_upload_deletion.py`; 73 passing tests including AppTest. Limitation: retention decisions are session-only, and detection does not establish semantic duplicates across unrelated layouts or prove that supporting evidence is irrelevant.
+
 ## To-be requirements
 
 Record owner, date, state, decision, rationale, alternatives, consequences, validation evidence and successor ADR. Preserve old decisions when superseded. Require affected teams to sign architecture/accounting/compliance decisions before implementation.

@@ -16,6 +16,14 @@ Provide repeatable baseline evidence and the release regression plan.
 
 Run from the archive root on Linux using `python -m unittest discover -s tests -v`. Result: **52 passed, 0 failed, 0 errors, 0 skipped**. The verified run used Python 3.12.14 on Linux x86-64 with ReportLab 4.4.9, XlsxWriter 3.2.9, openpyxl 3.1.5, xlrd 2.0.1 and pdfplumber 0.11.9. Streamlit was absent from that interpreter. The initial `python -m pytest -q -p no:cacheprovider` could not start because pytest was absent. The unittest run used the available environment and the existing archive suite. Seven modules exercise core, mapped imports, autofill, Guided helper/integration logic, attention, clarification and brand/launcher checks. PDF/XLSX tests check signatures. Tests use bundled demo artifacts or construct fixtures. Brand tests inspect files and source. Mac UI was outside the test run.
 
+## Upload review/deletion verification — 20 November 2026
+
+Command: `/private/tmp/otto-delete-venv/bin/python -m unittest discover -s tests -v` on macOS arm64 / Python 3.9.6 / Streamlit 1.50.0: **73 passed, 0 failures, 0 errors, 0 skips**.
+
+New tests exercise renamed exact duplicates, stable retry identities, overlapping coverage by account, confirmed-year cutoffs, mismatched company UEN, uncertain/unreadable documents, non-mutating suggestions, and exact-copy proposal deduplication. Deletion tests cover same-name distinct-content files, stale/empty selection rejection without mutation, clear-all, legacy hashless extraction registers, unchanged accounting entries/balances/cash flows, and current ZIP restore preserving revoked balance confirmation. AppTest drives Guided Upload and Bank selection/deletion across reruns, retention followed by deletion of only one duplicate, re-adding removed content and Advanced entry rendering.
+
+Scope: synthetic fixtures, Python backend and Streamlit AppTest. Real browser file selection, previous-release ZIP archives and manual launcher/offline checks remain unverified; existing cutoff/reconciliation/report tests passed. Streamlit's existing container-width deprecation warnings are not failures.
+
 ## To-be requirements
 
 Use frozen synthetic ledgers, hand-calculated expected SGD results, explicit evidence locations, and permission-reviewed/redacted bank layout samples. Keep hashes and version metadata for golden fixtures. Unit tests cover date, decimals and rules, integration covers staged approvals through export, browser E2E covers state and downloads, and UAT covers Mac and accounting review.
