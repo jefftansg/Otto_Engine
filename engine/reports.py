@@ -151,13 +151,25 @@ def management_pdf(result):
     _section(story,s,'Outstanding invoices at year end',arr,[35*mm,inner-137*mm,31*mm,34*mm,37*mm],wrap=[1])
     story.append(PageBreak())
     _header(story,s,result,'7. Bank Reconciliation')
+    opening_missing = result.get('bank_open_missing', False)
+    closing_missing = result.get('bank_close_missing', False)
+    statement_opening = 'Not provided' if opening_missing else money_str(result['bank_open'])
+    statement_closing = 'Not provided' if closing_missing else money_str(result['bank_close'])
+    expected_closing = (
+        'Not available' if opening_missing
+        else money_str(result['bank_open'] + result['bank_delta'])
+    )
+    statement_difference = (
+        'Not available' if closing_missing
+        else money_str(result['bank_close'] - result['ledger_end'])
+    )
     _section(story,s,'Statement-to-ledger reconciliation',[['Item','SGD'],
-            ['Statement beginning balance',money_str(result['bank_open'])],
+            ['Statement beginning balance', statement_opening],
             ['Imported bank deposits less withdrawals',money_str(result['bank_delta'])],
-            ['Expected bank statement closing',money_str(result['bank_open']+result['bank_delta'])],
-            ['Statement closing balance entered',money_str(result['bank_close'])],
+            ['Expected bank statement closing', expected_closing],
+            ['Statement closing balance entered', statement_closing],
             ['General ledger bank balance',money_str(result['ledger_end'])],
-            ['Statement minus ledger difference',money_str(result['bank_close']-result['ledger_end'])]],
+            ['Statement minus ledger difference', statement_difference]],
              [inner-46*mm,46*mm])
     _paragraph(story,s,'Unpresented cheques, deposits in transit, unrecorded charges and bank feeds not covering the full reporting period require separate review.')
     story.append(PageBreak())
@@ -251,12 +263,16 @@ def financial_statements_pdf(result):
         ['Closing cash at bank',money_str(result['ledger_end'])]],[inner-42*mm,42*mm],wrap=[0])
     story.append(PageBreak())
     _header(story,s,result,'Notes to the Financial Statements - DRAFT')
+    closing_input = (
+        'not provided' if result.get('bank_close_missing')
+        else f"SGD {money_str(result['bank_close'])}"
+    )
     notes=[
       ('1. Corporate information',f"{c.get('company_name','')}, UEN {c.get('uen','')}, is recorded as a {c.get('entity_type','')}. Registered office: {c.get('registered_address') or '[not supplied]'}. Activity: {c.get('principal_activity') or '[not supplied]'} ."),
       ('2. Basis of preparation',f"Management selected {c.get('reporting_framework','')} for this preparation draft. Eligibility, consistency of accounting policies and all mandatory disclosures require review. Figures are stated in SGD."),
       ('3. Significant accounting policies',c.get('accounting_policies') or 'ACCOUNTING POLICIES NOT PROVIDED. Review revenue recognition, expenses, estimates, receivables, depreciation, capitalisation and related-party balances.'),
       ('4. Revenue and expenses',f"Revenue and other income total SGD {money_str(result['revenue'])}; recognised expenses total SGD {money_str(result['expenses'])}. Detailed ledger and supporting records form part of the Management Accounts."),
-      ('5. Cash and bank balances',f"Closing bank ledger balance is SGD {money_str(result['ledger_end'])}. Bank statement closing input is SGD {money_str(result['bank_close'])}."),
+      ('5. Cash and bank balances',f"Closing bank ledger balance is SGD {money_str(result['ledger_end'])}. Bank statement closing input is {closing_input}."),
       ('6. Trade receivables',f"Trade receivables per ledger are SGD {money_str(result['balances'].get('1100',0))}; unpaid invoices in the supplied AR schedule total SGD {money_str(sum((r['outstanding'] for r in result['receivables']),Decimal(0)))}."),
       ('7. Related parties - directors', '; '.join(f'{n}: SGD {money_str(v)}' for n,code,v in director_balances(result)) or 'No director loan register configured.'),
       ('8. Going concern',c.get('going_concern_note') or 'NOT CONFIRMED. Management must document its going-concern assessment before release.'),
