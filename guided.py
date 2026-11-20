@@ -20,6 +20,7 @@ from engine.attention import build_attention, counts, ADVANCED_PAGES
 from engine.intake_review import upload_id, merge_uploads, flag_uploads
 from engine.issue_tracker import sync_issues, update_issue, issues_csv
 from engine.stages import stage_statuses, tab_labels
+from engine.document_history import statement_history_controls
 
 STAGES = ['1  Company', '2  Documents', '3  Bank', '4  Other records', '5  Reports']
 
@@ -431,6 +432,7 @@ def render(p, inspect, register_evidence, suggest):
         else:
             st.info('No documents added yet. Start by confirming your company in Step 1, then add its records here.')
         _upload_deletion_controls(p, parsed, inspect, 'upload')
+        statement_history_controls(p, 'documents', (_go, 1))
         a,b=st.columns([3,1])
         with a:st.button('Continue to bank statements',key='documents_continue_bank',type='primary',width='stretch',on_click=_go,args=(2,))
         with b:
@@ -457,6 +459,7 @@ def render(p, inspect, register_evidence, suggest):
                              'Opening (S$)':b.get('opening'),'Closing (S$)':b.get('closing')})
             st.dataframe(info,hide_index=True,width='stretch')
         _upload_deletion_controls(p, parsed, inspect, 'bank')
+        statement_history_controls(p, 'bank', (_go, 2))
         batch=_bank_batch(parsed,cfg,p.bank)
         proposal=batch['balances']
         if banks and cfg.get('fy_confirmed') and proposal['ready']:

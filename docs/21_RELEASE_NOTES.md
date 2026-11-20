@@ -80,3 +80,9 @@ Historical test counts and differences cannot be replayed from the supplied ZIP 
 - [Test Strategy](18_TEST_STRATEGY.md)
 - [Development Roadmap](19_DEVELOPMENT_ROADMAP.md)
 - [Decision Log](22_DECISION_LOG.md)
+
+## v1.3.1 follow-up — obsolete document removal (21 November 2026)
+
+Added “Saved statement history” with “Select obsolete statement history to remove” and “Remove selected statement history” in Guided Documents/Bank and Advanced Setup. These summaries can survive a workspace restore even when PDFs are unavailable. Added selected available-upload removal in Advanced intake. Original files and accounting/evidence records are preserved. Removing history requires bank balances to be reverified; save a new ZIP to retain the removal. Existing ZIPs are not modified.
+
+Verification for this follow-up: `python -m unittest discover -s tests -v` — 103 tests passed, no failures or skips, using the local v1.3.1 virtual environment (Python 3.9 / pinned M0 dependencies). Includes Guided/Advanced removal, stale-selection rejection, selective same-name record removal, workspace restore and unchanged accounting totals. AppTest covered UI mechanics; live browser and native Mac removal flows were not manually retested.

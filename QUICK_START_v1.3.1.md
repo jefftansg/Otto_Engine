@@ -47,3 +47,9 @@ In Documents or Bank, review flagged duplicates and documents of uncertain relev
 - **Can't generate a final report:** use the questions and validation checks to resolve exceptions. All documents remain drafts requiring review.
 
 No corporate tax computations, GST filing or ACRA/XBRL filing are included.
+
+## Remove obsolete documents and statement history
+
+In Guided Documents or Bank, use **Review or delete uploaded files** to delete selected available uploads. For records from previous workspaces, find **Saved statement history**, choose **Select obsolete statement history to remove**, then click **Remove selected statement history**. Advanced Setup also provides saved-history removal and **Remove selected available files** for retained uploads.
+
+Saved history contains extraction summaries, not the original PDFs. Removal preserves recorded transactions, evidence, company fields and balance amounts. Reverify bank balances after removal and save a new workspace ZIP. Original Mac files and older exported ZIPs remain unchanged. Removing a summary does not correct or reverse any accounting entry.

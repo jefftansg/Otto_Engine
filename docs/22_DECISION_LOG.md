@@ -78,3 +78,7 @@ Observed decisions describe source behaviour. Original approval identities and d
 - [System Architecture](03_SYSTEM_ARCHITECTURE.md)
 - [Development Roadmap](19_DEVELOPMENT_ROADMAP.md)
 - [Open Questions](23_OPEN_QUESTIONS.md)
+
+## Decision 015 — separate uploads from saved extraction history
+
+21 November 2026. User-authorized obsolete-file removal distinguishes in-memory uploads from statement summaries persisted in company.json. Remove only selected summaries; retain accounting and evidence provenance and invalidate bank balance confirmation. Previously exported ZIPs remain immutable. No accounting recognition or measurement policy changed.
