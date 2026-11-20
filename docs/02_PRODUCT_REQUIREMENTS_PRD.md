@@ -44,6 +44,20 @@ See the matched code and test evidence in the traceability register. Implemented
 | OTTO-SEC-002 | P1 | Planned | As a service provider I can serve multiple clients with access controls and audit trails. | Cross-tenant access is denied and logged for users, documents, report downloads and administrator actions. | TEST-OTTO-SEC-002 |
 | OTTO-REP-002 | P1 | Blocked | As a product owner I can approve layout against Inner Mirror examples. | Compare against authorised redacted source packages and sign off section, terminology and A4 layout differences. | TEST-OTTO-REP-002 |
 
+## Outsourced accounting review and independent audit handoff (proposed, 20 November 2026)
+
+These are new requirements and are **not implemented in Otto v1.2.4**.
+
+| Requirement | Priority | Status | Acceptance criteria | Proposed test |
+| --- | --- | --- | --- | --- |
+| OTTO-SVC-001 | P0 | Planned | Record external accountant engagement, assigned reviewer, scope, competence confirmation, findings, review sign-off and separately authorised adjustments; do not label quality review as assurance. | TEST-OTTO-SVC-001 |
+| OTTO-SVC-002 | P0 | Planned | Client separately appoints/contracts an appropriate ACRA-registered auditor or accounting entity if required; registration and engagement are verified, with audit work and opinion entirely external to Otto. | TEST-OTTO-SVC-002 |
+| OTTO-AUD-001 | P1 | Planned | Generate a client-approved, read-only audit-handoff ZIP with frozen financial statement snapshot, ledger, TB, cash/bank reconciliations, adjusting journals, source evidence, disclosure schedule, exceptions and manifest hashes. | TEST-OTTO-AUD-001 |
+| OTTO-AUD-002 | P0 | Planned | Explicit client consent and recipient access control for external evidence requests; log disclosures, approvals, amendments and revocation without mutating source records. | TEST-OTTO-AUD-002 |
+| OTTO-UFS-003 | P0 | Planned | Distinct draft, accountant-reviewed (non-assurance), director-authorised and externally audited statuses; never auto-convert UFS into audited FS or fabricate an audit opinion. | TEST-OTTO-UFS-003 |
+
+Out of scope: Otto itself performing an audit, issuing an auditor's report or SSRS 4410 compilation report, or conducting a formal SSRE assurance review. Separate practitioner engagements may be referred or supported without Otto becoming the practitioner. Preserve the existing exclusion of GST, tax computation, IRAS, ACRA and XBRL filing.
+
 ## Acceptance criteria / verification
 
 Run the named tests and verify the additional cases in the test strategy before promoting a requirement. Preserve legacy ZIP compatibility and verify duplicate retries, rejected imports, mixed dates, missing evidence, unsupported entity/framework and long-text exports. Measure input resource use at parser limits and record restart/recovery behaviour.
