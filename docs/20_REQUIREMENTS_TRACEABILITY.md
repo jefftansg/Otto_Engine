@@ -76,3 +76,7 @@ Missing test evidence denotes an unexecuted case, not a pass. Partial rows requi
 - [Test Strategy](18_TEST_STRATEGY.md)
 - [Development Roadmap](19_DEVELOPMENT_ROADMAP.md)
 - [Release Notes](21_RELEASE_NOTES.md)
+
+## Obsolete document removal — 21 November 2026
+
+Implemented: Guided Documents/Bank and Advanced Setup show saved statement history separately from available uploads. Users select obsolete extraction summaries for removal; transactions, evidence, company fields and balance amounts remain. Bank balance confirmation is revoked. Updated workspace ZIPs omit removed summaries; older ZIPs remain unchanged. Advanced intake also supports selected file removal without restoring removed files on rerun. Tests: `tests/test_document_history.py`.

@@ -67,3 +67,7 @@ Single bank and fixed COA limit transfers, FX, accumulated depreciation and liab
 - [Report Specifications](10_REPORT_SPECIFICATIONS.md)
 - [Test Strategy](18_TEST_STRATEGY.md)
 - [Open Questions](23_OPEN_QUESTIONS.md)
+
+### Obsolete source history removal
+
+Removing an uploaded source or saved statement extraction summary does not reverse or delete recorded transactions or evidence. Saved statement-history removal revokes bank balance confirmation while retaining amounts for review. Corrections to the books still require the existing transaction/correction workflow.

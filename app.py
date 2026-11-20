@@ -7,6 +7,7 @@ from engine.core import Package, generate, COA_MAP, money_str, csv_bytes
 from engine.importers import (inspect_document, fields, guess_field, convert_records,
                               existing_duplicates, empty_company)
 from engine.reports import management_pdf, financial_statements_pdf, xlsx_report
+from engine.document_history import statement_history_controls
 from engine.autofill import extract_acra_profile,extract_bank_statement,consolidate_statement_balances,suggested_start,propose_bank_rows
 
 ROOT = Path(__file__).parent
@@ -186,9 +187,34 @@ if page==0:
     cfg=p.config
     st.markdown('### Step 0 — Upload ACRA profile and bank statements')
     st.caption('Upload any combination of ACRA Business Profile PDF, bank statements in PDF/Excel/CSV, supplier or director expense schedules. You may upload multiple months together. Nothing is silently posted.')
+    statement_history_controls(p, 'advanced')
+    owner = st.session_state.get('advanced_upload_owner')
+    if owner is not p:
+        st.session_state['advanced_upload_owner'] = p
+        st.session_state['advanced_upload_files'] = []
+        st.session_state['advanced_upload_version'] = st.session_state.get('advanced_upload_version',0)+1
     uploaded=st.file_uploader('Drop ACRA profile, bank statements and accounting files here',
         type=['pdf','xlsx','xls','csv'],accept_multiple_files=True,
-        help='Text-based PDFs and spreadsheet exports. Scanned PDFs cannot be read without OCR. Maximum 25 MB per file.',key='source_documents')
+        help='Text-based PDFs and spreadsheet exports. Scanned PDFs cannot be read without OCR. Maximum 25 MB per file.',key='source_documents_'+str(st.session_state.get('advanced_upload_version',0)))
+    available = {(u.name, hashlib.sha256(u.getvalue()).hexdigest()): u
+                 for u in st.session_state.get('advanced_upload_files', [])}
+    for u in uploaded or []:
+        available[(u.name, hashlib.sha256(u.getvalue()).hexdigest())] = u
+    uploaded = list(available.values())
+    st.session_state['advanced_upload_files'] = uploaded
+    if uploaded:
+        st.markdown('**Available uploaded files — Advanced Mode**')
+        st.caption('These files remain in the running app until removed. Original Mac files, recorded transactions, evidence and saved statement history are kept.')
+        keys = list(available)
+        selected = st.multiselect('Select available files to remove', keys, format_func=lambda k:k[0]+' · '+k[1][:8], key='advanced_remove_files')
+        if st.button('Remove selected available files', disabled=not selected):
+            removed = set(selected)
+            st.session_state['advanced_upload_files'] = [u for k,u in available.items() if k not in removed]
+            st.session_state['advanced_upload_version'] = st.session_state.get('advanced_upload_version',0)+1
+            p.config['bank_balances_confirmed'] = False
+            p.config['bank_balance_source'] = 'Advanced uploads removed: reconfirm bank balances'
+            inspect_cached.clear()
+            st.rerun()
     parsed=[]
     if uploaded:
         for up in uploaded:
