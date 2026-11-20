@@ -36,6 +36,19 @@ No versioned source registry or regulatory rule engine was observed. This regist
 
 The upload review/deletion change introduces no regulatory eligibility decision, source-version update or filing behaviour. Relevance flags are local review suggestions based on content hashes, extracted statement periods/account IDs, UEN and recognition status. They are not regulatory determinations. No new legal or accounting source claims are made by this change.
 
+## Additional references — outsourcing, auditors and assurance engagements (20 November 2026)
+
+| ID / source | Issuer | Relevance |
+| --- | --- | --- |
+| S14 [Financial reporting duties for directors](https://www.acra.gov.sg/manage/companies/legal-requirements-common-offences/preparing-financial-statements/financial-reporting-duties-for-directors/) | ACRA | Financial statement preparation outsourcing does not transfer directors' responsibility |
+| S15 [Public accountant eligibility](https://www.acra.gov.sg/register/public-accountant/requirements-eligibility/) | ACRA | Public accountant registration and professional obligations |
+| S16 [Public accountants/accounting entities](https://www.acra.gov.sg/manage/public-accountant-accounting-entity/overview/) | ACRA | Registered entities and public accountancy service boundaries |
+| S17 [Singapore Standards on Auditing](https://www.isca.org.sg/standards-guidance/audit-assurance/standards-and-guidance/singapore-standards-on-auditing-%28ssas%29) | ISCA | SSA audit procedures and independent reporting |
+| S18 [Singapore Standards on Related Services](https://www.isca.org.sg/standards-guidance/audit-assurance/standards-and-guidance/singapore-standards-on-related-services-%28ssrss%29) | ISCA | SSRS 4410 compilation; no audit assurance |
+| S19 [Audit/assurance standards directory](https://www.isca.org.sg/standards-guidance/audit-assurance/standards-and-guidance) | ISCA | Distinguish SSRE review from audit and compilation |
+
+Retain version/date verification, professional ethics and independence review before using this information in production. No conclusion about a particular auditor's independence or licensing is implied.
+
 ## To-be requirements
 
 Version rules by authority, section, publication, effective interval, entity/period applicability and retrieval date. Record amendments, transitional cases, approved interpretation and date, next review and fixture impacts. Monitor ACRA, ASC, Singapore Statutes Online, government gazettes and PDPC at release/review intervals. When changes appear, check enactment and commencement independently. Preserve previously approved decisions and version-tag reproductions. Review copyright and licences before embedding standards wording or ACRA taxonomy. Use summaries and links for this documentation.
