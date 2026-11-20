@@ -1,0 +1,44 @@
+{
+  "source_commit": "432f43c4e523f34a1e7e13656e6c9396983ffd10",
+  "source_blobs": {
+    "engine/core.py": "b1d50ea0d4189b9f3b25a61cfb3648c1f7de7147",
+    "engine/reports.py": "566589d14dd4a7858d11e7e142bbdc35fdfb2fc9"
+  },
+  "pdfs": [
+    {
+      "file": "Management_Accounts_DRAFT.pdf",
+      "pages": 12,
+      "all_pages_rendered": true,
+      "text_outside_page_bounds": 0,
+      "sha256": "1805a71ec9028888cfdb59c6c0966a9e0d10ee1fea565ab9e305f1a3de1d1d0e"
+    },
+    {
+      "file": "Unaudited_FS_DRAFT.pdf",
+      "pages": 5,
+      "all_pages_rendered": true,
+      "text_outside_page_bounds": 0,
+      "sha256": "3d7cac01d35024f3674d902e804de5735c7e5f41e9f20729c0b0000ea8143c38"
+    }
+  ],
+  "xlsx": {
+    "sheets": 16,
+    "all_sheets_rendered": true,
+    "formula_errors": 0,
+    "cached_totals_and_formula_text_match_independent_controls": true,
+    "expected_sample_values": {
+      "assets": 1768,
+      "liabilities": 650,
+      "equity": 1118,
+      "revenue": 1500,
+      "expenses": 482,
+      "profit": 1018,
+      "bank_closing": 1768
+    },
+    "preview_limitation": "Artifact renderer displayed shared-string index 91 in some empty Code cells; original XLSX has empty strings, verified independently. No source workbook was changed.",
+    "native_excel_recalculation": "Not manually tested",
+    "sha256": "0d01b7670fa469dec8fe7420fb4fde4fd4bf16f6549821046e8a5ee513f8b88f"
+  },
+  "review_findings": 5,
+  "blocking_errors": 0,
+  "professional_approval": false
+}

@@ -58,7 +58,9 @@ Company is the first/default tab, followed by Documents, Bank, Other records and
 
 ## M0 stabilization evidence — v1.3.1
 
-95 tests passed locally and from a clean temporary installation on macOS 14.6 arm64 / Python 3.9.6 / Streamlit 1.50.0. Fresh launch, offline relaunch without reinstall, exact dependency-pin matching, active-port refusal and legacy workspace/report compatibility passed. Startup now checks before dependency installation, supports an explicit alternate port, and allows immediate restart after connections close. Requirements and constraints are fingerprinted together; deprecated width arguments are removed. CI covers Linux 3.9/3.12 and macOS 3.12. Committed-source releases use a deterministic ZIP builder with per-file SHA-256 manifest and checksum sidecar. See [M0 record](24_M0_STABILIZATION.md) for scope and remaining manual acceptance.
+100 tests passed locally and from a clean temporary installation on macOS 14.6 arm64 / Python 3.9.6 / Streamlit 1.50.0. Fresh launch, offline relaunch without reinstall, exact dependency-pin matching, active-port refusal and legacy workspace/report compatibility passed. Startup now checks before dependency installation, supports an explicit alternate port, and allows immediate restart after connections close. Requirements and constraints are fingerprinted together; deprecated width arguments are removed. CI covers Linux 3.9/3.12 and macOS 3.12. Committed-source releases use a deterministic ZIP builder with per-file SHA-256 manifest and checksum sidecar. See [M0 record](24_M0_STABILIZATION.md) for scope and remaining manual acceptance.
+
+The expanded M0 candidate suite passes 100 tests locally and in all three jobs of [CI run 44752853119](https://github.com/jefftansg/Otto_Engine/actions/runs/44752853119). Current-candidate sample reports were regenerated and technically reviewed; professional approval and manual UAT remain pending. See the M0 record for the rendered-workbook blank-string preview limitation and the independent saved-file check.
 
 ## To-be requirements
 

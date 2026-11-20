@@ -98,14 +98,14 @@ The highest-risk areas derive from direct reading of current `engine/core.py`, `
 
 ## Subsequent engineering stabilization — v1.3.1 candidate
 
-The Company-first, issue-tracker and version-label changes were separately requested by the user before the explicit instruction to carry on M0 stabilization. [The stabilization record](../24_M0_STABILIZATION.md) records the updated local evidence; the initial 73-test/main and older-archive evidence above remains historical.
+The Company-first, issue-tracker and version-label changes were separately requested by the user before the explicit instruction to carry on M0 stabilization. [Run 44752853119](https://github.com/jefftansg/Otto_Engine/actions/runs/44752853119) passed 100 tests and pip check in each of the three compatible CI environments at candidate head `432f43c`. [The stabilization record](../24_M0_STABILIZATION.md) records the updated local evidence; the initial 73-test/main and older-archive evidence above remains historical.
 
 | Finding | Updated evidence | Remaining boundary |
 | --- | --- | --- |
 | M0-01 provenance | v1.3.1 app/launcher/docs; committed-source ZIP builder, per-file manifest and SHA-256 sidecar; repeat builds compared byte-for-byte | Product selects/approves the release candidate; no GitHub Release or tag is published automatically |
-| M0-02 Mac UAT | 95 tests on macOS 14.6 arm64 / Python 3.9.6, repeated on a clean dependency install; shell-invoked first launch, safe busy-port handling and offline relaunch verified | Finder double-click, keyboard/mobile, full file-format/manual workflow and real attestations remain pending |
+| M0-02 Mac UAT | 100 tests on macOS 14.6 arm64 / Python 3.9.6, repeated on a clean dependency install; shell-invoked first launch, safe busy-port handling and offline relaunch verified | Finder double-click, keyboard/mobile, full file-format/manual workflow and real attestations remain pending |
 | M0-03 draft reports | Current candidate demo pack regenerated with 0 blocking errors and 5 retained review warnings; technical visual/data QA is recorded in the stabilization record | No professional UFS/disclosure or compliance approval is inferred |
-| M0-04/05 accounting | Existing opening, journal collision and cash/noncash regression tests remain green; legacy restore preserves outputs | Broader independent golden ledgers and professional acceptance remain pending |
+| M0-04/05 accounting | Opening, journal collision and cash/noncash regressions plus five hand-calculated funding/opening/mixed-cash/reversal/cutoff vectors pass; legacy restore preserves outputs | Broader independent golden ledgers and professional acceptance remain pending |
 | M0-06 evidence restore | Legacy synthetic ZIP plus issue-history/missing-source tests pass; original source files remain excluded and the UI explains retention | Real client record-retention acceptance remains with the preparer |
 | M0-07 parsing | Synthetic duplicate/rejection/cutoff and optional ACRA browser upload checks pass | No claim of all bank layouts, all formats or scanned OCR support |
 | M0-08 dependencies | Exact dependency constraints; pip check; clean install and cached offline launch; CI matrix extended | Check current PR results for Linux 3.9/3.12 and Mac 3.12; no unrun platform is certified |

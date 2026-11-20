@@ -42,6 +42,16 @@ New tests cover company setup/continuation, explicitly applied optional ACRA fie
 
 Browser preview verified Company as the first selected tab, optional synthetic ACRA PDF upload and explicit field application. The browser date-confirmation checkbox was not clicked: automatic approval review rejected its attestation wording. Synthetic AppTest covers that form; no real director verification is asserted. Manual keyboard/mobile coverage and operator acceptance remain pending. CI matrix results are reported separately in GitHub. [M0 verification record](24_M0_STABILIZATION.md).
 
+## Expanded M0 candidate controls
+
+The expanded suite now passes **100 tests**, including five hand-calculated ledger vectors for director funding, supported/missing opening counterpart, mixed manual-cash rejection, accrual reversal and a post-year-end cutoff. All 100 pass on the local macOS/Python 3.9 environment and the fresh pinned environment against current source. No accounting policy was changed. Report QA regenerated current-candidate outputs (12 + 5 PDF pages, 16 workbook sheets), rendered every page/sheet, found no off-page PDF text or saved-workbook formula-error cells, and tied cached totals/formula text to independent sample arithmetic. See [M0 record](24_M0_STABILIZATION.md) and its QA inventory for exact boundaries and the workbook preview's empty-string rendering limitation.
+
+CI labels were corrected after ubuntu-latest resolved to Ubuntu 26.04 with no Python 3.9 binary, and macOS 14 was retired. The compatible matrix is Ubuntu 22.04/Python 3.9, Ubuntu 24.04/Python 3.12 and macOS 15/Python 3.12. checkout@v5 and setup-python@v6 avoid the Node 20 action warning. Do not substitute earlier failed/cancelled configuration runs for completed test evidence.
+
+## Cross-platform M0 result
+
+[GitHub Actions run 44752853119](https://github.com/jefftansg/Otto_Engine/actions/runs/44752853119) at head `432f43c` passed all three compatibility jobs. Ubuntu 22.04/Python 3.9 ran 100 tests, Ubuntu 24.04/Python 3.12 ran 100 tests, and macOS 15/Python 3.12 ran 100 tests. Every job reported no broken requirements. This supersedes the initial failed/cancelled runner-configuration attempt, not the outstanding human-acceptance gates.
+
 ## To-be requirements
 
 Use frozen synthetic ledgers, hand-calculated expected SGD results, explicit evidence locations, and permission-reviewed/redacted bank layout samples. Keep hashes and version metadata for golden fixtures. Unit tests cover date, decimals and rules, integration covers staged approvals through export, browser E2E covers state and downloads, and UAT covers Mac and accounting review.
