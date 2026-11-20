@@ -184,6 +184,8 @@ def generate(pkg:Package):
             flow_items.append({'date':dt,'journal_id':jid,'description':desc,'category':cat,'cash_movement':credit-debit})
         except ValueError as e: errors.append(str(e))
 
+    bank_total = sum((item['cash_movement'] for item in flow_items), D('0'))
+
     for i,r in enumerate(pkg.claims,1):
         try:
             dt=parse_date(r.get('date',''),f'Claim {i} date')
@@ -221,13 +223,20 @@ def generate(pkg:Package):
             entries.append(_entry(jid,dt,code,debit,credit,r.get('description',''),'Manual',r.get('evidence_ref','')))
         except ValueError as e: errors.append(str(e))
 
+    journal_sources = {}
     by_journal=defaultdict(lambda:[D('0'),D('0'),0])
     for e in entries:
-        v=by_journal[e['journal_id']]; v[0]+=e['debit']; v[1]+=e['credit']; v[2]+=1
-    for jid,(dr,cr,n) in by_journal.items():
+        jid = e['journal_id']
+        source_type = e['source']
+        first_source = journal_sources.setdefault(jid, source_type)
+        if first_source != source_type:
+            errors.append(f'Journal ID collision: {jid} is used by {first_source} and {source_type}.')
+        v=by_journal[(source_type, jid)]; v[0]+=e['debit']; v[1]+=e['credit']; v[2]+=1
+    for (_, jid),(dr,cr,n) in by_journal.items():
         if dr!=cr: errors.append(f'Journal {jid} unbalanced: debit {money_str(dr)} vs credit {money_str(cr)}.')
         if n<2: warnings.append(f'Journal {jid} has fewer than two lines.')
-    for jid,lines in _group(entries,'journal_id').items():
+    manual_entries = (entry for entry in entries if entry['source'] == 'Manual')
+    for jid,lines in _group(manual_entries,'journal_id').items():
         if lines[0]['source']=='Manual':
             cash=[l for l in lines if l['account_code']=='1000' and start<=l['date']<=end]
             if cash:
@@ -261,7 +270,6 @@ def generate(pkg:Package):
         bank_end=money(cfg.get('bank_statement_closing','0'),'bank closing balance')
     except ValueError as e:
         errors.append(str(e));bank_open=bank_end=D('0')
-    bank_total=sum((f['cash_movement'] for f in flow_items if f['journal_id'].startswith('BANK-')),D('0'))
     ledger_open=prev['1000']
     ledger_end=balances['1000']
     if bank_open!=ledger_open: errors.append(f'Opening bank statement {money_str(bank_open)} differs from opening ledger {money_str(ledger_open)}.')
