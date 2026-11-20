@@ -1,0 +1,4 @@
+Transaction Date,Transaction Details,Reference Number,Money In,Money Out,Running Balance
+2026-01-10,Sample consulting receipt,EX-SRC-001,1500.00,,1500.00
+2026-01-18,Sample bank fee,EX-SRC-002,,15.00,1485.00
+2026-02-02,Sample subscription,EX-SRC-003,,35.00,1450.00
