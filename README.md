@@ -4,6 +4,16 @@ Otto helps Singapore businesses and their preparers assemble bookkeeping records
 
 ![Otto original logo](assets/otto_original_logo.png)
 
+## Service model: draft UFS, external review and audit handoff
+
+Otto is a **bookkeeping and financial statement preparation tool**, not an audit service. A small Singapore service provider may operate without employing an accountant or auditor, while engaging an external suitably experienced Singapore financial-reporting accountant on a case-by-case contract. Company directors remain responsible for the records, financial statements and approval of the final accounts.
+
+For clients that require an audit, the **client company appoints an independent ACRA-registered public accountant / appropriate registered accounting entity** under a separate audit engagement. Otto supplies an evidence-linked **audit-ready handoff package** (planned); the auditor independently decides the procedures, evidence requests and opinion. Otto must not issue or imitate an auditor's opinion, mark its reports `Audited`, or represent itself as an audit firm.
+
+A professional **SSRS 4410 compilation engagement**, if commissioned, is separately scoped and reported by the engaged practitioner and provides **no audit assurance**. A formal assurance review under SSRE is also different from a preparer's quality-control check. Auditor independence must be evaluated by the appointed practitioner before accepting any combined preparation/audit arrangement; Otto does not decide independence automatically.
+
+See [UFS preparation](docs/11_UFS_PREPARATION_AND_DISCLOSURES.md), [report specifications](docs/10_REPORT_SPECIFICATIONS.md), [Singapore compliance](docs/12_SINGAPORE_COMPLIANCE.md) and [roadmap](docs/19_DEVELOPMENT_ROADMAP.md). **Partner onboarding, professional sign-off workflow and audit-ready export are proposed features, not implemented in v1.2.4.**
+
 ## Review or remove uploaded files
 
 In Guided **Upload** or **Bank**, review the **Flagged files — your decision** list. Open **Review or delete uploaded files**, select files, then choose **Retain selected files** or **Delete selected files**. Flags include exact duplicates, possible overlapping statement coverage, financial-year mismatches, different company UENs and uncertain relevance. Nothing is deleted automatically; supporting documents may still be useful. Retain choices last for this session. Deletion keeps saved accounting/evidence records and original disk files, and requires bank balances to be rechecked when a statement is removed.
