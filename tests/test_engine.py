@@ -81,6 +81,25 @@ class EngineTests(unittest.TestCase):
         package.config["bank_statement_opening"] = "0.00"
         self.assertEqual(generate(package)["errors"], [])
 
+    def test_missing_bank_closing_balance_requires_review(self):
+        sample = Package.from_directory(BASE)
+        config = {**sample.config, "bank_statement_opening": "0.00"}
+        config.pop("bank_statement_closing", None)
+
+        cases = (
+            ("missing", config),
+            ("blank", {**config, "bank_statement_closing": ""}),
+        )
+        for label, case in cases:
+            with self.subTest(closing=label):
+                self.assertIn(
+                    "Bank statement closing balance is required.",
+                    generate(Package(case))["errors"],
+                )
+
+        explicit_zero = {**config, "bank_statement_closing": "0.00"}
+        self.assertEqual(generate(Package(explicit_zero))["errors"], [])
+
     def test_demo_balances(self):
         r=generate(self.p)
         self.assertEqual(r['errors'],[])
