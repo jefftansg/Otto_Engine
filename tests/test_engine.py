@@ -9,6 +9,36 @@ BASE=Path(__file__).resolve().parents[1]/'sample_company'
 class EngineTests(unittest.TestCase):
     def setUp(self):self.p=Package.from_directory(BASE)
 
+    def test_bank_payment_mapped_to_depreciation_requires_review(self):
+        package = Package.from_directory(BASE)
+        package.bank.append({
+            "date": package.config["fy_end"],
+            "description": "Fictional payment mapped to depreciation",
+            "reference": "CASHFLOW-TEST-01",
+            "deposit": "0",
+            "withdrawal": "20.00",
+            "account_code": "5700",
+        })
+        package.config["bank_statement_closing"] = "1748.00"
+
+        result = generate(package)
+        cashflows = result["cashflows"]
+        visible_movement = sum(
+            cashflows[category]
+            for category in ("Operating", "Investing", "Financing", "Unallocated")
+        )
+
+        with self.subTest("validation flags the incorrect mapping"):
+            self.assertTrue(
+                any("noncash" in message.lower() for message in result["errors"]),
+                result["errors"],
+            )
+        with self.subTest("draft shows the payment for review"):
+            self.assertEqual(cashflows["Unallocated"], -20)
+            self.assertEqual(
+                visible_movement, result["ledger_end"] - result["ledger_open"]
+            )
+
     def test_demo_balances(self):
         r=generate(self.p)
         self.assertEqual(r['errors'],[])

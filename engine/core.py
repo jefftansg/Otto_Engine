@@ -175,6 +175,12 @@ def generate(pkg:Package):
             entries.extend([_entry(jid,dt,'1000',credit,debit,desc,'Bank',ev),
                             _entry(jid,dt,code,debit,credit,desc,'Bank',ev)])
             cat=COA_MAP[code]['cashflow']
+            if cat == 'Noncash':
+                errors.append(
+                    f'Bank row {i}: cash movement mapped to noncash account {code}. '
+                    'Choose a cash-flow-appropriate counter-account.'
+                )
+                cat = 'Unallocated'
             flow_items.append({'date':dt,'journal_id':jid,'description':desc,'category':cat,'cash_movement':credit-debit})
         except ValueError as e: errors.append(str(e))
 
