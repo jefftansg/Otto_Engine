@@ -243,6 +243,12 @@ def generate(pkg:Package):
                 cats={COA_MAP[l['account_code']]['cashflow'] for l in lines if l['account_code']!='1000'}
                 cat=next(iter(cats)) if len(cats)==1 else 'Unallocated'
                 if cat=='Unallocated': errors.append(f'Manual cash journal {jid} has mixed classifications; split into separate journals.')
+                elif cat == 'Noncash':
+                    errors.append(
+                        f'Manual cash journal {jid}: cash movement mapped to a noncash account. '
+                        'Review the counter-account before reporting.'
+                    )
+                    cat = 'Unallocated'
                 flow_items.append({'date':cash[0]['date'],'journal_id':jid,'description':cash[0]['description'],
                                    'category':cat,'cash_movement':sum((l['debit']-l['credit'] for l in cash),D('0'))})
     balances=defaultdict(lambda:D('0')); prev=defaultdict(lambda:D('0'))
