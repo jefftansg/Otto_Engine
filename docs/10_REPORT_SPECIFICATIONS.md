@@ -45,6 +45,23 @@ UFS uses a portrait PDF. Position and earnings derive from the same result. Equi
 
 PDF layout uses A4, labelled units, repeated table headers, wrapped descriptions, visible draft state, page numbering and enough width for signed cents. Proposed example layout: cover/readiness → primary tables → detailed schedules → review findings. Workbook tabs use typed numeric values, frozen headers and drill-down keys. Preserve a frozen run ID, report-line ID, mapping rule and version, constituent ledger lines, journal IDs and original document locations. Record missing comparative/disclosure values as unresolved and avoid defaulting missing values to zero.
 
+## Proposed audit-ready evidence package (not implemented)
+
+Produce a read-only, versioned and explicitly **client-authorised** ZIP, not an audit report:
+
+| Folder | Required content | Control |
+| --- | --- | --- |
+| 00_Manifest | Company, FY, framework edition, report revision, export date, file inventory/hash, incomplete-record flags | Verify files and provenance |
+| 01_Statements | Draft/authorised UFS plus Management Accounts | Trace figures to frozen TB |
+| 02_Books | Trial balance, general ledger, journals and adjustments | Debits/credits and report totals reconcile |
+| 03_Bank | Statements for every account, per-account reconciliations and cutoff evidence | Balances and coverage verified |
+| 04_Schedules | A/R and A/P, director loans, share capital, fixed assets, accruals, prepayments, contracts and related parties as applicable | Schedules agree with control accounts |
+| 05_Evidence | Authorised receipts, invoices, claims, contracts, minutes, confirmations | Evidence IDs link to posting and report lines |
+| 06_Review | Clarification questions/answers, accounting review findings, outstanding issues and approvals | Missing evidence explicitly shown |
+| 07_Handoff | Client-authorised recipient, sharing record, auditor query log and any external auditor report link | No forged or Otto-issued audit opinion |
+
+Exclude data not authorised for disclosure. Never mark a package complete merely because all files successfully export; unresolved gaps remain visible. External accountant quality checks do not turn the UFS into audited statements.
+
 ## Acceptance criteria / verification
 
 Verify no clipped rows with long names and wide figures, all component totals agree with the TB, equity roll-forward and cash reconcile, and each material line traces back to evidence. Advanced working drafts visibly carry errors. Guided checks company/bank/classification/other records, crucial questions and accounting errors before enabling downloads. Require explicit separate approval for any issued report.
