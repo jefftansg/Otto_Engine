@@ -24,6 +24,34 @@ New tests exercise renamed exact duplicates, stable retry identities, overlappin
 
 Scope: synthetic fixtures, Python backend and Streamlit AppTest. Real browser file selection, previous-release ZIP archives and manual launcher/offline checks remain unverified; existing cutoff/reconciliation/report tests passed. Streamlit's existing container-width deprecation warnings are not failures.
 
+## Issue tracker, tabs and stage status verification
+
+20 November 2026; macOS arm64 / Python 3.9.6 / Streamlit 1.50.0. `/private/tmp/otto-delete-venv/bin/python -m unittest discover -s tests -v`: **86 passed, 0 failures, 0 errors, 0 skips**. New `test_issue_tracker` and `test_stages` cases cover all lifecycle states, recurrence, invalid clear without mutation, missing bank source recheck after ZIP restore, notes/events/CSV persistence, initialization from the older bundled package, report/ledger equality, every generated question, full validation details, more than eight uncategorised questions, native tab rendering, exact question routing, issue progress, status colours/text and ready-to-attention regression. Existing Guided/Advanced entry, import retry, deletion, cutoff, reconciliation and report tests passed.
+
+Local in-app browser at port 8511 verified tab selection, an issue action opening Company, synthetic sample loading and header clearance below Streamlit controls. This does not establish keyboard-only or narrow-screen coverage, every historical ZIP, or independent professional approval.
+
+## v1.3.0 version-display verification
+
+20 November 2026: all 86 tests pass after updating the header badge, bold sidebar label, launcher and current release documentation to v1.3.0. Existing branding tests assert the visible version labels and consistency with the launcher, README, Quick Start and release note. Local browser preview confirmed both Engine version 1.3.0 labels are visible and clear of the developer toolbar. Historical v1.2.4 documents remain unchanged.
+
+## v1.3.1 Company-first and M0 verification
+
+`python -m unittest discover -s tests -v`: **95 passed, 0 failures, 0 errors, 0 skips** on macOS 14.6 arm64 / Python 3.9.6 / Streamlit 1.50.0. The existing installed environment and a fresh temporary environment both passed. `pip check` found no broken requirements, and normalized package metadata matched every pinned version. Fresh `START_ON_MAC.command` launch and `PIP_NO_INDEX=1` relaunch on isolated port 8513 returned healthy Streamlit endpoints. Relaunch did not reinstall dependencies. A second launch refused an occupied port before installation, and the existing server remained healthy. A TIME_WAIT restart failure was found and fixed by matching Tornado's address-reuse behaviour; offline restart and active-port refusal were retested.
+
+New tests cover company setup/continuation, explicitly applied optional ACRA fields, reordered issue routes, runtime boundaries, incomplete releases, unavailable ports, loopback probing and a ZIP containing only the fictional sample files from baseline commit `838565d`. Legacy restore/tracker/save preserved journal, balances, cash flows, profit, errors and all tables. Existing duplicate, rejection, cutoff, reconciliation and report regressions passed. Old width-deprecation messages are eliminated; AppTest's expected missing-ScriptRunContext notices remain confined to tests.
+
+Browser preview verified Company as the first selected tab, optional synthetic ACRA PDF upload and explicit field application. The browser date-confirmation checkbox was not clicked: automatic approval review rejected its attestation wording. Synthetic AppTest covers that form; no real director verification is asserted. Manual keyboard/mobile coverage and operator acceptance remain pending. CI matrix results are reported separately in GitHub. [M0 verification record](24_M0_STABILIZATION.md).
+
+## Expanded M0 candidate controls
+
+The expanded suite now passes **100 tests**, including five hand-calculated ledger vectors for director funding, supported/missing opening counterpart, mixed manual-cash rejection, accrual reversal and a post-year-end cutoff. All 100 pass on the local macOS/Python 3.9 environment and the fresh pinned environment against current source. No accounting policy was changed. Report QA regenerated current-candidate outputs (12 + 5 PDF pages, 16 workbook sheets), rendered every page/sheet, found no off-page PDF text or saved-workbook formula-error cells, and tied cached totals/formula text to independent sample arithmetic. See [M0 record](24_M0_STABILIZATION.md) and its QA inventory for exact boundaries and the workbook preview's empty-string rendering limitation.
+
+CI labels were corrected after ubuntu-latest resolved to Ubuntu 26.04 with no Python 3.9 binary, and macOS 14 was retired. The compatible matrix is Ubuntu 22.04/Python 3.9, Ubuntu 24.04/Python 3.12 and macOS 15/Python 3.12. checkout@v5 and setup-python@v6 avoid the Node 20 action warning. Do not substitute earlier failed/cancelled configuration runs for completed test evidence.
+
+## Cross-platform M0 result
+
+[GitHub Actions run 44752853119](https://github.com/jefftansg/Otto_Engine/actions/runs/44752853119) at head `432f43c` passed all three compatibility jobs. Ubuntu 22.04/Python 3.9 ran 100 tests, Ubuntu 24.04/Python 3.12 ran 100 tests, and macOS 15/Python 3.12 ran 100 tests. Every job reported no broken requirements. This supersedes the initial failed/cancelled runner-configuration attempt, not the outstanding human-acceptance gates.
+
 ## To-be requirements
 
 Use frozen synthetic ledgers, hand-calculated expected SGD results, explicit evidence locations, and permission-reviewed/redacted bank layout samples. Keep hashes and version metadata for golden fixtures. Unit tests cover date, decimals and rules, integration covers staged approvals through export, browser E2E covers state and downloads, and UAT covers Mac and accounting review.

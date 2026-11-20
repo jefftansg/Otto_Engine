@@ -18,12 +18,15 @@ from engine.autofill import extract_acra_profile, extract_bank_statement, consol
 from engine.clarifications import OTHER_RECORDS, build_questions, outstanding, questions_csv, questions_pdf
 from engine.attention import build_attention, counts, ADVANCED_PAGES
 from engine.intake_review import upload_id, merge_uploads, flag_uploads
+from engine.issue_tracker import sync_issues, update_issue, issues_csv
+from engine.stages import stage_statuses, tab_labels
 
-STAGES = ['1  Upload', '2  Company', '3  Bank', '4  Other records', '5  Reports']
+STAGES = ['1  Company', '2  Documents', '3  Bank', '4  Other records', '5  Reports']
 
 
 def _go(i: int):
     st.session_state['guided_stage'] = max(0, min(len(STAGES)-1, i))
+    st.session_state['guided_navigation_revision'] = st.session_state.get('guided_navigation_revision',0)+1
 
 
 def _date(raw, default):
@@ -71,7 +74,7 @@ def _delete_uploads(pkg, file_ids, bank_hashes=()):
     return True
 
 
-def _upload_deletion_controls(pkg, parsed, inspect):
+def _upload_deletion_controls(pkg, parsed, inspect, scope):
     bank_hashes = {doc.sha256 for doc, acra, bank in parsed if bank.get('detected')}
     files = st.session_state.get('guided_files', [])
     if not files:
@@ -85,18 +88,18 @@ def _upload_deletion_controls(pkg, parsed, inspect):
         st.caption('Flags are suggestions for review. No file is deleted automatically. Retained files stay visible, and accounting import checks still apply.')
         st.dataframe([{'File': f['name'], 'Flag': ' | '.join(f['reasons']),
                        'Decision': 'Retained' if decisions.get(f['file_id']) == f['reasons'] else 'Awaiting your decision'}
-                      for f in flagged], hide_index=True, use_container_width=True)
+                      for f in flagged], hide_index=True, width='stretch')
     with st.expander('Review or delete uploaded files', expanded=bool(flagged)):
         st.caption('Remove files from this session and refresh extracted summaries. Saved transactions, company details and evidence remain. Bank balances must be rechecked after deleting a statement. Original files on your computer are kept.')
         selected = st.multiselect('Select files to retain or delete', list(names),
                                  format_func=lambda h: names[h] + ' · ' + h[:8],
-                                 key='guided_delete_all_'+str(st.session_state.get('guided_upload_version', 0)))
-        if st.button('Retain selected files', key='guided_retain_button_all', disabled=not selected):
+                                 key='guided_delete_'+scope+'_'+str(st.session_state.get('guided_upload_version', 0)))
+        if st.button('Retain selected files', key='guided_retain_button_'+scope, disabled=not selected, on_click=_go, args=(1 if scope=='upload' else 2,)):
             for f in flagged:
                 if f['file_id'] in selected:
                     decisions[f['file_id']] = f['reasons']
             st.rerun()
-        if st.button('Delete selected files', key='guided_delete_button_all', disabled=not selected):
+        if st.button('Delete selected files', key='guided_delete_button_'+scope, disabled=not selected, on_click=_go, args=(1 if scope=='upload' else 2,)):
             if _delete_uploads(pkg, selected, bank_hashes):
                 if hasattr(inspect, 'clear'):
                     inspect.clear()
@@ -153,48 +156,68 @@ def _advanced(page: int):
     st.session_state['advanced_page']=page
 
 
-def _attention_panel(pkg, parsed, batch, *, full=False):
-    """Give ordinary users a plain-language path to resolve detected issues."""
-    questions=build_questions(pkg,parsed,batch)
-    open_questions=outstanding(questions,pkg.config.get('clarification_answers',{}))
-    checks=generate(pkg)
-    items=build_attention(pkg,open_questions,checks,batch)
-    summary=counts(items)
+def _open_issue(issue):
+    if issue.get('question_id'):
+        st.session_state['question_focus_id'] = issue['question_id']
+    _go(1 if issue['status'] == 'Needs recheck' else issue['guided_stage'])
+
+
+def _issue_records(pkg, parsed, batch):
+    questions = outstanding(build_questions(pkg, parsed, batch), pkg.config.get('clarification_answers', {}))
+    items = build_attention(pkg, questions, generate(pkg), batch)
+    return sync_issues(pkg.config, items, sources_available=bool(batch.get('detected_banks')))
+
+
+def _attention_panel(pkg, records, scope):
+    """List every active issue, track work, and preserve cleared history."""
+    active = [r for r in records if r['status'] != 'Cleared']
+    cleared = [r for r in records if r['status'] == 'Cleared']
     st.markdown('### What needs your attention?')
-    if not items:
-        st.success('No automated issues were detected. A final accounting and disclosure review is still required.')
-        return items
-    if summary['transactions']:
-        st.warning(f"**{summary['transactions']} bank transaction(s) need a category.** Review the suggested categories before making financial reports.")
-    else:
-        st.info(f"**{summary['required']} important issue(s)** and **{summary['follow_up']} follow-up item(s)** found. You can answer questions without knowing accounting codes.")
-    st.caption('The engine suggests what to ask next. Answering a question never changes or approves a journal entry automatically.')
-    visible=items if full else items[:2]
-    for issue in visible:
-        st.markdown('**'+issue['title']+'**')
-        st.caption(issue['why'])
-        st.write('**Question to ask:** '+issue['question'])
-        c1,c2=st.columns([2,1])
-        primary_text='Answer questions' if issue['guided_stage']==3 else 'Fix in Guided Mode'
+    summary = counts(active)
+    if active:
+        st.info(f"{summary['required']} important issue(s) and {summary['follow_up']} follow-up item(s) remain. Select an issue below to handle it.")
+        st.dataframe([{'Issue':r['title'], 'Priority':r['severity'], 'Status':r['status'],
+                       'Next action':'Upload source documents to recheck' if r['status']=='Needs recheck' else r['question']}
+                      for r in active], hide_index=True, width='stretch')
+        ids = [r['id'] for r in active]
+        chosen = st.selectbox('Issue to handle', ids,
+                              format_func=lambda key: next(r['title']+' · '+r['status']+' · '+r['id'] for r in active if r['id']==key),
+                              key='issue_picker_'+scope)
+        issue = next(r for r in active if r['id']==chosen)
+        st.write('**Why it was raised:** '+issue['why'])
+        if issue['status'] == 'Needs recheck':
+            st.warning('The source files are no longer available in this session. This issue remains open until the documents are uploaded and the checks can run again.')
+        for detail in issue.get('details', []):
+            st.write('• '+str(detail))
+        st.write('**What to do:** '+issue['question'])
+        c1,c2,c3 = st.columns(3)
         with c1:
-            st.button(primary_text, key='issue-guided-'+issue['id'],
-                      on_click=_go,args=(issue['guided_stage'],),use_container_width=True,type='primary')
+            action = 'Upload documents to recheck' if issue['status']=='Needs recheck' else 'Answer this question' if issue.get('question_id') else 'Go to '+STAGES[issue['guided_stage']].strip()
+            st.button(action, key='issue_fix_'+scope, on_click=_open_issue, args=(issue,), width='stretch', type='primary')
         with c2:
-            st.button('Advanced review',key='issue-advanced-'+issue['id'],
-                      help='Opens '+ADVANCED_PAGES[issue['advanced_page']],
-                      on_click=_advanced,args=(issue['advanced_page'],),use_container_width=True)
-    if len(items)>len(visible):
-        with st.expander(f'Show {len(items)-len(visible)} more item(s)'):
-            for issue in items[len(visible):]:
-                st.markdown('**'+issue['title']+'**')
-                st.caption(issue['why'])
-                a,b=st.columns([2,1])
-                with a:st.button('Answer / fix',key='more-guided-'+issue['id'],
-                                 on_click=_go,args=(issue['guided_stage'],),use_container_width=True)
-                with b:st.button('Advanced review',key='more-advanced-'+issue['id'],
-                                 on_click=_advanced,args=(issue['advanced_page'],),use_container_width=True)
+            st.button('Advanced review', key='issue_advanced_'+scope, on_click=_advanced,
+                      args=(issue['advanced_page'],), help='Opens '+ADVANCED_PAGES[issue['advanced_page']], width='stretch')
+        with c3:
+            if st.button('Recheck issues', key='issue_recheck_'+scope, width='stretch', on_click=_go, args=(int(scope),)):
+                st.rerun()
+        with st.form('issue_progress_'+scope+'_'+issue['id']):
+            status = st.radio('Work status', ['Open','In progress'],
+                              index=1 if issue['status']=='In progress' else 0, horizontal=True)
+            note = st.text_area('Progress / action taken', value=issue.get('notes',''))
+            if st.form_submit_button('Save issue progress', on_click=_go, args=(int(scope),)):
+                update_issue(pkg.config, issue['id'], status, note)
+                st.rerun()
+    else:
+        st.success('All tracked issues are cleared by the current checks. A final professional review is still required.')
+    st.caption('The list is rechecked as records change. Progress notes do not clear an issue or approve an accounting entry. Cleared items remain in history. Save your workspace ZIP to keep issue history and notes.')
+    if cleared:
+        with st.expander(f'Cleared issues ({len(cleared)})'):
+            st.dataframe([{'Issue':r['title'], 'Status':r['status'], 'Cleared at (UTC)':r.get('cleared_at',''),
+                           'Progress / action taken':r.get('notes','')} for r in cleared], hide_index=True, width='stretch')
+    if records:
+        st.download_button('Download issue list (CSV)', issues_csv(records),
+                           file_name='Otto_Issue_Tracker.csv', mime='text/csv', key='issue_csv_'+scope)
     st.divider()
-    return items
 
 
 def _question_panel(pkg, parsed, batch):
@@ -231,7 +254,7 @@ def _question_panel(pkg, parsed, batch):
                     horizontal=True)
                 reply=st.text_area('Answer / supporting record / reason',
                     value=previous.get('answer',''),placeholder='e.g. Director confirms these were loan repayments; supporting bank advice attached.')
-                if st.form_submit_button('Save this answer',type='primary'):
+                if st.form_submit_button('Save this answer',on_click=_go,args=(3,),type='primary'):
                     if status!='Still waiting' and not reply.strip():
                         st.error('Write the answer or reason before closing a question.')
                     else:
@@ -248,12 +271,12 @@ def _question_panel(pkg, parsed, batch):
                 prev=answers.get(q['id'],{})
                 rows.append({'Priority':q['priority'],'Topic':q['section'],'Question':q['question'],
                             'Status':prev.get('status','Needs answer'), 'Answer or note':prev.get('answer','')})
-            edited=st.data_editor(rows,num_rows='fixed',hide_index=True,use_container_width=True,
+            edited=st.data_editor(rows,num_rows='fixed',hide_index=True,width='stretch',
                    disabled=['Priority','Topic','Question'],
                    column_config={'Status':st.column_config.SelectboxColumn('Status',options=['Needs answer','Answered','Not applicable'],required=True),
                        'Answer or note':st.column_config.TextColumn('Answer or note',width='large')},
                    key='clarification_grid_'+__import__('hashlib').sha256('|'.join(q['id'] for q in questions).encode()).hexdigest()[:14])
-            if st.button('Save all edited answers',type='primary',key='save_clarifications',use_container_width=True):
+            if st.button('Save all edited answers',on_click=_go,args=(3,),type='primary',key='save_clarifications',width='stretch'):
                 updated=dict(answers);bad=[]
                 for q,r in zip(questions,edited):
                     state=r.get('Status','Needs answer');note=str(r.get('Answer or note') or '').strip()
@@ -273,10 +296,10 @@ def _question_panel(pkg, parsed, batch):
         col_pdf,col_csv=st.columns(2)
         with col_pdf:
             st.download_button('Download client questions (PDF)',questions_pdf(cfg.get('company_name'),questions,answers),
-                               file_name='Client_Questions_To_Clarify.pdf',mime='application/pdf',use_container_width=True)
+                               file_name='Client_Questions_To_Clarify.pdf',mime='application/pdf',width='stretch')
         with col_csv:
             st.download_button('Download questions and answers (CSV)',questions_csv(questions,answers,only_open=False),
-                               file_name='Client_Questions_Tracker.csv',mime='text/csv',use_container_width=True)
+                               file_name='Client_Questions_Tracker.csv',mime='text/csv',width='stretch')
         st.caption('The PDF contains only outstanding questions. The CSV also retains answered questions. Keep both with client records; they may contain sensitive financial information.')
     return questions,open_items
 
@@ -287,77 +310,48 @@ def render(p, inspect, register_evidence, suggest):
     stage=st.session_state['guided_stage']
 
     st.header('Start here — your financial reports in 5 steps')
-    st.caption('No accounting expertise required for initial setup. The engine reads what it can and asks you to check only the important parts.')
-    st.progress((stage+1)/len(STAGES),text=f'Step {stage+1} of {len(STAGES)}')
-    cols=st.columns(len(STAGES))
-    for idx,label in enumerate(STAGES):
-        with cols[idx]:
-            st.button(label, type='primary' if idx==stage else 'secondary', use_container_width=True,
-                      on_click=_go, args=(idx,), key=f'guided_nav_{idx}')
-    st.divider()
+    st.caption('For SMEs preparing management accounts and draft unaudited financial statements. Start with your company, then add its accounting records.')
+    issue_panels=[]
     notice = st.session_state.pop('guided_deleted_notice', None)
     if notice:
         st.success(notice)
     parsed=_load_documents(inspect)
     profiles=[(doc,acra) for doc,acra,bank in parsed if acra.get('detected') and acra.get('fields')]
     banks=[bank for doc,acra,bank in parsed if bank.get('detected')]
+    # Check once before rendering so tab status reflects restored issue history too.
+    records=_issue_records(p,parsed,_bank_batch(parsed,cfg,p.bank))
+    statuses=stage_statuses(p,parsed,_bank_batch(parsed,cfg,p.bank),
+                            st.session_state.get('guided_files',[]),st.session_state.get('guided_file_decisions',{}))
+    labels=tab_labels(STAGES,statuses)
+    # Streamlit 1.50 preserves a manually selected tab when only `default` changes.
+    # An invisible label identity change makes an explicit navigation action apply
+    # its new default, while ordinary reruns keep the user's selected tab.
+    suffix='\u200b' if st.session_state.get('guided_navigation_revision',0)%2 else '\u200c'
+    labels=[label+suffix for label in labels]
+    st.caption('Green ✓ Cleared · Amber ! Needs attention · Grey ○ Not started. Select a tab to review it. Cleared means the current checks passed, not professional approval.')
+    tabs=st.tabs(labels, default=labels[stage])
 
-    if stage in (1,2,4):
-        _attention_panel(p,parsed,_bank_batch(parsed,cfg,p.bank))
-
-    if stage==0:
-        st.subheader('Upload what you have')
-        st.write('Start with your **ACRA Business Profile** and **bank statements**. You can add receipts, invoices and Excel files at the same time. There is no need to rename files.')
-        st.caption('Accepted: PDF, Excel (.xlsx, .xls) and CSV. Text-based PDFs work best. Scanned-image PDFs require manual review.')
-        upload=st.file_uploader('Choose files or drag them here',type=['pdf','xlsx','xls','csv'],accept_multiple_files=True,
-                                key='guided_upload_'+str(st.session_state.get('guided_upload_version',0)),help='Maximum 25 MB per file. Your documents are processed on this Mac, not uploaded to ACRA.')
-        if upload:
-            incoming=[]
-            for f in upload:
-                b=f.getvalue();h=hashlib.sha256(b).hexdigest()
-                incoming.append({'name':f.name,'bytes':b,'sha256':h})
-            st.session_state['guided_files']=merge_uploads(st.session_state['guided_files'],incoming)
-            parsed=_load_documents(inspect)
-            profiles=[(doc,acra) for doc,acra,bank in parsed if acra.get('detected') and acra.get('fields')]
-            banks=[bank for doc,acra,bank in parsed if bank.get('detected')]
-        with st.expander('Want to practice? Load a fictional example instead'):
-            st.caption('Two small PDFs: a pretend ACRA profile and a pretend bank statement for a company with a first-year opening balance of S$0. These are NOT real government or bank records.')
-            if st.button('Load fictional sample documents'):
-                st.session_state['guided_file_decisions']={}
-                sample_dir=Path(__file__).parent/'example_imports'/'guided_demo'
-                st.session_state['guided_files']=[{'name':f.name,'bytes':f.read_bytes(),
-                        'sha256':hashlib.sha256(f.read_bytes()).hexdigest()} for f in sorted(sample_dir.glob('*.pdf'))]
-                st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
-                st.rerun()
-        if parsed:
-            st.success(f"{len(parsed)} file(s) received. Here is what I recognised:")
-            statuses=[]
-            for doc,acra,bank in parsed:
-                typ='ACRA company information' if acra.get('detected') and acra.get('fields') else ('Bank statement' if bank.get('detected') else ('Spreadsheet for review' if doc.tables else 'Supporting document / needs review'))
-                statuses.append({'File':doc.name,'Identified as':typ,'What happens next':'Review details' if typ in ('ACRA company information','Bank statement') else 'Can be reviewed in Advanced Mode'})
-            st.dataframe(statuses,hide_index=True,use_container_width=True)
-        else:
-            st.info('No documents added yet. You can still set up the company manually in Step 2.')
-        _upload_deletion_controls(p, parsed, inspect)
-        a,b=st.columns([3,1])
-        with a:st.button('Continue to company details',type='primary',use_container_width=True,on_click=_go,args=(1,))
-        with b:
-            if st.button('Clear uploaded files',use_container_width=True):
-                bank_hashes={doc.sha256 for doc,acra,bank in parsed if bank.get('detected')}
-                if _delete_uploads(p, [upload_id(f) for f in st.session_state['guided_files']], bank_hashes):
-                    if hasattr(inspect, 'clear'):inspect.clear()
-                    st.rerun()
-        st.caption('Uploads are stored temporarily in this running session. Use **Save client workspace ZIP** for the accounting data; keep original PDFs/receipts separately.')
-
-    elif stage==1:
+    with tabs[0]:
         st.subheader('Confirm your company details')
-        st.write('If an ACRA Business Profile was uploaded, the engine can fill most of this page for you.')
+        st.write('Start with the business identity and financial year. Enter the details below, or upload an ACRA Business Profile to fill the fields for review.')
+        with st.expander('About unaudited financial statements'):
+            st.write('Otto supports bookkeeping and draft UFS preparation. Audit exemption, financial-statement preparation and filing requirements are separate matters. [ACRA audit-exemption guidance](https://www.acra.gov.sg/manage/companies/legal-requirements-common-offences/preparing-financial-statements/audit-exemptions/)')
+        acra_upload=st.file_uploader('ACRA Business Profile (optional)',type=['pdf'],
+            key='guided_acra_upload_'+str(st.session_state.get('guided_upload_version',0)),
+            on_change=_go,args=(0,))
+        if acra_upload is not None:
+            payload=acra_upload.getvalue()
+            incoming=[dict(name=acra_upload.name,bytes=payload,sha256=hashlib.sha256(payload).hexdigest())]
+            merged=merge_uploads(st.session_state['guided_files'],incoming)
+            if [upload_id(f) for f in merged]!=[upload_id(f) for f in st.session_state['guided_files']]:
+                st.session_state['guided_files']=merged
+                st.rerun()
         if profiles:
             choice=st.selectbox('ACRA profile found',list(range(len(profiles))),format_func=lambda i:profiles[i][0].name)
             doc, result=profiles[choice]
             found=result['fields']
-            st.dataframe([{'Field':k.replace('_',' ').title(),'Read from document':v} for k,v in found.items()],hide_index=True,use_container_width=True)
-            if st.button('Use information found in ACRA document',type='primary'):
+            st.dataframe([{'Field':k.replace('_',' ').title(),'Read from document':v} for k,v in found.items()],hide_index=True,width='stretch')
+            if st.button('Use information found in ACRA document',on_click=_go,args=(0,),type='primary'):
                 for key in ('company_name','uen','entity_type','registered_address','principal_activity','incorporation_date','fy_end'):
                     if found.get(key):cfg[key]=found[key]
                 if found.get('fy_end'):
@@ -370,7 +364,7 @@ def render(p, inspect, register_evidence, suggest):
             if not found.get('fy_end'):
                 st.info('This ACRA profile does not state the financial year-end clearly. Check your previous annual return or ask the company director.')
         else:
-            st.info('No readable ACRA Business Profile detected. You can enter the required company details below.')
+            st.caption('You can enter these details manually. An ACRA profile is optional for initial setup.')
         with st.form('guided_company_form'):
             name=st.text_input('Registered company name',cfg.get('company_name',''),placeholder='e.g. EXAMPLE PTE. LTD.')
             uen=st.text_input('UEN (business registration number)',cfg.get('uen',''),placeholder='e.g. 202600000A')
@@ -384,7 +378,7 @@ def render(p, inspect, register_evidence, suggest):
             with ca:fy_start=st.date_input('Financial year begins',_date(cfg.get('fy_start'),date(2026,1,1)),format='DD/MM/YYYY')
             with cb:fy_end=st.date_input('Financial year ends',_date(cfg.get('fy_end'),date(2026,12,31)),format='DD/MM/YYYY')
             yes=st.checkbox('I checked these dates against company records or confirmed them with the director',value=bool(cfg.get('fy_confirmed')))
-            if st.form_submit_button('Save company information',type='primary'):
+            if st.form_submit_button('Save company information',on_click=_go,args=(0,),type='primary'):
                 if not name.strip() or not uen.strip():st.error('Please enter both company name and UEN.')
                 elif fy_start>fy_end:st.error('The financial year cannot end before it begins.')
                 else:
@@ -394,30 +388,80 @@ def render(p, inspect, register_evidence, suggest):
                     if changed:
                         cfg['bank_balances_confirmed']=False
                         cfg['bank_balance_source']='Financial year changed: reconfirm bank balances'
-                    st.success('Saved. The next step checks your bank statements.')
+                    st.rerun()
         _status('Company information and financial year confirmed',bool(cfg.get('company_name') and cfg.get('uen') and cfg.get('fy_confirmed')),'complete the required fields and tick the date confirmation box')
-        st.button('Continue to bank statements',type='primary',on_click=_go,args=(2,),use_container_width=True)
+        st.button('Continue to documents',type='primary',on_click=_go,args=(1,),width='stretch')
+        issue_panels.append(st.container())
 
-    elif stage==2:
+    with tabs[1]:
+        issue_panels.append(st.container())
+        st.subheader('Add your accounting documents')
+        st.write('Now add bank statements, invoices, receipts and accounting spreadsheets for the company and financial year you set up. Add an ACRA Business Profile here too if you did not provide one under Company.')
+        st.caption('Accepted: PDF, Excel (.xlsx, .xls) and CSV. Text-based PDFs work best. Scanned-image PDFs require manual review.')
+        upload=st.file_uploader('Choose files or drag them here',type=['pdf','xlsx','xls','csv'],accept_multiple_files=True,
+                                key='guided_upload_'+str(st.session_state.get('guided_upload_version',0)),help='Maximum 25 MB per file. Your documents are processed on this Mac, not uploaded to ACRA.',on_change=_go,args=(1,))
+        if upload:
+            incoming=[]
+            for f in upload:
+                b=f.getvalue();h=hashlib.sha256(b).hexdigest()
+                incoming.append({'name':f.name,'bytes':b,'sha256':h})
+            merged=merge_uploads(st.session_state['guided_files'],incoming)
+            changed=[upload_id(f) for f in merged]!=[upload_id(f) for f in st.session_state['guided_files']]
+            st.session_state['guided_files']=merged
+            if changed:st.rerun()
+            parsed=_load_documents(inspect)
+            profiles=[(doc,acra) for doc,acra,bank in parsed if acra.get('detected') and acra.get('fields')]
+            banks=[bank for doc,acra,bank in parsed if bank.get('detected')]
+        with st.expander('Want to practice? Load a fictional example instead'):
+            st.caption('Two small PDFs: a pretend ACRA profile and a pretend bank statement for a company with a first-year opening balance of S$0. These are NOT real government or bank records.')
+            if st.button('Load fictional sample documents',on_click=_go,args=(1,)):
+                st.session_state['guided_file_decisions']={}
+                sample_dir=Path(__file__).parent/'example_imports'/'guided_demo'
+                st.session_state['guided_files']=[{'name':f.name,'bytes':f.read_bytes(),
+                        'sha256':hashlib.sha256(f.read_bytes()).hexdigest()} for f in sorted(sample_dir.glob('*.pdf'))]
+                st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
+                st.rerun()
+        if parsed:
+            st.success(f"{len(parsed)} file(s) received. Here is what I recognised:")
+            statuses=[]
+            for doc,acra,bank in parsed:
+                typ='ACRA company information' if acra.get('detected') and acra.get('fields') else ('Bank statement' if bank.get('detected') else ('Spreadsheet for review' if doc.tables else 'Supporting document / needs review'))
+                statuses.append({'File':doc.name,'Identified as':typ,'What happens next':'Review details' if typ in ('ACRA company information','Bank statement') else 'Can be reviewed in Advanced Mode'})
+            st.dataframe(statuses,hide_index=True,width='stretch')
+        else:
+            st.info('No documents added yet. Start by confirming your company in Step 1, then add its records here.')
+        _upload_deletion_controls(p, parsed, inspect, 'upload')
+        a,b=st.columns([3,1])
+        with a:st.button('Continue to bank statements',key='documents_continue_bank',type='primary',width='stretch',on_click=_go,args=(2,))
+        with b:
+            if st.button('Clear uploaded files',on_click=_go,args=(1,),width='stretch'):
+                bank_hashes={doc.sha256 for doc,acra,bank in parsed if bank.get('detected')}
+                if _delete_uploads(p, [upload_id(f) for f in st.session_state['guided_files']], bank_hashes):
+                    if hasattr(inspect, 'clear'):inspect.clear()
+                    st.rerun()
+        st.caption('Uploads are stored temporarily in this running session. Use **Save client workspace ZIP** for the accounting data; keep original PDFs/receipts separately.')
+
+    with tabs[2]:
+        issue_panels.append(st.container())
         st.subheader('Let the engine check your bank statements')
         st.write('The engine attempts to find **opening balance**, **closing balance**, **statement dates** and **transactions**. It never guesses missing figures.')
         if not cfg.get('fy_confirmed'):
-            st.warning('First, confirm your financial year in Step 2. This tells the engine which months to check.')
+            st.warning('First, confirm your financial year in Step 1. This tells the engine which months to check.')
         if not banks:
-            st.warning('No bank statement was recognised. Upload statements under Step 1, or use Advanced Mode for other layouts.')
+            st.warning('No bank statement was recognised. Upload statements under Step 2, or use Advanced Mode for other layouts.')
         else:
             info=[]
             for b in banks:
                 info.append({'Statement':b.get('source',''),'Bank':b.get('bank') or 'Not identified',
                              'Account':b.get('masked_account'),'From':b.get('period_start'),'To':b.get('period_end'),
                              'Opening (S$)':b.get('opening'),'Closing (S$)':b.get('closing')})
-            st.dataframe(info,hide_index=True,use_container_width=True)
-        _upload_deletion_controls(p, parsed, inspect)
+            st.dataframe(info,hide_index=True,width='stretch')
+        _upload_deletion_controls(p, parsed, inspect, 'bank')
         batch=_bank_batch(parsed,cfg,p.bank)
         proposal=batch['balances']
         if banks and cfg.get('fy_confirmed') and proposal['ready']:
             st.success(f"Statements cover your financial year without gaps. Suggested opening balance: **S${proposal['opening']}** · closing balance: **S${proposal['closing']}**.")
-            if st.button('Use these verified bank balances',type='primary',use_container_width=True):
+            if st.button('Use these verified bank balances',on_click=_go,args=(2,),type='primary',width='stretch'):
                 cfg.update(bank_statement_opening=proposal['opening'],bank_statement_closing=proposal['closing'],
                            bank_balances_confirmed=True,bank_balance_source='Bank statement extraction; statement continuity checked',
                            statement_register=batch['detected_banks'])
@@ -427,21 +471,21 @@ def render(p, inspect, register_evidence, suggest):
                 st.rerun()
         elif banks:
             for error in proposal['errors'][:7]:st.warning(error)
-            st.caption('If a month is missing, upload it under Step 1. If the bank layout is unusual, use Advanced Mode to enter or map the details safely.')
+            st.caption('If a month is missing, upload it under Step 2. If the bank layout is unusual, use Advanced Mode to enter or map the details safely.')
         if not proposal['ready']:
             with st.expander('I want to enter or verify the two balances myself'):
                 with st.form('guided_manual_bank'):
                     op=st.text_input('Opening balance (S$)',str(cfg.get('bank_statement_opening','0.00')))
                     cl=st.text_input('Closing balance (S$)',str(cfg.get('bank_statement_closing','0.00')))
                     checked=st.checkbox('Both amounts are copied from the actual bank statements')
-                    if st.form_submit_button('Save verified amounts'):
+                    if st.form_submit_button('Save verified amounts',on_click=_go,args=(2,)):
                         try:
                             if not checked:raise ValueError('Please verify both values against the statement first.')
                             opval=Decimal(op.replace(',',''));clval=Decimal(cl.replace(',',''))
                             if not opval.is_finite() or not clval.is_finite():raise ValueError('Enter valid amounts.')
                             cfg.update(bank_statement_opening=str(opval),bank_statement_closing=str(clval),
                                        bank_balances_confirmed=True,bank_balance_source='Manually verified against statement')
-                            st.success('Balances saved, marked manually verified. Complete missing transaction review.')
+                            st.rerun()
                         except (InvalidOperation,ValueError) as exc:st.error(str(exc))
         if batch['already_imported']:
             st.success('The transaction rows from these statements are already in your workspace. They will not be imported twice.')
@@ -451,7 +495,7 @@ def render(p, inspect, register_evidence, suggest):
             st.metric('Transactions found',len(batch['rows']))
             display=[{'Date':r['date'],'Description':r['description'],
                       'Money received (S$)':r['deposit'],'Money paid (S$)':r['withdrawal']} for r in batch['rows']]
-            st.dataframe(display,use_container_width=True,hide_index=True)
+            st.dataframe(display,width='stretch',hide_index=True)
             problems=batch['issues']+batch['mismatches']
             if batch['duplicates'] and not batch['already_imported']:problems.append(f"{len(batch['duplicates'])} duplicate or previously imported transaction(s).")
             if batch['outside']:problems.append(f"{len(batch['outside'])} transaction(s) fall outside the confirmed financial year.")
@@ -460,8 +504,8 @@ def render(p, inspect, register_evidence, suggest):
             if not problems:
                 reviewed=st.checkbox('I checked the transactions and totals against my bank statements',
                                       key='guided_import_checked_'+hashlib.sha256(''.join(sorted(b['sha256'] for b in batch['detected_banks'])).encode()).hexdigest()[:12])
-                if st.button(f"Import {len(batch['rows'])} reviewed transactions",type='primary',use_container_width=True,
-                             disabled=not(reviewed and cfg.get('fy_confirmed') and cfg.get('bank_balances_confirmed'))):
+                if st.button(f"Import {len(batch['rows'])} reviewed transactions",type='primary',width='stretch',
+                             on_click=_go,args=(2,),disabled=not(reviewed and cfg.get('fy_confirmed') and cfg.get('bank_balances_confirmed'))):
                     for row in batch['rows']:
                         if str(row.get('account_code','')).strip() in ('','9999'):
                             row['account_code']=suggest(row) or '9999'
@@ -485,10 +529,10 @@ def render(p, inspect, register_evidence, suggest):
                 shown.append({'Date':row.get('date',''),'Description':row.get('description',''),
                               'Money received':row.get('deposit',''),'Money paid':row.get('withdrawal',''),
                               'Category':label if code!='9999' and label in by_name else opts[0]})
-            edited=st.data_editor(shown,use_container_width=True,hide_index=True,num_rows='fixed',disabled=['Date','Description','Money received','Money paid'],
+            edited=st.data_editor(shown,width='stretch',hide_index=True,num_rows='fixed',disabled=['Date','Description','Money received','Money paid'],
                                   column_config={'Category':st.column_config.SelectboxColumn('What was this for?',options=opts,required=True)},
                                   key='guided_categories_'+str(st.session_state.get('guided_category_revision',0)))
-            if st.button('Save these transaction categories',type='primary'):
+            if st.button('Save these transaction categories',on_click=_go,args=(2,),type='primary'):
                 for i,r in enumerate(edited):
                     category=r['Category'];p.bank[i]['account_code']=by_name.get(category,'9999')
                 st.session_state['guided_category_revision']=st.session_state.get('guided_category_revision',0)+1
@@ -499,9 +543,10 @@ def render(p, inspect, register_evidence, suggest):
             else:st.success('Every imported bank transaction has a category. Final validation is still required.')
         if proposal.get('opening') not in (None,'0','0.0','0.00'):
             st.info('For an existing business, non-zero opening bank cash also needs last year’s accounts or an opening trial balance. Bank cash alone does not explain share capital or loans.')
-        st.button('Continue to other records',type='primary',on_click=_go,args=(3,),use_container_width=True)
+        st.button('Continue to other records',type='primary',on_click=_go,args=(3,),width='stretch')
 
-    elif stage==3:
+    with tabs[3]:
+        issue_panels.append(st.container())
         st.subheader('Answer outstanding questions')
         _question_panel(p,parsed,_bank_batch(parsed,cfg,p.bank))
         st.divider()
@@ -517,28 +562,30 @@ def render(p, inspect, register_evidence, suggest):
                                         horizontal=True,help=hint,key='question_'+key)
             agree=st.checkbox('I have checked these answers and will provide or record any missing items before the reports are issued.',
                               value=bool(cfg.get('other_records_confirmed',False)))
-            if st.form_submit_button('Save my answers',type='primary'):
+            if st.form_submit_button('Save my answers',on_click=_go,args=(3,),type='primary'):
                 cfg['simple_questions']=responses
                 cfg['other_records_confirmed']=bool(agree and all(v!='Not sure' for v in responses.values()))
                 if cfg['other_records_confirmed']:
                     st.success('Your checklist has been confirmed.')
                 else:
                     st.warning('Answers saved. Complete any Not sure items and tick the confirmation box before generating reports.')
-        outstanding=[q for key,q,_ in questions if cfg.get('simple_questions',{}).get(key,'Not sure')!='No']
-        if outstanding:
+                st.rerun()
+        outstanding_records=[q for key,q,_ in questions if cfg.get('simple_questions',{}).get(key,'Not sure')!='No']
+        if outstanding_records:
             st.warning('Items marked Yes or Not sure may require additional documents or accounting entries before reports can be completed.')
-            for item in outstanding:st.write('• '+item)
+            for item in outstanding_records:st.write('• '+item)
         if parsed:
             st.markdown('**Save uploaded documents in the evidence list**')
-            if st.button('Register all source files as evidence',use_container_width=True):
+            if st.button('Register all source files as evidence',on_click=_go,args=(3,),width='stretch'):
                 for doc,acra,b in parsed:register_evidence(p,doc,'Source document (needs review)')
                 st.success('Document filenames and fingerprints recorded. Keep original documents in a secure folder.')
                 st.rerun()
         batch=_bank_batch(parsed,cfg,p.bank)
         st.info('To import **director expense spreadsheets**, accounts receivable or manual journals, switch to **Advanced Mode** at the top. The engine provides a preview and column mapper there; it never posts unreviewed files.')
-        st.button('Continue to final checks and reports',type='primary',on_click=_go,args=(4,),use_container_width=True)
+        st.button('Continue to final checks and reports',type='primary',on_click=_go,args=(4,),width='stretch')
 
-    elif stage==4:
+    with tabs[4]:
+        issue_panels.append(st.container())
         st.subheader('Final review and reports')
         st.write('Here is what is complete, and what still needs attention. Nothing will be labelled approved automatically.')
         result=generate(p)
@@ -548,17 +595,17 @@ def render(p, inspect, register_evidence, suggest):
         if remaining:
             st.warning(f'{len(remaining)} clarification question(s) are still open, including {len(crucial)} important item(s). Open **Step 4 — Other records** to answer or download the client questions.')
             with st.expander('Questions still waiting for answers',expanded=bool(crucial)):
-                for q in remaining[:20]:
+                for q in remaining:
                     st.write('• '+q['question']+' — '+q['request'])
         else:
             st.success('No unanswered clarification questions remain in this workspace. This is not a professional compliance review.')
         st.download_button('Download outstanding questions to send to client (PDF)',
                            questions_pdf(cfg.get('company_name'),questions,cfg.get('clarification_answers',{})),
-                           file_name='Client_Questions_To_Clarify.pdf',mime='application/pdf',use_container_width=True)
+                           file_name='Client_Questions_To_Clarify.pdf',mime='application/pdf',width='stretch')
         basics=bool(cfg.get('company_name') and cfg.get('uen') and cfg.get('fy_confirmed'))
         bank_ok=bool(cfg.get('bank_balances_confirmed'))
         classified=bool(p.bank) and all(str(r.get('account_code','') or '9999')!='9999' for r in p.bank)
-        _status('Company and financial year',basics,'go to Step 2 to confirm')
+        _status('Company and financial year',basics,'go to Step 1 to confirm')
         _status('Bank opening and closing balances',bank_ok,'go to Step 3 to review')
         _status('Bank transactions categorised',classified,'go to Step 3 to import and categorise')
         other_ok=bool(cfg.get('other_records_confirmed',False))
@@ -573,23 +620,24 @@ def render(p, inspect, register_evidence, suggest):
         else:st.success('Internal arithmetic checks passed. This is not a certification of compliance with Singapore reporting standards.')
         st.markdown('#### Save and download')
         st.download_button('Save editable client workspace (ZIP) — recommended first',p.to_zip(),
-                           file_name='Otto_Client_Workspace.zip',mime='application/zip',use_container_width=True)
+                           file_name='Otto_Client_Workspace.zip',mime='application/zip',width='stretch')
         can_export=bool(basics and bank_ok and classified and other_ok and not crucial and not result['errors'] and (p.bank or p.claims or p.journals))
         if not can_export:
             st.warning('Draft report downloads are paused until important clarification questions, the five checklist stages and accounting checks are complete. Advanced Mode can still create clearly labelled working drafts for review.')
         try:
             a,b,c=st.columns(3)
-            with a:st.download_button('Management Accounts PDF',management_pdf(result) if can_export else b'',file_name='Management_Accounts_DRAFT.pdf',mime='application/pdf',disabled=not can_export,use_container_width=True)
+            with a:st.download_button('Management Accounts PDF',management_pdf(result) if can_export else b'',file_name='Management_Accounts_DRAFT.pdf',mime='application/pdf',disabled=not can_export,width='stretch')
             with b:
                 can_fs=can_export and cfg.get('entity_type')=='Private limited company'
-                st.download_button('Unaudited FS PDF',financial_statements_pdf(result) if can_fs else b'',file_name='Unaudited_FS_DRAFT.pdf',mime='application/pdf',disabled=not can_fs,use_container_width=True)
-            with c:st.download_button('Excel Working Papers',xlsx_report(result) if can_export else b'',file_name='Financial_Workpapers_DRAFT.xlsx',mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',disabled=not can_export,use_container_width=True)
+                st.download_button('Unaudited FS PDF',financial_statements_pdf(result) if can_fs else b'',file_name='Unaudited_FS_DRAFT.pdf',mime='application/pdf',disabled=not can_fs,width='stretch')
+            with c:st.download_button('Excel Working Papers',xlsx_report(result) if can_export else b'',file_name='Financial_Workpapers_DRAFT.xlsx',mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',disabled=not can_export,width='stretch')
         except Exception as e:
             st.error(f'Reports could not be prepared: {e}')
         st.caption('Reports are drafts for management/director review. No tax returns, GST returns or ACRA filings are prepared.')
         with st.expander('Additional checks before issuing financial statements'):
             st.write('Confirm reporting framework eligibility, accounting policies, related-party transactions, opening balances, comparative figures, tax provisions, going concern and all required disclosures with a qualified reviewer.')
 
-    if stage>0:
-        st.divider()
-        st.button('← Previous step',on_click=_go,args=(stage-1,),key='guided_previous')
+    records=_issue_records(p,parsed,_bank_batch(parsed,cfg,p.bank))
+    for idx,panel in enumerate(issue_panels):
+        with panel:
+            _attention_panel(p,records,str(idx))

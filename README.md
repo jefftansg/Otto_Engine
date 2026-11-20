@@ -1,26 +1,44 @@
-# Otto Financial Report Engine v1.2.4
+# Otto Financial Report Engine v1.3.1
 
 Otto helps Singapore businesses and their preparers assemble bookkeeping records, management accounts and draft unaudited financial statements (UFS). Lighthouse Studio Works Pte. Ltd. owns the product. **Clear Numbers for a Brighter Tomorrow.**
 
 ![Otto original logo](assets/otto_original_logo.png)
 
-## Service model: draft UFS, external review and audit handoff
+## Current service scope
+
+Otto is for an SME service provider offering **bookkeeping and draft unaudited financial statements (UFS)** first. Begin with **Company → Documents → Bank → Other records → Reports**. Company setup accepts manual details or an optional ACRA Business Profile, then confirms the financial year before accounting records are reviewed. Initial Company clearance covers company name, UEN and confirmed dates; further particulars and disclosures remain in the issue list for UFS preparation.
+
+Corporate-secretarial workflows, audit services/automated audit-exemption assessment, tax preparation/filing and ACRA/XBRL submission are future scope, not current deliverables. Bookkeeping adjustments, reconciliation and the particulars needed for draft UFS remain supported. Audit exemption is informational guidance, separate from preparation and filing requirements.
+
+## Future service model: external review and audit handoff (planned)
 
 Otto is a **bookkeeping and financial statement preparation tool**, not an audit service. A small Singapore service provider may operate without employing an accountant or auditor, while engaging an external suitably experienced Singapore financial-reporting accountant on a case-by-case contract. Company directors remain responsible for the records, financial statements and approval of the final accounts.
 
-For clients that require an audit, the **client company appoints an independent ACRA-registered public accountant / appropriate registered accounting entity** under a separate audit engagement. Otto supplies an evidence-linked **audit-ready handoff package** (planned); the auditor independently decides the procedures, evidence requests and opinion. Otto must not issue or imitate an auditor's opinion, mark its reports `Audited`, or represent itself as an audit firm.
+For clients that require an audit, the **client company appoints an independent ACRA-registered public accountant / appropriate registered accounting entity** under a separate audit engagement. A future Otto workflow may supply an evidence-linked **audit-ready handoff package** (planned); the auditor independently decides the procedures, evidence requests and opinion. Otto must not issue or imitate an auditor's opinion, mark its reports `Audited`, or represent itself as an audit firm.
 
 A professional **SSRS 4410 compilation engagement**, if commissioned, is separately scoped and reported by the engaged practitioner and provides **no audit assurance**. A formal assurance review under SSRE is also different from a preparer's quality-control check. Auditor independence must be evaluated by the appointed practitioner before accepting any combined preparation/audit arrangement; Otto does not decide independence automatically.
 
-See [UFS preparation](docs/11_UFS_PREPARATION_AND_DISCLOSURES.md), [report specifications](docs/10_REPORT_SPECIFICATIONS.md), [Singapore compliance](docs/12_SINGAPORE_COMPLIANCE.md) and [roadmap](docs/19_DEVELOPMENT_ROADMAP.md). **Partner onboarding, professional sign-off workflow and audit-ready export are proposed features, not implemented in v1.2.4.**
+See [UFS preparation](docs/11_UFS_PREPARATION_AND_DISCLOSURES.md), [report specifications](docs/10_REPORT_SPECIFICATIONS.md), [Singapore compliance](docs/12_SINGAPORE_COMPLIANCE.md) and [roadmap](docs/19_DEVELOPMENT_ROADMAP.md). **Partner onboarding, professional sign-off workflow and audit-ready export are proposed features, not implemented in the current v1.3.1 release.**
 
 ## Review or remove uploaded files
 
-In Guided **Upload** or **Bank**, review the **Flagged files — your decision** list. Open **Review or delete uploaded files**, select files, then choose **Retain selected files** or **Delete selected files**. Flags include exact duplicates, possible overlapping statement coverage, financial-year mismatches, different company UENs and uncertain relevance. Nothing is deleted automatically; supporting documents may still be useful. Retain choices last for this session. Deletion keeps saved accounting/evidence records and original disk files, and requires bank balances to be rechecked when a statement is removed.
+In Guided **Documents** or **Bank**, review the **Flagged files — your decision** list. Open **Review or delete uploaded files**, select files, then choose **Retain selected files** or **Delete selected files**. Flags include exact duplicates, possible overlapping statement coverage, financial-year mismatches, different company UENs and uncertain relevance. Nothing is deleted automatically; supporting documents may still be useful. Retain choices last for this session. Deletion keeps saved accounting/evidence records and original disk files, and requires bank balances to be rechecked when a statement is removed.
+
+## Follow issues through to clearance
+
+The five Guided sections are tabs: green **Cleared**, amber **Needs attention**, grey **Not started**. Text and symbols accompany the colours. Each tab lists every current issue with its priority and next action. Select **Issue to handle** to read the full details, open the relevant tab or Advanced editor, and save progress notes as **Open** or **In progress**. Checks clear resolved items automatically, retain cleared history and reopen recurring problems. Missing source files leave historical bank-source issues in **Needs recheck**. Save the workspace ZIP to retain notes/history, or download the issue-list CSV. Progress and green labels do not approve accounting entries.
+
+This release uses the verified dependency versions in `constraints-m0.txt`, including Streamlit 1.50.0. Python 3.9–3.12 is the declared runtime range; see the M0 verification record for tested platforms. The launcher installs the pinned requirements. Streamlit's developer controls occupy their own top strip above Otto branding.
+
+## M0 stabilization
+
+Startup checks for an incomplete release, unsupported Python and an occupied port before installing dependencies. If another Otto session uses port 8501, save its workspace ZIP and stop its Terminal with Control+C; Otto never stops it for you. To run a separate session, use `OTTO_PORT=8502 ./START_ON_MAC.command` and open the printed address. Subsequent launches reuse the verified environment offline. Changes to either requirements or constraints trigger a dependency recheck.
+
+[The M0 verification record](docs/24_M0_STABILIZATION.md) lists completed checks and remaining acceptance work. Build a ZIP containing only committed source with `python3 scripts/build_release.py`; it includes `SOURCE_MANIFEST.json` and writes a `.zip.sha256` sidecar. Saved client data, local virtual environments and untracked files are excluded.
 
 ## Run locally
 
-On macOS, unzip the release, open `START_ON_MAC.command` and keep Terminal open. Open <http://localhost:8501>. The launcher creates a local virtual environment and installs dependencies when needed. See the [original Quick Start](QUICK_START_v1.2.4.md) for setup and troubleshooting.
+On macOS, unzip the release, open `START_ON_MAC.command` and keep Terminal open. Open <http://localhost:8501>. The launcher creates a local virtual environment and installs dependencies when needed. See the [v1.3.1 Quick Start](QUICK_START_v1.3.1.md) for setup and troubleshooting.
 
 For explicit local setup, use a supported Python 3 environment. Check compatibility with the selected dependency versions.
 
@@ -67,7 +85,7 @@ assets/                                   Four supplied Otto PNGs
 docs/                                     Documentation and archived release notes
 ```
 
-The [original v1.2.4 release note](RELEASE_NOTES_v1.2.4.md) and [earlier releases](docs/previous_releases/RELEASE_NOTES_v1.2.3.md) remain available.
+The [v1.3.1 release note](RELEASE_NOTES_v1.3.1.md) covers Company-first setup and the focused service scope. The [v1.3.0 release note](RELEASE_NOTES_v1.3.0.md) covers upload review, the persistent issue tracker and coloured stage tabs. The [original v1.2.4 release note](RELEASE_NOTES_v1.2.4.md) and [earlier releases](docs/previous_releases/RELEASE_NOTES_v1.2.3.md) remain available.
 
 ## M0 baseline stabilisation — in progress
 

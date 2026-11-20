@@ -1,4 +1,4 @@
-"""Otto Financial Report Engine v1.2.4: branded, issue-driven guided mode."""
+"""Otto Financial Report Engine v1.3.1: branded, issue-driven guided mode."""
 from pathlib import Path
 from datetime import date, datetime
 import hashlib
@@ -17,13 +17,15 @@ st.set_page_config(
     layout='wide',
 )
 st.markdown("""<style>
-.block-container {padding-top:1.0rem; max-width:1500px}
+.block-container {padding-top:5.5rem; max-width:1500px}
+header[data-testid="stHeader"] {background-color:#fff; border-bottom:1px solid #edf2f5}
 [data-testid="stMetric"] {background-color:#eff7f8; border-radius:9px; padding:13px}
 small {color:#607080}
 div[data-testid="stForm"] {border:1px solid #d7e9e9}
 .otto-app-title {font-size:2.35rem; font-weight:800; color:#003b57; line-height:1.12; margin:0.04rem 0 0}
 .otto-app-subtitle {font-size:1.22rem; font-weight:700; color:#09556c; margin-top:0.12rem}
 .otto-app-tagline {font-size:.8rem; text-transform:uppercase; letter-spacing:.13em; font-weight:650; color:#1d9b9c; margin-top:.38rem}
+.otto-version {display:inline-block; font-size:.95rem; font-weight:750; color:#003b57; background:#e4f5f5; border:1px solid #afd9dc; border-radius:6px; padding:.22rem .6rem; margin:.45rem 0 .15rem}
 .otto-app-caption {font-size:.77rem; color:#667783; margin:.5rem 0 .9rem}
 </style>""",unsafe_allow_html=True)
 
@@ -41,17 +43,18 @@ with hero_text:
     st.markdown('''<div class="otto-app-title">Otto</div>
 <div class="otto-app-subtitle">Financial Report Engine</div>
 <div class="otto-app-tagline">Clear numbers for a brighter tomorrow</div>
-<div class="otto-app-caption">Version 1.2.4 · Bookkeeping · Management Accounts · Financial Statements</div>''',unsafe_allow_html=True)
-st.info('Upload your documents, review the details we find, and generate draft reports. Nothing is recorded from an upload without your approval.')
+<div class="otto-version">Engine version 1.3.1</div>
+<div class="otto-app-caption">Bookkeeping · Management Accounts · Financial Statements</div>''',unsafe_allow_html=True)
+st.info('Set up your company, add its accounting records, and prepare draft unaudited financial statements. Nothing is recorded from an upload without your approval.')
 if st.session_state.is_demo:
     st.warning('You are viewing a FICTIONAL demonstration company. Use **Create blank client** in the sidebar to start with your own company.')
 
 with st.sidebar:
     st.image(str(ASSETS / 'otto_wordmark.png'), width=235)
-    st.caption('Financial Report Engine · v1.2.4')
+    st.markdown('**Engine version 1.3.1**')
     st.divider()
     st.header('Your client')
-    if st.button('＋ Start a new company',use_container_width=True,type='primary'):
+    if st.button('＋ Start a new company',width='stretch',type='primary'):
         st.session_state.pkg=Package(empty_company())
         st.session_state.upload_hash=''
         st.session_state.is_demo=False
@@ -65,7 +68,7 @@ with st.sidebar:
         st.session_state.pop('guided_import_checked',None)
         st.session_state.pop('restore_workspace',None)
         st.rerun()
-    st.download_button('💾 Save my work (ZIP)',p.to_zip(),file_name='Otto_Client_Workspace.zip',mime='application/zip',use_container_width=True,
+    st.download_button('💾 Save my work (ZIP)',p.to_zip(),file_name='Otto_Client_Workspace.zip',mime='application/zip',width='stretch',
         help='Save this ZIP somewhere safe. It contains the accounting data and company settings, but not copies of the original bank statements.')
     st.caption('Save after every working session. You can reload your company later.')
     with st.expander('Restore a saved company or try a demo'):
@@ -87,7 +90,7 @@ with st.sidebar:
                     st.session_state['guided_category_revision']=st.session_state.get('guided_category_revision',0)+1
                     st.rerun()
                 except Exception as exc:st.error(f'Unable to open saved workspace: {exc}')
-        if st.button('Open fictional example company',use_container_width=True):
+        if st.button('Open fictional example company',width='stretch'):
             st.session_state.pkg=Package.from_directory(SAMPLE)
             st.session_state.upload_hash=''
             st.session_state.is_demo=True
@@ -104,20 +107,20 @@ with st.sidebar:
     st.markdown('**Working mode**')
     if st.session_state.get('app_mode','Guided')=='Advanced':
         st.warning('Professional accounting controls are open. Changes update the same company workspace.')
-        if st.button('← Return to Guided Mode',use_container_width=True,type='primary'):
+        if st.button('← Return to Guided Mode',width='stretch',type='primary'):
             st.session_state['app_mode']='Guided'
             st.rerun()
     else:
         st.caption('Guided Mode is recommended. The next screen can direct you to professional controls when needed.')
-        with st.expander('Professional accounting tools (optional)'):
+        with st.expander('Detailed bookkeeping tools (optional)'):
             st.caption('Use this only to correct journals, director claims or detailed account classifications.')
-            if st.button('Open Advanced Mode',use_container_width=True):
+            if st.button('Open Advanced Mode',width='stretch'):
                 st.session_state['app_mode']='Advanced'
                 st.session_state['advanced_page']=1
                 st.rerun()
     st.divider()
     st.markdown('**How it works**')
-    st.caption('Upload → Company → Bank → Other records → Reports')
+    st.caption('Company → Documents → Bank → Other records → Reports')
     st.caption('PDF, Excel and CSV files are added in Guided Mode. The saved-workspace ZIP above is only for reopening existing work.')
     with st.expander('Privacy and service limits'):
         st.caption('Files are processed locally in the running application. Keep original financial documents separately; source files are not embedded in the saved ZIP.')
@@ -149,7 +152,7 @@ def edit_table(title,attr,columns,helptext):
     rows=getattr(p,attr)
     if not rows:
         rows=[{col:'' for col in columns}]
-    result=st.data_editor(rows,num_rows='dynamic',use_container_width=True,hide_index=True,key=attr+'_editor')
+    result=st.data_editor(rows,num_rows='dynamic',width='stretch',hide_index=True,key=attr+'_editor')
     setattr(p,attr,[{col:str(r.get(col,'') or '') for col in columns} for r in result if any(str(v).strip() for v in r.values())])
 
 def suggest(row):
@@ -210,7 +213,7 @@ if page==0:
                    'incorporation_date':'Incorporated / registered','registered_address':'Registered address',
                    'principal_activity':'Principal activity','fy_end':'Financial year-end (if stated)'
                 }
-                st.dataframe([{'Field':readable.get(k,k),'Extracted value':v,'Source':d.name} for k,v in found.items()],hide_index=True,use_container_width=True)
+                st.dataframe([{'Field':readable.get(k,k),'Extracted value':v,'Source':d.name} for k,v in found.items()],hide_index=True,width='stretch')
                 for msg in a['warnings']:st.caption('• '+msg)
                 if found.get('fy_end'):
                     guess=suggested_start(found['fy_end'],found.get('incorporation_date',''))
@@ -235,7 +238,7 @@ if page==0:
                             'Period start':b.get('period_start'),'Period end':b.get('period_end'),
                             'Opening S$':b.get('opening'),'Closing S$':b.get('closing'),
                             'Review items':len(b.get('warnings',[]))} for b in banks]
-                st.dataframe(summaries,use_container_width=True,hide_index=True)
+                st.dataframe(summaries,width='stretch',hide_index=True)
                 for b in banks:
                     for msg in b.get('warnings',[]):st.caption(f'• {b["source"]}: {msg}')
                 proposal=consolidate_statement_balances(banks,cfg.get('fy_start'),cfg.get('fy_end'))
@@ -275,7 +278,7 @@ if page==0:
                     import_warnings.extend([f'{d.name}: {msg}' for msg in warns])
             if all_rows:
                 st.metric('Transactions automatically identified for review',len(all_rows))
-                st.dataframe(all_rows[:100],use_container_width=True,hide_index=True)
+                st.dataframe(all_rows[:100],width='stretch',hide_index=True)
                 if len(all_rows)>100:st.caption('Showing the first 100 rows. Use the manual mapper below to review full source files.')
                 for warning in import_warnings[:25]:st.warning(warning)
                 for mismatch in statement_mismatches:st.error('Incomplete or inconsistent extraction — '+mismatch)
@@ -449,7 +452,7 @@ if page==0:
                     key=f'header_{doc.sha256[:12]}_{table_id}')
                 headers,records=fields(table,header_row)
                 st.caption(f'{len(records)} data rows detected. The headings must match the source document; choose another header row if necessary.')
-                st.dataframe(records[:12],use_container_width=True,hide_index=True)
+                st.dataframe(records[:12],width='stretch',hide_index=True)
                 kind=kind_map[kind_label]
                 if kind=='bank':
                     mapping_fields=['date','description','reference','deposit','withdrawal','amount','direction','account_code','evidence_ref']
@@ -485,7 +488,7 @@ if page==0:
                         if len(issues)>15:st.error(f'... and {len(issues)-15} more errors')
                     if skipped:st.warning('Rows without parseable dates were excluded (source row positions after header): '+', '.join(map(str,skipped[:35]))+(' ...' if len(skipped)>35 else '')+'. Verify excluded rows are headers/totals, not transactions.')
                     if duplicates:st.info('Existing or repeated rows will be skipped, not silently duplicated.')
-                    st.dataframe(proposed[:50],use_container_width=True,hide_index=True)
+                    st.dataframe(proposed[:50],width='stretch',hide_index=True)
                     confirm=st.checkbox('I checked the row preview, all excluded rows and the column mapping. Add the valid rows to the ledger workspace for classification / reconciliation.',
                         key=f'confirm_{doc.sha256[:12]}_{table_id}_{kind}')
                     can_import=bool(proposed) and not issues and confirm and bool(cfg.get('company_name')) and bool(cfg.get('uen')) and bool(cfg.get('fy_confirmed'))
@@ -514,7 +517,7 @@ if page==0:
     }
     dc=st.columns(4)
     for i,(filename,columns) in enumerate(tmpl.items()):
-        with dc[i]:st.download_button(filename, csv_bytes([],columns),file_name=filename,mime='text/csv',key='blank_'+filename,use_container_width=True)
+        with dc[i]:st.download_button(filename, csv_bytes([],columns),file_name=filename,mime='text/csv',key='blank_'+filename,width='stretch')
     st.divider()
     st.markdown('### Step 4 — Review, validate and export')
     rr=generate(p)
@@ -578,8 +581,8 @@ if page==7:
     st.caption('Outputs always remain DRAFT. PDF exports include a review register. XLSX includes raw sources, ledger, statements and controls.')
     try:
         a,b,c=st.columns(3)
-        a.download_button('Management Accounts PDF',management_pdf(r),file_name='Management_Accounts_DRAFT.pdf',mime='application/pdf',use_container_width=True)
-        b.download_button('Unaudited FS PDF' if p.config.get('entity_type')=='Private limited company' else 'UFS (company only)',financial_statements_pdf(r) if p.config.get('entity_type')=='Private limited company' else b'',file_name='Unaudited_FS_DRAFT.pdf',mime='application/pdf',use_container_width=True,disabled=p.config.get('entity_type')!='Private limited company')
-        c.download_button('Working Papers XLSX',xlsx_report(r),file_name='Financial_Workpapers_DRAFT.xlsx',mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',use_container_width=True)
+        a.download_button('Management Accounts PDF',management_pdf(r),file_name='Management_Accounts_DRAFT.pdf',mime='application/pdf',width='stretch')
+        b.download_button('Unaudited FS PDF' if p.config.get('entity_type')=='Private limited company' else 'UFS (company only)',financial_statements_pdf(r) if p.config.get('entity_type')=='Private limited company' else b'',file_name='Unaudited_FS_DRAFT.pdf',mime='application/pdf',width='stretch',disabled=p.config.get('entity_type')!='Private limited company')
+        c.download_button('Working Papers XLSX',xlsx_report(r),file_name='Financial_Workpapers_DRAFT.xlsx',mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',width='stretch')
     except Exception as exc:st.error(f'Export error: {exc}')
     st.caption('Not included: corporate tax computations, IRAS filings, GST, ACRA filing, XBRL creation, audit or automatic issuance of director-approved financial statements.')

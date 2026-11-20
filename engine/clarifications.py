@@ -108,7 +108,7 @@ def build_questions(pkg, parsed=(), bank_batch=None):
                      'Provide a complete statement or bank CSV export and verify the affected rows. '+_mask(msg),
                      priority='Required',source=msg,section='Bank')
         if bank_batch.get('issues'):
-            for msg in list(dict.fromkeys(bank_batch['issues']))[:5]:
+            for msg in list(dict.fromkeys(bank_batch['issues'])):
                 _one(qs,'transaction-extraction','Can you clarify the unreadable or incomplete statement entries?',
                      'The application cannot safely read every transaction from the uploaded file.',
                      'Please supply a bank-exported CSV or Excel file, or a clearer statement. '+_mask(msg),
@@ -149,7 +149,7 @@ def build_questions(pkg, parsed=(), bank_batch=None):
         code=str(row.get('account_code') or '9999').strip()
         if code in ('','9999'):
             missing.append((i,row))
-    for i,row in missing[:8]:
+    for i,row in missing:
         amt=row.get('deposit') or row.get('withdrawal') or 'Unknown'
         incoming=bool(str(row.get('deposit') or '').strip() not in ('','0','0.00'))
         description=_mask(str(row.get('description') or '')[:115])
@@ -159,11 +159,6 @@ def build_questions(pkg, parsed=(), bank_batch=None):
              f"Transaction {i}: {row.get('date','date missing')} — {description or '(no description)'} — S${amt}.",
              'Explain whether it was a sale, refund, transfer, loan, owner funding or business expense; provide an invoice or receipt if available.',
              priority='Required',source=src,section='Transactions')
-    if len(missing)>8:
-        _one(qs,'many-uncategorised',f'Can you explain the remaining {len(missing)-8} transactions with no category?',
-             'There are more transactions awaiting classification than the list shows individually.',
-             'Use the transaction list in Step 3 and supporting bank records.',section='Transactions')
-
     replies=cfg.get('simple_questions',{})
     for key,question,evidence in OTHER_RECORDS:
         answer=replies.get(key,'Not sure')

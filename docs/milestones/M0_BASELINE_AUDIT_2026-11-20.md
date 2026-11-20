@@ -5,7 +5,7 @@
 - **Milestone:** M0 — Baseline Stabilisation / audit
 - **Status:** **In progress; initial technical baseline established, release gate NOT approved**
 - **Source of truth:** [GitHub main](https://github.com/jefftansg/Otto_Engine) at commit `23e5b92def48a8d01a222fac8f1c570118a5c24d`
-- **Code change scope:** None. This milestone records reproducible evidence, issues, test coverage and an acceptance plan; feature development and refactoring are excluded.
+- **Initial kickoff code-change scope:** None. The kickoff recorded evidence and acceptance criteria. The user later explicitly requested Company-first UI changes and M0 stabilization; those implementation/verification results are recorded separately below. This does not waive any release gate.
 - **Baseline version printed by launcher:** v1.2.4; GitHub contains additional changes after the older downloadable v1.2.4 ZIP.
 
 ## Executive assessment
@@ -95,6 +95,23 @@ The highest-risk areas derive from direct reading of current `engine/core.py`, `
 4. Mac UAT run and screenshot/video evidence, recording pass/fail/blocked.
 5. Accountant-reviewed report pack and a concise accepted-risk/defect list.
 6. Formal M0 sign-off by Product and Engineering, with Accounting/Compliance approval for financial reporting assumptions.
+
+## Subsequent engineering stabilization — v1.3.1 candidate
+
+The Company-first, issue-tracker and version-label changes were separately requested by the user before the explicit instruction to carry on M0 stabilization. [Run 44752853119](https://github.com/jefftansg/Otto_Engine/actions/runs/44752853119) passed 100 tests and pip check in each of the three compatible CI environments at candidate head `432f43c`. [The stabilization record](../24_M0_STABILIZATION.md) records the updated local evidence; the initial 73-test/main and older-archive evidence above remains historical.
+
+| Finding | Updated evidence | Remaining boundary |
+| --- | --- | --- |
+| M0-01 provenance | v1.3.1 app/launcher/docs; committed-source ZIP builder, per-file manifest and SHA-256 sidecar; repeat builds compared byte-for-byte | Product selects/approves the release candidate; no GitHub Release or tag is published automatically |
+| M0-02 Mac UAT | 100 tests on macOS 14.6 arm64 / Python 3.9.6, repeated on a clean dependency install; shell-invoked first launch, safe busy-port handling and offline relaunch verified | Finder double-click, keyboard/mobile, full file-format/manual workflow and real attestations remain pending |
+| M0-03 draft reports | Current candidate demo pack regenerated with 0 blocking errors and 5 retained review warnings; technical visual/data QA is recorded in the stabilization record | No professional UFS/disclosure or compliance approval is inferred |
+| M0-04/05 accounting | Opening, journal collision and cash/noncash regressions plus five hand-calculated funding/opening/mixed-cash/reversal/cutoff vectors pass; legacy restore preserves outputs | Broader independent golden ledgers and professional acceptance remain pending |
+| M0-06 evidence restore | Legacy synthetic ZIP plus issue-history/missing-source tests pass; original source files remain excluded and the UI explains retention | Real client record-retention acceptance remains with the preparer |
+| M0-07 parsing | Synthetic duplicate/rejection/cutoff and optional ACRA browser upload checks pass | No claim of all bank layouts, all formats or scanned OCR support |
+| M0-08 dependencies | Exact dependency constraints; pip check; clean install and cached offline launch; CI matrix extended | Check current PR results for Linux 3.9/3.12 and Mac 3.12; no unrun platform is certified |
+| M0-09/10 scope | Audit/secretarial/tax/filing expansion and professional-partner/audit-handoff features remain future/planned | No regulatory certification, multi-tenant deployment or external evidence sharing introduced |
+
+**M0 remains in progress and not signed off.** Engineering stabilization does not replace the completion rule or human acceptance above. Dates in the browser were not attested by the agent after automatic approval review rejected that action; synthetic AppTest covers form mechanics only.
 
 ## Out-of-scope work until M0 acceptance
 

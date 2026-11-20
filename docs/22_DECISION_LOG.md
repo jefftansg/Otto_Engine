@@ -42,6 +42,24 @@ Evidence: `engine/intake_review.py`, `guided._delete_uploads`, `guided._upload_d
 
 **Owner:** Product / Accounting. **Business-scope decision:** planned read-only, versioned, consent-controlled audit-handoff ZIP with statements, books, reconciliations, source evidence, adjustments and exceptions. An independent auditor performs all procedures and issues any auditor's report; Otto never generates, signs or implies an audit opinion. **Implementation status:** Planned; OTTO-AUD-001/002.
 
+## Decision 011 — persistent issue handling and native stage tabs
+
+20 November 2026; Engineering; implemented at the user's request. Show every generated issue with an action and lifecycle, retain notes and cleared history in the optional workspace `issue_register`, and reopen recurring conditions. Permit manual Open/In progress only; no manual accounting-clear override. Preserve source-dependent findings as Needs recheck when original bank files are unavailable. Use native tabs with accessible colour/text statuses. Streamlit 1.50 retains tab selection across reruns, so explicit navigation changes an invisible tab-label identity suffix to apply the requested default; ordinary reruns preserve the selected tab. Place developer controls in a separate toolbar strip above branding.
+
+Evidence: `engine/issue_tracker.py`, `engine/stages.py`, `engine/attention.py`, `guided.py`, `app.py`, `tests/test_issue_tracker.py`, `tests/test_stages.py`; 86 passing tests plus local browser verification. Issue history is client-supplied workspace metadata, not a tamper-proof audit log or authorised certification. No accounting-policy or deployment change.
+
+## Decision 012 — engine version v1.3.0
+
+20 November 2026; Engineering; implemented at the user's request. Identify the feature update as v1.3.0. Display a prominent Engine version 1.3.0 badge below the product title and repeat it in bold in the sidebar; align the Mac launcher and current README/Quick Start/release notes. Retain historical v1.2.4 release and audit evidence. No accounting or regulatory-policy change. Verification: 86 passing tests and local browser confirmation of both labels.
+
+## Decision 013 — Company-first setup and current service scope
+
+20 November 2026; implemented at the user's request in v1.3.1. Place Company first/default, allow optional ACRA PDF or manual details, confirm the financial year before general accounting intake, then Documents/Bank/Other records/Reports. Keep the setup form ahead of issue triage. Reorder status and issue routing consistently. Initial Company clearance is the basic identity/date gate; later UFS particulars remain tracked. Target the user's bookkeeping and draft UFS offering now; defer corporate-secretarial workflows, audit services/automated audit-exemption assessment, tax filing and ACRA/XBRL submission to future scope. No new regulatory assessment, automatic entry, accounting-policy change or report-gate relaxation is authorised.
+
+## Decision 014 — M0 stabilization baseline
+
+20 November 2026; implemented under the user's explicit M0 request. Fail early on unsupported runtime, incomplete source or unavailable port; preserve running sessions and offer an explicit alternate port. Pin the actually verified dependency graph, fingerprint both dependency inputs, and check installed consistency. Match address reuse so just-stopped instances can restart. Replace deprecated UI width arguments without changing layout intent. Build releases from committed Git source only, with deterministic metadata, executable launcher permissions, per-file SHA-256 manifest and archive checksum. Preserve bookkeeping rules and the limited service scope. Evidence: 100 passing tests in existing/clean Mac environments, legacy workspace equality, clean/offline launch and occupied-port recovery; residual acceptance is in the M0 record.
+
 ## To-be requirements
 
 Record owner, date, state, decision, rationale, alternatives, consequences, validation evidence and successor ADR. Preserve old decisions when superseded. Require affected teams to sign architecture/accounting/compliance decisions before implementation.

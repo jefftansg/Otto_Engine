@@ -36,6 +36,18 @@ No versioned source registry or regulatory rule engine was observed. This regist
 
 The upload review/deletion change introduces no regulatory eligibility decision, source-version update or filing behaviour. Relevance flags are local review suggestions based on content hashes, extracted statement periods/account IDs, UEN and recognition status. They are not regulatory determinations. No new legal or accounting source claims are made by this change.
 
+## Issue tracker and navigation — 20 November 2026
+
+Issue lifecycle, coloured readiness labels and toolbar spacing introduce no regulatory-source update, eligibility determination or filing action. Green status denotes application checks only. No external legal or accounting source claim is added.
+
+## v1.3.1 scope and audit-exemption guidance
+
+The current product remains bookkeeping and draft UFS preparation. An optional informational Company expander links to ACRA's [audit-exemption guidance](https://www.acra.gov.sg/manage/companies/legal-requirements-common-offences/preparing-financial-statements/audit-exemptions/), checked 20 November 2026. ACRA's [financial-reporting duties guidance](https://www.acra.gov.sg/manage/companies/legal-requirements-common-offences/preparing-financial-statements/financial-reporting-duties-for-directors/) distinguishes unaudited financial-statement presentation for audit-exempt companies. Audit exemption, preparation and filing are treated separately; no eligibility thresholds, assessment engine, legal determination or new approval gate are implemented. Tax, audit, corporate-secretarial and filing services remain future scope.
+
+## M0 engineering stabilization
+
+Runtime/port checks, dependency constraints and release checksums introduce no regulatory-source update, licensing determination, financial certification or audit-exemption assessment. Dependency version inventory is engineering evidence only. Current service scope remains bookkeeping and draft UFS; broader audit, secretarial, tax and filing services remain deferred.
+
 ## Additional references — outsourcing, auditors and assurance engagements (20 November 2026)
 
 | ID / source | Issuer | Relevance |

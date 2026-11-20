@@ -16,6 +16,14 @@ Sequence work for reliability and commercial readiness. Scope is proposed and re
 
 v1.2.4 is a local single-account SGD preparation tool. 52 existing backend tests passed. The baseline archive and documentation audit support M0 with unresolved application, source and platform gaps.
 
+## Current priority override — v1.3.1
+
+Focus near-term delivery on the user's first two services: bookkeeping and draft UFS preparation. Company-first setup and a simple single-preparer workflow precede broader service expansion. Retain reconciliations, corrections, UFS particulars/disclosures and reliable exports as core work. Corporate-secretarial workflows, audit services/automated audit-exemption assessment, tax preparation/filing and ACRA/XBRL submission are future scope requiring a new product decision. The milestone table is a historical backlog; it does not authorise those expansions or make the eligibility-suite milestones prerequisites to the current service offering.
+
+## M0 stabilization checkpoint — v1.3.1
+
+Engineering verification now covers pinned dependencies, clean/offline Mac launch, safe occupied-port handling, runtime/source preflight, old-schema workspace/report preservation, 100 local tests and reproducible source-release inventory. CI adds Linux 3.9/3.12 and macOS 3.12 checks; consult the current PR for actual results. [M0 record](24_M0_STABILIZATION.md) names residual checks and owners. This is an engineering baseline, not professional UFS approval or a production-service launch. Keyboard/mobile acceptance, manual attestation and all historical ZIPs remain outside the verified evidence.
+
 ## To-be requirements
 
 | Milestone | Depends on | Outcome and deliverables | Acceptance gate | Risk and exclusions |
@@ -43,7 +51,7 @@ Do not infer deployment or commercial-service readiness from these documented pl
 
 **Status: In progress; not signed off.** GitHub `main` commit `23e5b92` is the technical source baseline. The latest Ubuntu/Python 3.12 CI run passed 73 automated tests, but live Mac UAT, current-main PDF/XLSX visual checks, versioned package provenance, and independent accounting sign-off remain outstanding.
 
-See the [M0 Baseline Audit](milestones/M0_BASELINE_AUDIT_2026-11-20.md) for the reproducible test evidence, 10 prioritised findings, acceptance gates and Mac manual test checklist. No source changes, accounting policy decisions or feature implementation are authorised by starting M0.
+See the [M0 Baseline Audit](milestones/M0_BASELINE_AUDIT_2026-11-20.md) for the reproducible test evidence, 10 prioritised findings, acceptance gates and Mac manual test checklist. The initial kickoff alone did not authorise source changes. Subsequent user-requested engineering stabilization and its evidence are recorded separately in the M0 supplement; no accounting-policy change or future-scope expansion is implied.
 
 ## Acceptance criteria / verification
 
