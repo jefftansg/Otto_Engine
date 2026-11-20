@@ -1,0 +1,2 @@
+claim_id,date,director,merchant,description,amount,expense_account,evidence_ref,notes
+CLAIM-001,2026-02-28,Alex Tan (Demo),Office Provider,Workspace rent paid personally,250.00,5200,E-005,Director-funded rent

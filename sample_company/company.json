@@ -1,0 +1,24 @@
+{
+  "company_name": "DEMO MERIDIAN SERVICES PTE. LTD.",
+  "uen": "DEMO000001",
+  "entity_type": "Private limited company",
+  "registered_address": "Sample company - no real address",
+  "principal_activity": "Business consulting services (demonstration only)",
+  "fy_start": "2026-01-01",
+  "fy_end": "2026-12-31",
+  "currency": "SGD",
+  "reporting_framework": "SFRS for Small Entities",
+  "framework_eligibility_confirmed": false,
+  "director_review_confirmed": false,
+  "disclosures_reviewed": false,
+  "bank_statement_opening": "0.00",
+  "bank_statement_closing": "1768.00",
+  "directors": [
+    {"name": "Alex Tan (Demo)", "loan_account": "2100"},
+    {"name": "Jamie Lim (Demo)", "loan_account": "2101"}
+  ],
+  "revenue_policy": "Sample policy only: services are recognised as rendered; requires review for actual client contracts.",
+  "accounting_policies": "Demonstration only. Accrual-basis entries posted as supplied; no depreciation, income tax or foreign currency adjustments have been made.",
+  "going_concern_note": "Demonstration only; actual company assessment is required.",
+  "other_disclosures": "Demonstration first-year data. Actual comparative and disclosure requirements must be evaluated."
+}

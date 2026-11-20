@@ -1,0 +1,5 @@
+date,description,reference,deposit,withdrawal,account_code,evidence_ref,notes
+2026-01-10,Client A consulting services,DEMO-B-001,1500.00,,4000,E-001,Revenue for service delivered
+2026-02-05,Monthly bank service fee,DEMO-B-002,,32.00,5100,E-002,Bank expense
+2026-04-11,Cloud subscription,DEMO-B-003,,200.00,5400,E-003,Software expense
+2026-05-02,Funding advanced by director Alex,DEMO-B-004,500.00,,2100,E-004,Director loan not sales
