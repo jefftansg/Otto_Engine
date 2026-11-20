@@ -165,6 +165,46 @@ class EngineTests(unittest.TestCase):
                     finally:
                         workbook.close()
 
+    def test_draft_pdfs_distinguish_missing_bank_balances_from_zero(self):
+        from io import BytesIO
+
+        import pdfplumber
+
+        from engine.reports import financial_statements_pdf, management_pdf
+
+        def pdf_text(content):
+            with pdfplumber.open(BytesIO(content)) as pdf:
+                return " ".join(
+                    " ".join(page.extract_text() or "" for page in pdf.pages).split()
+                )
+
+        sample = Package.from_directory(BASE)
+        for supplied, balance, calculation in (
+            ("", "Not provided", "Not available"),
+            ("0.00", "0.00", "0.00"),
+        ):
+            config = {
+                **sample.config,
+                "bank_statement_opening": supplied,
+                "bank_statement_closing": supplied,
+            }
+            result = generate(Package(config))
+            management = pdf_text(management_pdf(result))
+            financial = pdf_text(financial_statements_pdf(result))
+
+            with self.subTest(balance=supplied, report="management accounts"):
+                for label, value in (
+                    ("Statement beginning balance", balance),
+                    ("Expected bank statement closing", calculation),
+                    ("Statement closing balance entered", balance),
+                    ("Statement minus ledger difference", calculation),
+                ):
+                    self.assertIn(f"{label} {value}", management)
+
+            with self.subTest(balance=supplied, report="financial statements"):
+                closing = "SGD 0.00" if supplied else "not provided"
+                self.assertIn(f"Bank statement closing input is {closing}.", financial)
+
     def test_demo_balances(self):
         r=generate(self.p)
         self.assertEqual(r['errors'],[])
