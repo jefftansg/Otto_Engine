@@ -100,6 +100,42 @@ class EngineTests(unittest.TestCase):
         explicit_zero = {**config, "bank_statement_closing": "0.00"}
         self.assertEqual(generate(Package(explicit_zero))["errors"], [])
 
+    def test_manual_cash_journal_mapped_to_depreciation_requires_review(self):
+        package = Package.from_directory(BASE)
+        for journal_id, account, debit, credit in (
+            ("TEST-MANUAL-OUT", "5700", "20.00", "0"),
+            ("TEST-MANUAL-IN", "4000", "0", "20.00"),
+        ):
+            journal = {
+                "journal_id": journal_id,
+                "date": package.config["fy_end"],
+                "description": "Fictional cash-flow test",
+            }
+            package.journals.extend([
+                {**journal, "account_code": account, "debit": debit, "credit": credit},
+                {**journal, "account_code": "1000", "debit": credit, "credit": debit},
+            ])
+
+        result = generate(package)
+        cashflows = result["cashflows"]
+        visible = sum(
+            cashflows[category]
+            for category in ("Operating", "Investing", "Financing", "Unallocated")
+        )
+
+        with self.subTest("validation identifies the manual journal"):
+            self.assertTrue(
+                any(
+                    "TEST-MANUAL-OUT" in error and "noncash" in error.lower()
+                    for error in result["errors"]
+                ),
+                result["errors"],
+            )
+        with self.subTest("withdrawal is visible for review"):
+            self.assertEqual(cashflows["Unallocated"], -20)
+        with self.subTest("visible cash movement agrees with the ledger"):
+            self.assertEqual(visible, result["ledger_end"] - result["ledger_open"])
+
     def test_demo_balances(self):
         r=generate(self.p)
         self.assertEqual(r['errors'],[])
