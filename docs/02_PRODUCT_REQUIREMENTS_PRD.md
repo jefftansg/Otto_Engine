@@ -76,3 +76,7 @@ A passing test for a subset cannot promote a Partial requirement. Thresholds and
 - [Test Strategy](18_TEST_STRATEGY.md)
 - [Requirements Traceability](20_REQUIREMENTS_TRACEABILITY.md)
 - [Open Questions](23_OPEN_QUESTIONS.md)
+
+## Otto Auto P0 requirements (planned, 21 November 2026)
+
+Add OTTO-AUTO-001 through OTTO-AUTO-008: single batch upload; source-backed company/FYE and opening balances; month coverage/duplicates; optional AI classification proposals with reviewer approval; consolidated material exceptions; deterministic MA/UFS workpaper exports with truthful provisional/final status; Advanced/shared-ledger/ZIP continuity; measurable reduced-friction UX benchmark. No Otto Auto functions or tests are yet verified implemented. Required cases include missing November in a 12-month FYE, previous-year opening evidence, and rejecting month-edited demo bank statements as authentic evidence. See [Otto Auto proposal](25_AI_FIRST_AUTO_EXPERIENCE.md).
