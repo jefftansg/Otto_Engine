@@ -84,3 +84,7 @@ Add OTTO-AUTO-001 through OTTO-AUTO-008: single batch upload; source-backed comp
 ## Otto Auto requirements addendum (planned, 21 November 2026)
 
 OTTO-AUTO-001–008 specify single-screen batch upload, source-backed company/FYE/opening balance, month coverage and duplicates, optional AI proposals requiring approval, consolidated exceptions, deterministic draft report outputs, Advanced/legacy ZIP continuity, and UX benchmarks. The corresponding acceptance cases are TEST-OTTO-AUTO-001–009. These requirements are **not implemented** in the current release. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## P0 report-design and consistency requirements (21 November 2026)
+
+**Higher immediate priority than generic Auto UX convenience.** OTTO-DES-001–009 require approved MA/UFS master templates, fixed typography tokens and page geometry, consistent financial tables/number formatting, source-to-layout mapping, prospective DOCX/PDF fidelity, golden-master visual regression, owner approval and identical Auto/Advanced presentation. Exact fonts, sizes and margins remain TBD until historical reports are supplied. Do not treat successful PDF generation as layout acceptance. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md). Existing OTTO-REP-002 remains blocked for missing approved reference examples.
