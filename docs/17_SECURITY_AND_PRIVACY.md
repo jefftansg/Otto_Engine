@@ -37,3 +37,7 @@ Local scope reduces exposure while confidentiality still depends on machine, fil
 - [Data Model](04_DATA_MODEL.md)
 - [Regulatory Sources And Versioning](16_REGULATORY_SOURCES_AND_VERSIONING.md)
 - [Test Strategy](18_TEST_STRATEGY.md)
+
+## Planned Otto Auto privacy controls (21 November 2026)
+
+Document-first intake and any external AI processor require explicit data handling design: consent, provider selection, minimisation, per-client isolation, retention/deletion, audit trail, restricted log content and protection against prompt injection in uploaded files. Provider and hosted architecture remain undecided; do not infer current documents are sent externally. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
