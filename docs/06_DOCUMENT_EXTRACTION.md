@@ -40,3 +40,7 @@ Truncation and line-wrapping can lose context. Hash and row strings do not provi
 ## Proposed document-first extraction (21 November 2026)
 
 Accept unordered mixed bank statements and books, prior-year financial statements and templates in one batch. Create evidence inventory by entity, account, period and type; cite field-level extracted balances and dates; detect missing months, overlap and duplicate content; distinguish scan-only files and mock/demo-modified statements from valid bank evidence. Never infer nonexistent period statements from filenames. Current extractor remains unchanged. See [Otto Auto proposal](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Planned Otto Auto intake (21 November 2026)
+
+Accept unordered bank statements, prior-year accounts, bookkeeping files and templates in one batch. Identify account, company, dates, opening/closing balances and monthly gaps with field-level source provenance. Detect overlaps, duplicates, inaccessible scans and altered demonstration statements; do not use the latter as genuine evidence. Current extraction implementation is unchanged. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
