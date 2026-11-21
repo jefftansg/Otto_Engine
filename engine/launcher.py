@@ -12,7 +12,7 @@ def check_runtime(version=None):
 
 
 def check_project(root):
-    required = ('app.py', 'guided.py', 'requirements.txt', 'constraints-m0.txt',
+    required = ('app.py', 'guided.py', 'auto.py', 'requirements.txt', 'constraints-m0.txt',
                 'assets/otto_icon.png', 'assets/otto_mascot.png', 'assets/otto_wordmark.png')
     missing = [name for name in required if not (Path(root)/name).is_file()]
     if missing:

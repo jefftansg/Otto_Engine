@@ -81,7 +81,9 @@ class IssueTrackerTests(unittest.TestCase):
 
 class IssueTrackerUITests(unittest.TestCase):
     def app(self):
-        return AppTest.from_file(str(ROOT/'app.py'), default_timeout=30).run()
+        at = AppTest.from_file(str(ROOT/'app.py'), default_timeout=30).run()
+        at.session_state['app_mode']='Guided'
+        return at.run()
 
     def test_five_native_tabs_all_render_and_command_menu_is_gone(self):
         at = self.app()

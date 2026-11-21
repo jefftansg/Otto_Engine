@@ -1,4 +1,4 @@
-"""Otto Financial Report Engine v1.3.1: branded, issue-driven guided mode."""
+"""Otto Financial Report Engine v1.4.0: branded, issue-driven guided mode."""
 from pathlib import Path
 from datetime import date, datetime
 import hashlib
@@ -44,15 +44,15 @@ with hero_text:
     st.markdown('''<div class="otto-app-title">Otto</div>
 <div class="otto-app-subtitle">Financial Report Engine</div>
 <div class="otto-app-tagline">Clear numbers for a brighter tomorrow</div>
-<div class="otto-version">Engine version 1.3.1</div>
+<div class="otto-version">Engine version 1.4.0</div>
 <div class="otto-app-caption">Bookkeeping · Management Accounts · Financial Statements</div>''',unsafe_allow_html=True)
-st.info('Set up your company, add its accounting records, and prepare draft unaudited financial statements. Nothing is recorded from an upload without your approval.')
+st.info('Upload your documents, review the proposals and prepare draft financial reports. Nothing is recorded from an upload without your approval.')
 if st.session_state.is_demo:
     st.warning('You are viewing a FICTIONAL demonstration company. Use **Create blank client** in the sidebar to start with your own company.')
 
 with st.sidebar:
     st.image(str(ASSETS / 'otto_wordmark.png'), width=235)
-    st.markdown('**Engine version 1.3.1**')
+    st.markdown('**Engine version 1.4.0**')
     st.divider()
     st.header('Your client')
     if st.button('＋ Start a new company',width='stretch',type='primary'):
@@ -62,7 +62,7 @@ with st.sidebar:
         st.session_state['guided_files']=[]
         st.session_state['guided_file_decisions']={}
         st.session_state['guided_stage']=0
-        st.session_state['app_mode']='Guided'
+        st.session_state['app_mode']='Auto'
         st.session_state['advanced_page']=0
         st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
         st.session_state['guided_category_revision']=st.session_state.get('guided_category_revision',0)+1
@@ -85,7 +85,7 @@ with st.sidebar:
                     st.session_state['guided_files']=[]
                     st.session_state['guided_file_decisions']={}
                     st.session_state['guided_stage']=0
-                    st.session_state['app_mode']='Guided'
+                    st.session_state['app_mode']='Auto'
                     st.session_state['advanced_page']=0
                     st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
                     st.session_state['guided_category_revision']=st.session_state.get('guided_category_revision',0)+1
@@ -98,7 +98,7 @@ with st.sidebar:
             st.session_state['guided_files']=[]
             st.session_state['guided_file_decisions']={}
             st.session_state['guided_stage']=0
-            st.session_state['app_mode']='Guided'
+            st.session_state['app_mode']='Auto'
             st.session_state['advanced_page']=0
             st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
             st.session_state['guided_category_revision']=st.session_state.get('guided_category_revision',0)+1
@@ -106,23 +106,21 @@ with st.sidebar:
             st.rerun()
     st.divider()
     st.markdown('**Working mode**')
-    if st.session_state.get('app_mode','Guided')=='Advanced':
-        st.warning('Professional accounting controls are open. Changes update the same company workspace.')
-        if st.button('← Return to Guided Mode',width='stretch',type='primary'):
-            st.session_state['app_mode']='Guided'
-            st.rerun()
-    else:
-        st.caption('Guided Mode is recommended. The next screen can direct you to professional controls when needed.')
-        with st.expander('Detailed bookkeeping tools (optional)'):
-            st.caption('Use this only to correct journals, director claims or detailed account classifications.')
-            if st.button('Open Advanced Mode',width='stretch'):
-                st.session_state['app_mode']='Advanced'
-                st.session_state['advanced_page']=1
-                st.rerun()
+    mode=st.session_state.get('app_mode','Auto')
+    if st.session_state.get('workspace_view_last_mode')!=mode:
+        st.session_state['workspace_view']=mode
+    st.session_state['workspace_view_last_mode']=mode
+    if mode not in ('Auto','Guided','Advanced'):mode='Auto'
+    selected=st.selectbox('Workspace view',['Auto','Guided','Advanced'],index=['Auto','Guided','Advanced'].index(mode),key='workspace_view')
+    if selected!=mode:
+        st.session_state['app_mode']=selected
+        st.session_state['workspace_view_last_mode']=selected
+        st.rerun()
+    st.caption('Auto starts with your documents. Guided and Advanced share the same books.')
     st.divider()
     st.markdown('**How it works**')
-    st.caption('Company → Documents → Bank → Other records → Reports')
-    st.caption('PDF, Excel and CSV files are added in Guided Mode. The saved-workspace ZIP above is only for reopening existing work.')
+    st.caption('Upload → Analyse → Review exceptions → Generate and download')
+    st.caption('PDF, Excel and CSV files are added in Auto or Guided Mode. The saved-workspace ZIP above is only for reopening existing work.')
     with st.expander('Privacy and service limits'):
         st.caption('Files are processed locally in the running application. Keep original financial documents separately; source files are not embedded in the saved ZIP.')
         st.caption('Bookkeeping, management accounts and draft unaudited statements only. No corporate tax, GST or ACRA/XBRL filing. No ACRA certification.')
@@ -166,8 +164,13 @@ def suggest(row):
     if any(x in text for x in ('office rental','workspace rent','monthly rent')):return '5200'
     return ''
 
-if 'app_mode' not in st.session_state: st.session_state['app_mode']='Guided'
+if 'app_mode' not in st.session_state: st.session_state['app_mode']='Auto'
 if 'advanced_page' not in st.session_state: st.session_state['advanced_page']=0
+
+if st.session_state['app_mode']=='Auto':
+    from auto import render
+    render(p,inspect_cached,register_evidence,suggest)
+    st.stop()
 
 if st.session_state['app_mode']=='Guided':
     from guided import render
@@ -603,6 +606,15 @@ if page==7:
     else:st.success('Core internal arithmetic/reconciliation checks passed.')
     with st.expander(f'{len(r["warnings"])} review items',expanded=True):
         for msg in r['warnings']:st.warning(msg)
+    if p.config.get('auto_enabled') or p.config.get('auto_inventory'):
+        from engine.auto import analyse
+        from engine.auto_reports import frozen_report
+        from auto import _issues
+        from engine.auto import bank_proposal
+        analysis=analyse(st.session_state.get('guided_files',[]),p.config,inspect_cached)
+        proposal=bank_proposal(analysis,p.config,p.bank)
+        records,_=_issues(p,analysis,proposal)
+        r,_=frozen_report(p,analysis,records)
     st.markdown('### Export reports')
     st.caption('Outputs always remain DRAFT. PDF exports include a review register. XLSX includes raw sources, ledger, statements and controls.')
     try:

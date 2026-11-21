@@ -69,3 +69,7 @@ Repository v1.3.1 uses ReportLab and XlsxWriter with bundled demonstrations. Exi
 - [Test strategy](18_TEST_STRATEGY.md)
 - [Roadmap](19_DEVELOPMENT_ROADMAP.md)
 - [Otto Auto proposal](25_AI_FIRST_AUTO_EXPERIENCE.md)
+
+## Reference intake and v1.4.0 candidate
+
+The user supplied three historical PDF reports and one MA workbook during implementation. They were inspected locally; originals, financial content, signatures and font binaries are not in the repository. Reusable observed formatting: A4 landscape MA / portrait UFS, sans-serif typography, 8.5–10 pt body, 11–16 pt headings, restrained financial rules and director signatory boxes. The compact/standard profiles in `engine/report_layouts.py` are candidate derivatives with Helvetica substitution. Receipt of references resolves the earlier reference-location gap; it does not establish exact fidelity or owner approval. PDF section composition remains Otto’s current schema; editable DOCX and golden-master visual acceptance are pending.

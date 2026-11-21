@@ -92,3 +92,7 @@ OTTO-AUTO-001 → TEST-OTTO-AUTO-001 (upload); 002 → 002 (provenance); 003 →
 ## Template-fidelity requirements (all Planned / visually untested, 21 November 2026)
 
 OTTO-DES-001–009 map to TEST-OTTO-DES-001–009 in [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md). Priority P0. OTTO-REP-002 remains Blocked: prior user-approved report examples unavailable in reviewed repo. Gate requires owner-approved golden-master outputs, not PDF file signatures.
+
+## Otto Auto candidate evidence
+
+See [v1.4.0 implementation matrix](27_OTTO_AUTO_IMPLEMENTATION.md). OTTO-AUTO-001–007: Partial, with tested local subsets. OTTO-AUTO-008: Planned, usability comparison pending. OTTO-DES-001–005/009: Partial layout metadata/tokens/shared rendering only. DES-006 editable DOCX and DES-007/008 golden-master/owner sign-off remain pending. None of these are promoted to professionally accepted based on test counts.

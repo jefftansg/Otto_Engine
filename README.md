@@ -1,12 +1,14 @@
-# Otto Financial Report Engine v1.3.1
+# Otto Financial Report Engine v1.4.0 — Auto preview
 
 Otto helps Singapore businesses and their preparers assemble bookkeeping records, management accounts and draft unaudited financial statements (UFS). Lighthouse Studio Works Pte. Ltd. owns the product. **Clear Numbers for a Brighter Tomorrow.**
 
 ![Otto original logo](assets/otto_original_logo.png)
 
+See [v1.4.0 Quick Start](QUICK_START_v1.4.0.md), [release notes](RELEASE_NOTES_v1.4.0.md) and [implementation status](docs/27_OTTO_AUTO_IMPLEMENTATION.md). Auto is a local review candidate; connected AI and exact template fidelity are not claimed.
+
 ## Current service scope
 
-Otto is for an SME service provider offering **bookkeeping and draft unaudited financial statements (UFS)** first. Begin with **Company → Documents → Bank → Other records → Reports**. Company setup accepts manual details or an optional ACRA Business Profile, then confirms the financial year before accounting records are reviewed. Initial Company clearance covers company name, UEN and confirmed dates; further particulars and disclosures remain in the issue list for UFS preparation.
+Otto is for an SME service provider offering **bookkeeping and draft unaudited financial statements (UFS)** first. The v1.4.0 preview opens **Auto: Upload → Analyse → Review exceptions → Generate and download**. Processing stays local. Guided **Company → Documents → Bank → Other records → Reports** remains available from Workspace view. Company setup accepts manual details or an optional ACRA Business Profile, then confirms the financial year before accounting records are reviewed. Initial Company clearance covers company name, UEN and confirmed dates; further particulars and disclosures remain in the issue list for UFS preparation.
 
 Corporate-secretarial workflows, audit services/automated audit-exemption assessment, tax preparation/filing and ACRA/XBRL submission are future scope, not current deliverables. Bookkeeping adjustments, reconciliation and the particulars needed for draft UFS remain supported. Audit exemption is informational guidance, separate from preparation and filing requirements.
 

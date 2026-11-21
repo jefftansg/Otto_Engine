@@ -12,6 +12,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Table, LongTable,
                                 TableStyle, PageBreak, KeepTogether)
+from .report_layouts import layout
 from .core import COA_MAP, money, money_str, balance_sheet_rows, profit_rows, trial_rows, director_balances
 
 NAVY=colors.HexColor('#152641'); BLUE=colors.HexColor('#2C638A')
@@ -22,7 +23,7 @@ RED=colors.HexColor('#A33A3A')
 def esc(s): return html.escape(str(s if s is not None else ''))
 
 
-def _styles():
+def _styles(profile=None):
     styles=getSampleStyleSheet()
     styles.add(ParagraphStyle(name='SMETitle',fontName='Helvetica-Bold',fontSize=17,leading=22,textColor=NAVY,spaceAfter=8))
     styles.add(ParagraphStyle(name='SMESub',fontName='Helvetica',fontSize=10,leading=15,textColor=GREY,spaceAfter=10))
@@ -31,6 +32,16 @@ def _styles():
     styles.add(ParagraphStyle(name='SMETiny',fontName='Helvetica',fontSize=7.3,leading=10))
     styles.add(ParagraphStyle(name='SMETableHead',fontName='Helvetica-Bold',fontSize=7.4,leading=10,textColor=colors.white))
     styles.add(ParagraphStyle(name='SMEWarn',fontName='Helvetica-Bold',fontSize=8,leading=11,textColor=RED,spaceAfter=5))
+    if profile and profile.get('name')!='Otto classic (legacy)':
+        from reportlab.lib.enums import TA_CENTER
+        styles['SMETitle'].fontSize=profile['title'];styles['SMETitle'].leading=profile['title']+4
+        styles['SMETitle'].textColor=colors.black
+        styles['SMEH2'].fontSize=profile['heading'];styles['SMEH2'].leading=profile['heading']+3
+        styles['SMEH2'].textColor=colors.HexColor(profile['accent'])
+        styles['SMEBody'].fontSize=profile['body'];styles['SMEBody'].leading=profile['body']+3
+        styles['SMETiny'].fontSize=profile['table'];styles['SMETiny'].leading=profile['table']+2
+        styles['SMETableHead'].fontSize=profile['table'];styles['SMETableHead'].leading=profile['table']+2
+        styles['SMETableHead'].textColor=colors.black
     return styles
 
 
@@ -47,9 +58,19 @@ def _page(canvas,doc):
 def _table(rows, widths, styles, wrap=None):
     wrap = set(wrap or [])
     vals=[]
+    wide=styles['SMETableHead'].textColor==colors.black and len(widths)>=7
+    tiny=ParagraphStyle('WideBody',parent=styles['SMETiny'],fontSize=8,leading=10) if wide else styles['SMETiny']
+    head=ParagraphStyle('WideHead',parent=styles['SMETableHead'],fontSize=8,leading=10) if wide else styles['SMETableHead']
+    import re
+    def display(value):
+        text=str(value)
+        if styles['SMETableHead'].textColor==colors.black and re.fullmatch(r'-?[\d,]+\.\d{2}',text):
+            if Decimal(text.replace(',',''))==0:return '-'
+            if text.startswith('-'):return '('+text[1:]+')'
+        return text
     for idx,row in enumerate(rows):
-        vals.append([Paragraph(esc(v).replace('\n','<br/>'),styles['SMETableHead' if idx==0 else 'SMETiny'])
-                     if (idx==0 or c in wrap) else str(v) for c,v in enumerate(row)])
+        vals.append([Paragraph(esc(display(v)).replace('\n','<br/>'),head if idx==0 else tiny)
+                     if (idx==0 or c in wrap) else display(v) for c,v in enumerate(row)])
     t=LongTable(vals,colWidths=widths,repeatRows=1,hAlign='LEFT')
     commands=[('BACKGROUND',(0,0),(-1,0),NAVY),('VALIGN',(0,0),(-1,-1),'TOP'),
         ('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white,colors.HexColor('#F5F8FB')]),
@@ -57,6 +78,19 @@ def _table(rows, widths, styles, wrap=None):
         ('TOPPADDING',(0,0),(-1,-1),5),('LEFTPADDING',(0,0),(-1,-1),5),
         ('RIGHTPADDING',(0,0),(-1,-1),5),('FONTSIZE',(0,1),(-1,-1),7.2),
         ('LINEBELOW',(0,-1),(-1,-1),0.2,colors.HexColor('#DBE2E8'))]
+    if styles['SMETableHead'].textColor==colors.black:
+        commands += [('BACKGROUND',(0,0),(-1,0),colors.white),
+                     ('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white]),
+                     ('LINEBELOW',(0,0),(-1,0),0.6,colors.black),
+                     ('LINEBELOW',(0,-1),(-1,-1),0.6,colors.black),
+                     ('FONTSIZE',(0,1),(-1,-1),tiny.fontSize)]
+        if wide:commands += [('TOPPADDING',(0,0),(-1,-1),3),('BOTTOMPADDING',(0,0),(-1,-1),3)]
+        # Right-align explicitly numeric money cells, leaving codes and dates intact.
+        import re
+        for ridx,row in enumerate(rows[1:],1):
+            for col,value in enumerate(row):
+                if re.fullmatch(r'-?[\d,]+\.\d{2}',str(value)):
+                    commands.append(('ALIGN',(col,ridx),(col,ridx),'RIGHT'))
     t.setStyle(TableStyle(commands));return t
 
 
@@ -74,13 +108,19 @@ def _section(story, styles, title, rows, widths, wrap=None):
     story.append(_table(rows,widths,styles,wrap))
 
 
-def _status(result): return 'INCOMPLETE DRAFT - ERRORS PRESENT' if result['errors'] else 'DRAFT - DIRECTOR / ACCOUNTANT REVIEW REQUIRED'
+def _status(result):
+    if result.get('auto_report'):
+        return result['auto_report']['status'] + ' | TEMPLATE APPROVAL PENDING'
+    return 'INCOMPLETE DRAFT - ERRORS PRESENT' if result['errors'] else 'DRAFT - DIRECTOR / ACCOUNTANT REVIEW REQUIRED'
 
 
 def _header(story,styles,result,subject):
     c=result['config'];_title(story,styles,c.get('company_name',''),subject)
     _paragraph(story,styles,f"UEN: {c.get('uen','')}   |   Period: {result['start'].strftime('%d %B %Y')} - {result['end'].strftime('%d %B %Y')}   |   Currency: SGD")
     _paragraph(story,styles,_status(result),'SMEWarn')
+    if result.get('auto_report'):
+        meta=result['auto_report']
+        _paragraph(story,styles,'Snapshot: '+meta['snapshot']+' | Layouts: '+', '.join(t['id'] for t in meta['templates'].values()),'SMETiny')
 
 
 def _validation(story,styles,result):
@@ -94,7 +134,7 @@ def management_pdf(result):
     buf=io.BytesIO();w,h=landscape(A4)
     doc=SimpleDocTemplate(buf,pagesize=(w,h),leftMargin=15*mm,rightMargin=15*mm,
                           topMargin=23*mm,bottomMargin=19*mm, title='Draft Management Accounts')
-    s=_styles();story=[];c=result['config'];p=result['package']
+    s=_styles(layout(result['config'],'ma')[1]);story=[];c=result['config'];p=result['package']
     inner=w-30*mm
     _header(story,s,result,'MANAGEMENT ACCOUNTS | Internal draft reporting package')
     rows=[['Item','SGD'],['Total assets',money_str(result['assets'])],
@@ -207,7 +247,7 @@ def financial_statements_pdf(result):
     buf=io.BytesIO();w,h=A4
     doc=SimpleDocTemplate(buf,pagesize=A4,leftMargin=19*mm,rightMargin=19*mm,
                          topMargin=23*mm,bottomMargin=20*mm,title='Unaudited Financial Statements - Draft')
-    s=_styles();story=[];c=result['config'];inner=w-38*mm
+    s=_styles(layout(result['config'],'ufs')[1]);story=[];c=result['config'];inner=w-38*mm
     _header(story,s,result,'UNAUDITED FINANCIAL STATEMENTS | PREPARATION DRAFT')
     _paragraph(story,s,'This document is a preparation draft derived from supplied bookkeeping records. It is NOT yet a director-approved, fully disclosed or certified set of financial statements. Financial reporting framework eligibility, recognition, accounting policies, disclosures, going concern, tax treatment and audit exemption must be independently reviewed.')
     story.append(Spacer(1,5*mm))
@@ -215,8 +255,17 @@ def financial_statements_pdf(result):
     _paragraph(story,s,'The directors must independently review the accounting records and these draft statements before deciding whether they present a true and fair view in accordance with the applicable Singapore financial reporting framework and Companies Act requirements.')
     _paragraph(story,s,'No representation regarding audit exemption, solvency, ability to pay debts, absence of contingent liabilities or directors\' interests has been automatically asserted by this engine.')
     _paragraph(story,s,'The director(s) named below may complete an appropriately verified directors\' statement after review and approval:')
-    for d in c.get('directors',[]):
-        _paragraph(story,s,f"Signature: ___________________________    {d.get('name','')}    Date: _________________")
+    if layout(c,'ufs')[0]!='classic-v1':
+        directors=c.get('directors',[]) or [dict(name='[Director name to be confirmed]')]
+        for offset in range(0,len(directors),2):
+            pair=directors[offset:offset+2]
+            boxes=[[Paragraph('Signature: ___________________________<br/><br/>'+esc(d.get('name',''))+'<br/>Director<br/>Date: ___________________',s['SMEBody']) for d in pair]]
+            signature_table=Table(boxes,colWidths=[inner/len(pair)]*len(pair))
+            signature_table.setStyle(TableStyle([('BOX',(0,0),(-1,-1),0.5,colors.black),('INNERGRID',(0,0),(-1,-1),0.5,colors.black),('VALIGN',(0,0),(-1,-1),'TOP'),('TOPPADDING',(0,0),(-1,-1),7),('BOTTOMPADDING',(0,0),(-1,-1),7)]))
+            story.append(signature_table)
+    else:
+        for d in c.get('directors',[]):
+            _paragraph(story,s,f"Signature: ___________________________    {d.get('name','')}    Date: _________________")
     _paragraph(story,s,'Board approval date: ____________________')
     story.append(PageBreak())
     _header(story,s,result,'Statement of Financial Position')
@@ -294,12 +343,20 @@ def financial_statements_pdf(result):
 def xlsx_report(result):
     import xlsxwriter
     buf=io.BytesIO(); workbook=xlsxwriter.Workbook(buf,{'in_memory':True})
+    reference_layout=layout(result['config'],'ma')[0]!='classic-v1'
+    if reference_layout:
+        workbook.formats[0].set_font_name('Arial');workbook.formats[0].set_font_size(10)
     fmt_title=workbook.add_format({'bold':True,'font_size':15,'font_color':'#152641'})
     fmt_head=workbook.add_format({'bold':True,'font_color':'white','bg_color':'#152641','bottom':1,'bottom_color':'#80A0B6'})
     fmt_num=workbook.add_format({'num_format':'#,##0.00;[Red](#,##0.00);-'})
+    if reference_layout:fmt_num.set_num_format('#,##0.00;(#,##0.00);-')
     fmt_warn=workbook.add_format({'font_color':'#B23B3B','text_wrap':True})
     def sheet(name,rows,widths=None):
         ws=workbook.add_worksheet(name[:31]);ws.freeze_panes(1,0);ws.set_tab_color('#2C638A')
+        if reference_layout:
+            ws.set_paper(9);ws.set_landscape();ws.fit_to_pages(1,0)
+            ws.set_margins(0.7,0.7,0.75,0.75);ws.repeat_rows(0)
+            ws.set_footer('&COtto | DRAFT | Page &P of &N')
         if widths:
             for i,w in enumerate(widths):ws.set_column(i,i,w)
         for idx,row in enumerate(rows):
@@ -310,6 +367,10 @@ def xlsx_report(result):
         if rows:ws.autofilter(0,0,max(0,len(rows)-1),max(0,len(rows[0])-1))
         return ws
     c=result['config'];p=result['package']
+    if result.get('auto_report'):
+        meta=result['auto_report']
+        sheet('Report snapshot', [['Field','Value'],['Snapshot',meta['snapshot']],['Status',meta['status']],
+              ['Template approval','Pending'],['Layouts',', '.join(t['id'] for t in meta['templates'].values())]])
     sheet('Overview',[['Metric','Value'],['Company',c.get('company_name','')],['UEN',c.get('uen','')],
          ['Start',c.get('fy_start','')],['End',c.get('fy_end','')],['Framework selected',c.get('reporting_framework','')],
          ['Status',_status(result)],['Total assets',result['assets']],['Total liabilities',result['liabilities']],
@@ -372,5 +433,10 @@ def xlsx_report(result):
         [['REVIEW',v] for v in result['warnings']],[18,120])
     workbook.set_properties({'title':'Otto Draft Management Accounts','subject':'Local financial reporting workpapers',
       'comments':'Draft only. Not an ACRA filing or SFRS compliance certification.'})
+    if reference_layout:
+        for fmt in workbook.formats:
+            fmt.set_font_name('Arial')
+            if fmt.font_size==11:fmt.set_font_size(10)
+        fmt_title.set_font_size(14)
     workbook.close()
     return buf.getvalue()

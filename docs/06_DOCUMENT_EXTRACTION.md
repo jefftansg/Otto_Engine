@@ -44,3 +44,7 @@ Accept unordered mixed bank statements and books, prior-year financial statement
 ## Planned Otto Auto intake (21 November 2026)
 
 Accept unordered bank statements, prior-year accounts, bookkeeping files and templates in one batch. Identify account, company, dates, opening/closing balances and monthly gaps with field-level source provenance. Detect overlaps, duplicates, inaccessible scans and altered demonstration statements; do not use the latter as genuine evidence. Current extraction implementation is unchanged. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Local Auto analysis and OCBC text rows
+
+Batches are bounded to 50 files / 100 MB, with the existing 25 MB per-file limit reflected in Streamlit configuration. Inventory preserves unreadable/supporting/reference files for review; hashes deduplicate exact content. Explicit fictional/demo markers exclude bank evidence, without claiming general authenticity detection. Unprefixed OCBC periods/B/F/C/F are supported. A new review-only text-row fallback requires consecutive running balances, a consistent final balance, unambiguous dates and matching printed withdrawal/deposit totals. Failed checks return no rows. No OCR, amount invention or filename-derived financial dates.

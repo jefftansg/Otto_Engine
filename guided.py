@@ -329,7 +329,7 @@ def render(p, inspect, register_evidence, suggest):
     # its new default, while ordinary reruns keep the user's selected tab.
     suffix='\u200b' if st.session_state.get('guided_navigation_revision',0)%2 else '\u200c'
     labels=[label+suffix for label in labels]
-    st.caption('Green ✓ Cleared · Amber ! Needs attention · Grey ○ Not started. Select a tab to review it. Cleared means the current checks passed, not professional approval.')
+    st.caption('Green ✓ Cleared · Amber ! Needs attention · Grey ○ Not started. Select a tab to review it. Cleared means the current checks passed, not professional approval. Documents: Uploaded files reviewed describes only the files supplied, not complete financial-year coverage.')
     tabs=st.tabs(labels, default=labels[stage])
 
     with tabs[0]:
@@ -592,6 +592,13 @@ def render(p, inspect, register_evidence, suggest):
         st.subheader('Final review and reports')
         st.write('Here is what is complete, and what still needs attention. Nothing will be labelled approved automatically.')
         result=generate(p)
+        if cfg.get('auto_enabled'):
+            from engine.auto import analyse, bank_proposal
+            from engine.auto_reports import frozen_report
+            from auto import _issues
+            analysis=analyse(st.session_state.get('guided_files',[]),cfg,inspect)
+            auto_records,_=_issues(p,analysis,bank_proposal(analysis,cfg,p.bank))
+            result,_=frozen_report(p,analysis,auto_records)
         questions=build_questions(p,parsed,_bank_batch(parsed,cfg,p.bank))
         remaining=outstanding(questions,cfg.get('clarification_answers',{}))
         crucial=[q for q in remaining if q['priority']=='Required']

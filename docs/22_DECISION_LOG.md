@@ -94,3 +94,7 @@ Approved product direction, implementation planned: improve on the current cumbe
 ## Decision 018 — report consistency outranks workflow polish (21 November 2026)
 
 Product priority clarified: matching the previously approved financial-report layouts, font sizes, whitespace, table formatting and pagination is more important than merely reducing data-entry steps. Choose template-first generation with an immutable approved style/version; require independent numeric and visual acceptance. No claim of exact match until historical examples received and owner signs off. Preserve current v1.3.1 baseline. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
+
+## Decision 017 — local Auto preview and reference-derived layouts
+
+User authorized Otto Auto implementation on 21 November 2026, selected local processing and supplied report references. Implement a local upload-first candidate, preserving the shared Decimal ledger and explicit approvals. No provider/data transmission is configured. Add versioned typography profiles and blank signature regions without copying client figures, disclosures or signatures. Exact master-template fidelity and owner/professional approval remain independent release gates. Keep existing sessions intact during pilot launch.

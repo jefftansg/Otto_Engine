@@ -228,6 +228,8 @@ def consolidate_statement_balances(summaries,fy_start,fy_end):
 def propose_bank_rows(doc):
     """Best-effort auto mapping; ambiguous signed amount exports are excluded from this shortcut."""
     candidates=[];exceptions=[]
+    if not doc.tables and re.search(r'\bOCBC\b',doc.text_excerpt,re.I):
+        return _ocbc_text_rows(doc)
     for table in doc.tables:
         found=False
         for header in range(1,min(9,len(table.rows))+1):
@@ -245,7 +247,60 @@ def propose_bank_rows(doc):
                 if skipped:exceptions.append(f'{table.label}: {len(skipped)} rows excluded as headers/totals/invalid dates; review the source.')
                 found=True;break
         if not found:exceptions.append(f'{table.label}: no reliable transaction columns identified; use manual column mapping.')
+    if not candidates and re.search(r'\bOCBC\b',doc.text_excerpt,re.I):
+        return _ocbc_text_rows(doc)
     dedup=existing_duplicates([],candidates,'bank')
     if dedup:exceptions.append(f'{len(dedup)} repeated transaction row(s) detected inside the upload.')
     candidates=[x for i,x in enumerate(candidates) if i not in set(dedup)]
     return candidates,exceptions
+
+
+def _ocbc_text_rows(doc):
+    """Review-only proposals tied to printed running balances AND statement totals."""
+    summary=extract_bank_statement(doc)
+    if summary.get('bank')!='OCBC' or not all(summary.get(k) is not None for k in ('opening','closing','period_start','period_end')):
+        return [],['No supported OCBC text transaction layout.']
+    low=date.fromisoformat(summary['period_start']);high=date.fromisoformat(summary['period_end'])
+    lines=_lines(doc.text_excerpt);rows=[];previous=Decimal(summary['opening']);problems=[]
+    totals=None;active=False
+    for i,line in enumerate(lines):
+        if re.search(r'^Total\s+Withdrawals\s*/\s*Deposits\b',line,re.I):
+            values=_money_candidates(line)
+            if len(values)==2:totals=values
+        if re.match(r'^BALANCE\s+B\s*/\s*F\b',line,re.I):active=True;continue
+        if re.match(r'^BALANCE\s+C\s*/\s*F\b',line,re.I):active=False;continue
+        if not active:continue
+        match=re.match(r'^(\d{1,2}\s+[A-Z]{3})\s+(?:(\d{1,2}\s+[A-Z]{3})\s+)?(.+)$',line,re.I)
+        if not match:continue
+        amounts=_money_candidates(match.group(3))
+        if len(amounts)!=2:
+            problems.append(f'Line {i+1}: transaction amount and running balance need manual mapping.');continue
+        dates=[]
+        for year in range(low.year,high.year+1):
+            parsed=_date(match.group(1)+' '+str(year))
+            if parsed and low<=date.fromisoformat(parsed)<=high:dates.append(parsed)
+        if len(dates)!=1:
+            problems.append(f'Line {i+1}: transaction date is ambiguous.');continue
+        amount,balance=amounts;change=balance-previous
+        if amount<=0 or abs(change)!=amount:
+            problems.append(f'Line {i+1}: printed amount does not match running-balance movement.');continue
+        # Remove only the two terminal monetary columns, preserving source description.
+        description=re.sub(r'\s+[\d,]+\.\d{2}\s+[\d,]+\.\d{2}\s*$','',match.group(3)).strip()
+        if not description:
+            problems.append(f'Line {i+1}: description missing.');continue
+        details=[]
+        for following in lines[i+1:i+9]:
+            if re.match(r'^(?:\d{1,2}\s+[A-Z]{3}\b|BALANCE\b|Total\b|Please\s+turn|OCBC\s+Bank|Deposit\s+Insurance|STATEMENT\s+OF\s+ACCOUNT|Account\s+No)',following,re.I):break
+            details.append(following)
+        if details:description+=' | '+' | '.join(details)
+        rows.append(dict(date=dates[0],description=description,reference='OCBC-'+doc.sha256[:10]+'-'+str(i+1),
+                         deposit=str(amount) if change>0 else '',withdrawal=str(amount) if change<0 else '',
+                         account_code='9999',evidence_ref='DOC-'+doc.sha256[:10].upper(),
+                         notes='Review-only OCBC text extraction; running balance and printed statement totals cross-checked.'))
+        previous=balance
+    deposits=sum((Decimal(r['deposit'] or '0') for r in rows),Decimal('0'))
+    withdrawals=sum((Decimal(r['withdrawal'] or '0') for r in rows),Decimal('0'))
+    if previous!=Decimal(summary['closing']):problems.append('Final extracted running balance differs from printed closing balance.')
+    if totals is None or totals!=[withdrawals,deposits]:problems.append('Extracted withdrawals/deposits do not match the printed statement totals.')
+    if problems:return [],problems
+    return rows,[]

@@ -84,3 +84,7 @@ Management Accounts, UFS and PDF/XLSX workpapers must derive from one determinis
 ## P0 visual/layout acceptance override (21 November 2026)
 
 **Template fidelity is mandatory, not cosmetic.** Use approved MA/UFS master templates as visual authorities: fonts and point sizes, margins, heading hierarchy, line spacing, table column widths, cell padding, rules, currency/comparative conventions, page breaks, page numbering and section sequence must be fixed per template revision. The frozen ledger remains the numerical authority. Require visual golden-master review plus accounting tie-outs for release. DOCX output is planned and must not be represented as existing v1.3.1 functionality. Exact style values and source references are pending approved historical examples. Full detail: [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
+
+## Versioned draft layouts and snapshots
+
+Auto export freezes one shared-ledger package and records snapshot, renderer and layout IDs. Reports remain provisional/draft, never final or authorised. Compact and standard sans profiles derive only reusable formatting from supplied references, with explicit Helvetica substitution. No client figures or signatures are copied. Blank signatory boxes are included for reference-derived UFS. Auto and Advanced use the same renderers and layout selection; exact historic template reproduction and DOCX output remain pending.

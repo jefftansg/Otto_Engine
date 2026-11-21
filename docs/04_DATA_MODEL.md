@@ -69,3 +69,7 @@ Bank journal IDs use row indices, references can be blank and journal IDs group 
 ## Proposed Otto Auto model extension (21 November 2026)
 
 Future model additions require raw-source hash, entity/account/period identity, field-level source provenance, staged extraction confidence, AI candidate ID, human decision, exception lifecycle, report snapshot/revision and readiness status. Do not mutate approved journals when an inference changes. Existing v1.3.1 data model remains authoritative until implementation. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Auto preview configuration extensions
+
+Optional company.json keys: `auto_enabled`, `auto_inventory` (source identity/type/field excerpts/review reasons, no source bytes), `auto_setup_provenance`, `auto_imports` (reviewed proposal IDs and source hashes), `auto_category_history` (canonical before/after bank revisions, previous/approved codes and reversal status), `report_layout_ma` and `report_layout_ufs`. Core CSV schemas and Decimal accounting remain unchanged. The report bundle manifest separately captures a frozen snapshot, report revision, renderer hash, layout tokens and file hashes; no authorised/final state is offered. Restored source summaries require original files to be re-uploaded for checks.

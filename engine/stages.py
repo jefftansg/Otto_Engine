@@ -29,4 +29,4 @@ def stage_statuses(pkg, parsed, batch, files=(), decisions=None):
 
 def tab_labels(stages, statuses):
     styles = {'Cleared':('green','✓'), 'Needs attention':('orange','!'), 'Not started':('gray','○')}
-    return [f":{styles[status][0]}[{styles[status][1]} {label} · {status}]" for label,status in zip(stages,statuses)]
+    return [f":{styles[status][0]}[{styles[status][1]} {label} · {'Uploaded files reviewed' if 'Documents' in label and status=='Cleared' else status}]" for label,status in zip(stages,statuses)]

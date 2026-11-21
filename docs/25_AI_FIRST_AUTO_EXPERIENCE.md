@@ -1,7 +1,7 @@
-# Otto Auto — AI-first document-first experience (proposed)
+# Otto Auto — AI-first document-first experience
 
 - Date: 21 November 2026
-- State: Approved product direction; NOT implemented in v1.3.1
+- State: Approved direction; local subsets implemented in v1.4.0 preview; not implemented in historical v1.3.1
 - Owner: Product
 - Scope: Bookkeeping, Management Accounts and draft UFS for Singapore SMEs; excludes tax, GST, statutory filing, XBRL, audit and assurance.
 
@@ -57,3 +57,7 @@ After outstanding M0 acceptance: (1) upload-first UX prototype; (2) source inven
 ## Open design questions
 
 Decide AI provider/on-device processing and consent; OCR scope; exact reporting materiality/authorization gates; user template mapping; maximum batch sizes; measurable UX acceptance targets. Preserve existing regulatory and professional-review boundaries.
+
+## Current candidate status — v1.4.0
+
+The user authorized implementation and selected local processing. AUTO-001–007 have Partial implementations described in [the implementation record](27_OTTO_AUTO_IMPLEMENTATION.md). AUTO-008 and full professional/template acceptance remain pending. No LLM service is connected. Existing Planned tables/test criteria above describe the complete target, not a claim that every criterion has passed.
