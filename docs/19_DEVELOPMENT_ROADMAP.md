@@ -75,3 +75,7 @@ Prioritise document-first UX over peripheral modules once M0 is validated: (1) u
 ## P0 priority correction — report fidelity first (21 November 2026)
 
 Before polishing the proposed Otto Auto workflow, secure the old approved MA/UFS report templates, define a canonical layout/style schema, reproduce their typography/spacing/table design deterministically and pass golden-master visual and accounting checks. Preserve the M0 stability gate. Otto Auto can then simplify intake while reusing the approved report renderer. Planned, no implementation claimed. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
+
+## Auto implementation candidate
+
+A local v1.4.0 preview now implements the upload-first workflow and tested subsets of AUTO-001–007. User chose local processing. Outstanding: on-device/connected AI if separately selected, OCR, multi-account consolidation, full reference-template mapping and visual owner approval, native Excel/mobile/keyboard UAT and comparative usability measurements. M0 and professional acceptance are not automatically signed off by this preview.

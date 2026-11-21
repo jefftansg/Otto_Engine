@@ -90,3 +90,7 @@ Verification for this follow-up: `python -m unittest discover -s tests -v` — 1
 ## OCBC extraction fix — 21 November 2026
 
 v1.3.1 parser follow-up: recognise OCBC BALANCE B/F, BALANCE C/F and complete date headings beside BUSINESS GROWTH ACCOUNT or on a separate line. No values inferred from filenames or transaction totals. Full unittest suite: 109 passed, no failures or skips, local Python 3.9 / M0 pinned environment. Read-only local validation of 11 user-provided statements passed summary extraction and adjacent balance continuity; client files/data were not added to source or fixtures. November fictional material was excluded from this continuity validation. No live posting or balance approval was performed.
+
+## v1.4.0 — local Auto preview
+
+See [release notes](../RELEASE_NOTES_v1.4.0.md) and [implementation/verification matrix](27_OTTO_AUTO_IMPLEMENTATION.md). Default upload-first intake, source-backed contextual setup, conservative one-account reviewed import, persistent exceptions, undoable classification and versioned provisional report bundles are implemented as a local candidate. Full PRD delivery, M0 acceptance, connected AI and exact template visual approval are not claimed.

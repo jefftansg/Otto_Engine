@@ -88,3 +88,7 @@ OTTO-AUTO-001–008 specify single-screen batch upload, source-backed company/FY
 ## P0 report-design and consistency requirements (21 November 2026)
 
 **Higher immediate priority than generic Auto UX convenience.** OTTO-DES-001–009 require approved MA/UFS master templates, fixed typography tokens and page geometry, consistent financial tables/number formatting, source-to-layout mapping, prospective DOCX/PDF fidelity, golden-master visual regression, owner approval and identical Auto/Advanced presentation. Exact fonts, sizes and margins remain TBD until historical reports are supplied. Do not treat successful PDF generation as layout acceptance. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md). Existing OTTO-REP-002 remains blocked for missing approved reference examples.
+
+## v1.4.0 local Auto preview implementation
+
+The user authorized implementation and chose local processing. OTTO-AUTO-001–007 now have tested subsets; they are Partial rather than fully delivered. OTTO-AUTO-008 remains Planned pending a real usability benchmark. Source inventory/coverage, contextual setup, reviewed imports, persistent exceptions and frozen provisional reports are implemented. Local category rules and validated external AI JSON exchange are available; no LLM inference runs. See [implementation evidence](27_OTTO_AUTO_IMPLEMENTATION.md). Earlier v1.3.1 as-is claims above remain historical.

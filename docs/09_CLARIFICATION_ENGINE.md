@@ -53,3 +53,7 @@ Acknowledging a question can affect readiness lists earlier than substantive rev
 ## Exception-first dialogue (planned, 21 November 2026)
 
 Cluster material questions, present source citations and one next action, and persist decision history. For FYE 30 Nov 2026, Dec 2025 through Oct 2026 covers 11 months; request authentic November 2026 evidence or label through-October outputs provisional. A prior-month edited demo is never valid month-end evidence. Answers do not automatically approve journals. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Auto exception consolidation
+
+Auto presents one persistent inbox rather than repeating the same issue on five tabs. Company identity/date questions are handled by the contextual setup form; bank coverage by one account-level finding, and classification by one transaction review list. Distinct disclosures, director records and financial checks remain visible. Answers/progress do not post journals. Missing source evidence after restore stays Needs recheck. Existing issue IDs/history are retained. See docs/27 for the tested scope.

@@ -88,3 +88,7 @@ The obsolete-upload/history removal change introduces no regulatory, framework, 
 ## OCBC extraction fix — 21 November 2026
 
 OCBC extraction-format fix: no change to regulatory authorities, frameworks, filing rules, dependencies or licensing. It improves source-format recognition only.
+
+## v1.4.0 local Auto preview
+
+No regulatory source editions, licensing rules, reporting frameworks, accounting policies or filing/audit scopes changed. No network AI provider, OCR or new dependency was added. PDF uses built-in Helvetica as an explicit substitute for reference Arial/Liberation Sans; no embedded reference fonts, signatures or client report content were copied. Reference-derived layouts are not yet owner-approved.

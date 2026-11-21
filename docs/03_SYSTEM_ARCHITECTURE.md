@@ -79,3 +79,7 @@ Raw files and hashes → staged extraction with provenance → optional AI propo
 ## Proposed Otto Auto architecture (21 November 2026)
 
 Original documents → staged extraction and field-level provenance → optional AI proposals → exception/approval queue → deterministic Decimal double-entry ledger → reconciliation and cutoff checks → frozen report snapshot → draft PDF/XLSX. AI is not a posting or accounting authority. Existing application architecture above remains the current release. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Local Auto candidate architecture
+
+`auto.py` is the upload-first presentation layer. `engine/auto.py` inspects sources without mutating books, groups accounts, proposes fields and computes monthly coverage; approvals invoke separate mutation functions. `auto_classification.py` validates untrusted suggestions and versions/undoes explicit category approvals. `auto_reports.py` deep-copies the shared Package, generates one accounting snapshot and produces a hash-inventoried provisional bundle with fixed layout IDs. Existing Guided/Advanced views use the same package and renderers. There is no AI/OCR network service. See docs/27 for tested subsets and gaps.

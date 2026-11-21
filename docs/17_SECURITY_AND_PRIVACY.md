@@ -41,3 +41,7 @@ Local scope reduces exposure while confidentiality still depends on machine, fil
 ## Planned Otto Auto privacy controls (21 November 2026)
 
 Document-first intake and any external AI processor require explicit data handling design: consent, provider selection, minimisation, per-client isolation, retention/deletion, audit trail, restricted log content and protection against prompt injection in uploaded files. Provider and hosted architecture remain undecided; do not infer current documents are sent externally. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Local Auto privacy and retention
+
+The user selected local processing. No AI provider, external upload or OCR service is configured. Streamlit binds to loopback and usage statistics are disabled in project configuration. Optional classification review requests are local files; the operator decides any later sharing outside Otto. AI JSON input is limited to 1 MB and validated against canonical ledger revision, category IDs, row bounds and source references before staging. Original source bytes remain session-only; workspace ZIPs retain sensitive source metadata/excerpts and accounting records, so store them securely. Reference report financial values/signatures/font binaries are not bundled or committed.

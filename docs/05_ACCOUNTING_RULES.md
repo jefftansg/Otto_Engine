@@ -79,3 +79,7 @@ OCBC abbreviated balance labels are treated as explicit source proposals, subjec
 ## Otto Auto accounting invariants (planned, 21 November 2026)
 
 AI extraction/classification is advisory only; approved transactions continue through deterministic Decimal double entry, bank reconciliation, period cutoff, reversals and source identity rules. An absent monthly statement, inconsistent opening/closing balances, or a date-altered demo document cannot establish financial completeness. Provisional drafts must be labelled; unresolved material errors prohibit authorised reports. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Local Auto review boundaries
+
+Auto proposals never silently post. Confirm identity/dates, review exact transactions and explicitly approve import. Current Auto posting is one account/full period into an empty bank ledger; older/existing books require detailed review. Local rules and imported AI suggestions cannot change monetary values. OCBC text-row money direction must agree with consecutive printed balances and independently printed withdrawal/deposit totals, then requires human review. Unknown opening counterparts remain unresolved under existing core rules. No recognition or measurement policy has changed.

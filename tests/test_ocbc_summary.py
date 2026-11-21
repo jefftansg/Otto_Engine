@@ -43,3 +43,40 @@ class OCBCSummaryTests(unittest.TestCase):
             'Example Bank\nSTATEMENT OF ACCOUNT\n1 DEC 2024 TO 31 DEC 2024',
         ):
             self.assertIsNone(extract(body)['period_start'])
+
+
+class OCBCTransactionTests(unittest.TestCase):
+    def doc(self, alteration=''):
+        text='''OCBC Bank
+STATEMENT OF ACCOUNT
+Company Name: EXAMPLE WORKS PTE. LTD.
+Account No. 1234567890
+BUSINESS GROWTH ACCOUNT 1 DEC 2024 TO 31 DEC 2024
+BALANCE B/F 100.00
+02 DEC 02 DEC BANK CHARGES 10.00 90.00
+05 DEC 05 DEC FAST TRANSFER 50.00 140.00
+BALANCE C/F 140.00
+Total Withdrawals/Deposits 10.00 50.00
+1 JAN 2025 Promotion effective date
+'''
+        if alteration=='movement':text=text.replace('10.00 90.00','11.00 90.00')
+        if alteration=='totals':text=text.replace('10.00 50.00','9.00 50.00')
+        if alteration=='closing':text=text.replace('BALANCE C/F 140.00','BALANCE C/F 150.00')
+        if alteration=='no-totals':text=text.replace('Total Withdrawals/Deposits 10.00 50.00','')
+        return SourceDocument('synthetic.pdf','synthetic',[],text_excerpt=text)
+
+    def test_running_balances_and_totals_corroborate_money_direction(self):
+        from engine.autofill import propose_bank_rows
+        rows,errors=propose_bank_rows(self.doc())
+        self.assertEqual(errors,[])
+        self.assertEqual(len(rows),2)
+        self.assertEqual((rows[0]['withdrawal'],rows[1]['deposit']),('10.00','50.00'))
+        self.assertTrue(all(r['account_code']=='9999' for r in rows))
+        self.assertEqual(rows[0]['date'],'2024-12-02')
+
+    def test_corrupt_or_missing_corroboration_returns_no_rows(self):
+        from engine.autofill import propose_bank_rows
+        for condition in ('movement','totals','closing','no-totals'):
+            rows,errors=propose_bank_rows(self.doc(condition))
+            self.assertEqual(rows,[])
+            self.assertTrue(errors)

@@ -116,3 +116,7 @@ TEST-OTTO-AUTO-001–009 test batch upload, provenance, bank month gaps/overlaps
 ## P0 visual report test suite (planned; not executed, 21 November 2026)
 
 TEST-OTTO-DES-001–009 cover master-template versioning, typography token consistency, page geometry, table/number alignment, field mapping, PDF vs prospective DOCX geometry, golden-master page renders, owner approval, and Auto/Advanced reproducibility. Include long company names, negative values, sparse schedules, long descriptions and multi-page notes. Passes of PDF-signature tests do NOT count as visual acceptance. Do not claim historical parity without reference documents. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
+
+## Auto candidate tests
+
+`tests/test_auto.py` covers upload-first default, shared views, synthetic inventory and provenance, missing November, previous-period opening evidence, duplicate/demo/company exclusion, exact approval/stale-setup rejection, retry/ZIP restore, AI JSON validation, frozen snapshots, layout numeric equality and provisional status. `tests/test_ocbc_summary.py` additionally checks running balance / statement totals and rejection of corrupt or absent corroboration. Legacy UI tests now explicitly select Guided, preserving regression coverage for that mode. Real client statements are used only for local read-only inspection; no original data is committed.
