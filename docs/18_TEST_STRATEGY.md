@@ -112,3 +112,7 @@ The suite misses large layout variations, groups/regulatory decisions, report-by
 ## Planned Otto Auto acceptance tests (not executed, 21 November 2026)
 
 TEST-OTTO-AUTO-001–009 test batch upload, provenance, bank month gaps/overlaps/duplicates, AI approval isolation, persistent exceptions, deterministic report tie-outs, Auto-to-Advanced shared state, measured usability improvement, and rejection of date-altered demo statements as genuine evidence. Existing regression and Mac/browser acceptance are also mandatory before release. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## P0 visual report test suite (planned; not executed, 21 November 2026)
+
+TEST-OTTO-DES-001–009 cover master-template versioning, typography token consistency, page geometry, table/number alignment, field mapping, PDF vs prospective DOCX geometry, golden-master page renders, owner approval, and Auto/Advanced reproducibility. Include long company names, negative values, sparse schedules, long descriptions and multi-page notes. Passes of PDF-signature tests do NOT count as visual acceptance. Do not claim historical parity without reference documents. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
