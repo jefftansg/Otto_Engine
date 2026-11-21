@@ -80,3 +80,7 @@ PDF signature tests do not validate field placement. XlsxWriter converts Decimal
 ## Proposed Otto Auto output rules (21 November 2026)
 
 Management Accounts, UFS and PDF/XLSX workpapers must derive from one deterministic frozen ledger snapshot and reconcile to the cent. Each report records financial period, source coverage, exceptions, snapshot and draft/provisional status. Missing genuine FY-end evidence blocks final authorisation. Exclude audit/assurance, tax and filing claims. This is planned, not shipped. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## P0 visual/layout acceptance override (21 November 2026)
+
+**Template fidelity is mandatory, not cosmetic.** Use approved MA/UFS master templates as visual authorities: fonts and point sizes, margins, heading hierarchy, line spacing, table column widths, cell padding, rules, currency/comparative conventions, page breaks, page numbering and section sequence must be fixed per template revision. The frozen ledger remains the numerical authority. Require visual golden-master review plus accounting tie-outs for release. DOCX output is planned and must not be represented as existing v1.3.1 functionality. Exact style values and source references are pending approved historical examples. Full detail: [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
