@@ -59,3 +59,7 @@ Remain in documentation and preparation scope pending explicit implementation ap
 - [Test Strategy](18_TEST_STRATEGY.md)
 - [Development Roadmap](19_DEVELOPMENT_ROADMAP.md)
 - [Decision Log](22_DECISION_LOG.md)
+
+## Otto Auto pending design decisions (21 November 2026)
+
+Determine OCR/batch limits, AI provider or local inference and client consent, configurable materiality/provisional approval gates, user-template mapping without statutory disclosure loss, and measured success targets for migration from Guided to Auto. Keep these unresolved until separately designed and tested. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
