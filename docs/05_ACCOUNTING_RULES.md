@@ -71,3 +71,7 @@ Single bank and fixed COA limit transfers, FX, accumulated depreciation and liab
 ### Obsolete source history removal
 
 Removing an uploaded source or saved statement extraction summary does not reverse or delete recorded transactions or evidence. Saved statement-history removal revokes bank balance confirmation while retaining amounts for review. Corrections to the books still require the existing transaction/correction workflow.
+
+## OCBC extraction fix — 21 November 2026
+
+OCBC abbreviated balance labels are treated as explicit source proposals, subject to the existing ambiguity, account, coverage and continuity checks. Recognition does not approve a balance or post transactions. Accounting recognition and measurement rules are unchanged.

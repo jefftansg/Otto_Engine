@@ -82,3 +82,7 @@ Observed decisions describe source behaviour. Original approval identities and d
 ## Decision 015 — separate uploads from saved extraction history
 
 21 November 2026. User-authorized obsolete-file removal distinguishes in-memory uploads from statement summaries persisted in company.json. Remove only selected summaries; retain accounting and evidence provenance and invalidate bank balance confirmation. Previously exported ZIPs remain immutable. No accounting recognition or measurement policy changed.
+
+## OCBC extraction fix — 21 November 2026
+
+Decision 016 — support explicit OCBC summary labels. User-authorized parser repair recognises B/F and C/F with existing conservative amount selection. Unprefixed dates are accepted only as complete OCBC statement headings; differing heading periods remain unresolved. Use synthetic fixtures and keep client bank statements out of version control.

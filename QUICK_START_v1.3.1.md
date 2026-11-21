@@ -53,3 +53,7 @@ No corporate tax computations, GST filing or ACRA/XBRL filing are included.
 In Guided Documents or Bank, use **Review or delete uploaded files** to delete selected available uploads. For records from previous workspaces, find **Saved statement history**, choose **Select obsolete statement history to remove**, then click **Remove selected statement history**. Advanced Setup also provides saved-history removal and **Remove selected available files** for retained uploads.
 
 Saved history contains extraction summaries, not the original PDFs. Removal preserves recorded transactions, evidence, company fields and balance amounts. Reverify bank balances after removal and save a new workspace ZIP. Original Mac files and older exported ZIPs remain unchanged. Removing a summary does not correct or reverse any accounting entry.
+
+## OCBC extraction fix — 21 November 2026
+
+OCBC statements: upload text-based PDFs under Documents. Otto recognises BALANCE B/F (opening), BALANCE C/F (closing) and OCBC period headings. Confirm the company reporting dates and review the extracted figures under Bank. This does not guarantee every transaction was extracted. Missing months and conflicting amounts still require review.
