@@ -65,3 +65,7 @@ Bank journal IDs use row indices, references can be blank and journal IDs group 
 - [Accounting Rules](05_ACCOUNTING_RULES.md)
 - [Clarification Engine](09_CLARIFICATION_ENGINE.md)
 - [Security And Privacy](17_SECURITY_AND_PRIVACY.md)
+
+## Proposed Otto Auto model extension (21 November 2026)
+
+Future model additions require raw-source hash, entity/account/period identity, field-level source provenance, staged extraction confidence, AI candidate ID, human decision, exception lifecycle, report snapshot/revision and readiness status. Do not mutate approved journals when an inference changes. Existing v1.3.1 data model remains authoritative until implementation. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
