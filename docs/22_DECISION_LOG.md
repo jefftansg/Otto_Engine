@@ -90,3 +90,7 @@ Decision 016 — support explicit OCBC summary labels. User-authorized parser re
 ## Decision 017 — Otto Auto product direction (21 November 2026)
 
 Approved product direction, implementation planned: improve on the current cumbersome Guided setup using default document-first intake, evidence-driven automatic preparation, exception-only questions, and report generation; preserve Advanced and one ledger. AI may propose but not post, invent source evidence, override reconciliations or authorise reports. The v1.3.1 Company-first interface remains the implemented baseline. New requirements OTTO-AUTO-001–008 and proposed tests follow. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Decision 018 — report consistency outranks workflow polish (21 November 2026)
+
+Product priority clarified: matching the previously approved financial-report layouts, font sizes, whitespace, table formatting and pagination is more important than merely reducing data-entry steps. Choose template-first generation with an immutable approved style/version; require independent numeric and visual acceptance. No claim of exact match until historical examples received and owner signs off. Preserve current v1.3.1 baseline. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
