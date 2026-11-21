@@ -75,3 +75,7 @@ Browser sessions and downloads cross confidentiality boundaries. Package depende
 ## Proposed Otto Auto architecture (21 November 2026)
 
 Raw files and hashes → staged extraction with provenance → optional AI proposals → exception/approval queue → Decimal double-entry ledger → deterministic bank reconciliation and validation → frozen report snapshot → draft Management Accounts/UFS/PDF/XLSX. Approved changes only enter accounting records; AI never silently posts, alters cutoff dates or substitutes for source evidence. The existing Streamlit application architecture above remains current. See [Otto Auto proposal](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Proposed Otto Auto architecture (21 November 2026)
+
+Original documents → staged extraction and field-level provenance → optional AI proposals → exception/approval queue → deterministic Decimal double-entry ledger → reconciliation and cutoff checks → frozen report snapshot → draft PDF/XLSX. AI is not a posting or accounting authority. Existing application architecture above remains the current release. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
