@@ -76,3 +76,7 @@ PDF signature tests do not validate field placement. XlsxWriter converts Decimal
 - [Ufs Preparation And Disclosures](11_UFS_PREPARATION_AND_DISCLOSURES.md)
 - [Test Strategy](18_TEST_STRATEGY.md)
 - [Open Questions](23_OPEN_QUESTIONS.md)
+
+## Proposed Otto Auto output rules (21 November 2026)
+
+Management Accounts, UFS and PDF/XLSX workpapers must derive from one deterministic frozen ledger snapshot and reconcile to the cent. Each report records financial period, source coverage, exceptions, snapshot and draft/provisional status. Missing genuine FY-end evidence blocks final authorisation. Exclude audit/assurance, tax and filing claims. This is planned, not shipped. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
