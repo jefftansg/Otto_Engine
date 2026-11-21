@@ -84,3 +84,7 @@ Implemented: Guided Documents/Bank and Advanced Setup show saved statement histo
 ## OCBC extraction fix — 21 November 2026
 
 OCBC summary extraction: implemented B/F and C/F balance labels and OCBC statement period headings without a Period/From prefix. Repeated identical headings are accepted; ambiguous balances and conflicting OCBC heading periods remain unresolved. Synthetic regression cases: tests/test_ocbc_summary.py.
+
+## Planned Otto Auto traceability (21 November 2026)
+
+OTTO-AUTO-001 → TEST-OTTO-AUTO-001 (upload); 002 → 002 (provenance); 003 → 003 and 009 (gaps, duplicate and authentic evidence); 004 → 004 (AI proposals); 005 → 005 (exception queue); 006 → 006 (reports); 007 → 007 (Advanced and ZIP); 008 → 008 (UX measurement). **All Planned, not implemented/tested.** See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
