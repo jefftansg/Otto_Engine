@@ -7,3 +7,7 @@
 5. Protect source files, identity data, exports, backups and logs. Test restore and any access-control or tenant boundary change. Use draft labels, explicit director and reviewer approval, and evidence-backed certifications only from responsible authorised professionals.
 
 6. Maintain a strict boundary between Otto's preparation output, contracted accountant review, formal SSRS 4410 compilation/SSRE review engagements, and independent audits under SSAs. Do not describe an accountant's quality review as assurance, issue an audit opinion, mark an Otto-generated UFS as audited, or imply that a partner is employed or engaged without evidence. Record the client's separate engagement of any auditor, auditor independence decisions by that professional, client permission before evidence sharing, and professional approval responsibilities. Treat audit-ready export, external reviewer routing and related audit-handoff status as planned unless verified in source and tests. See OTTO-SVC-001/002 and OTTO-AUD-001/002.
+
+## Planned Otto Auto guardrails (21 November 2026)
+
+Use docs/25_AI_FIRST_AUTO_EXPERIENCE.md as the target UX specification. Its requirements and tests remain planned. Do not claim they ship in v1.3.1. AI can propose source-linked classifications; no silent posting, invented balances, fabricated disclosures or acceptance of date-edited demo statements as authentic bank evidence. Preserve double-entry arithmetic, one shared ledger, traceability, corrections, authorised status labels and legacy ZIP compatibility. Keep source statements out of GitHub.
