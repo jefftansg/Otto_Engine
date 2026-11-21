@@ -108,3 +108,7 @@ The suite misses large layout variations, groups/regulatory decisions, report-by
 - [Development Roadmap](19_DEVELOPMENT_ROADMAP.md)
 - [Requirements Traceability](20_REQUIREMENTS_TRACEABILITY.md)
 - [Release Notes](21_RELEASE_NOTES.md)
+
+## Planned Otto Auto acceptance tests (not executed, 21 November 2026)
+
+TEST-OTTO-AUTO-001–009 test batch upload, provenance, bank month gaps/overlaps/duplicates, AI approval isolation, persistent exceptions, deterministic report tie-outs, Auto-to-Advanced shared state, measured usability improvement, and rejection of date-altered demo statements as genuine evidence. Existing regression and Mac/browser acceptance are also mandatory before release. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
