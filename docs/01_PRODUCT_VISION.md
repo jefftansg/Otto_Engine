@@ -41,3 +41,7 @@ Multiple-client operation needs identity and storage controls. Draft arithmetic 
 ## Product direction — Otto Auto (21 November 2026)
 
 Target promise: **Upload your documents. Otto does the bookkeeping and prepares your financial reports. You review and approve.** The planned document-first default reduces setup forms; users review only exceptions, while accountants retain Advanced controls. Current five-stage Guided mode remains the implemented baseline. See [Otto Auto proposal](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Approved product direction: Otto Auto (21 November 2026)
+
+**Upload your documents. Otto does the bookkeeping and prepares your financial reports. You review and approve.** Default is planned as document-first and exception-driven, with Advanced controls retained. Not shipped in v1.3.1. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
