@@ -71,3 +71,7 @@ Feasibility depends on approved datasets, Mac/browser access, primary rules and 
 ## Otto Auto priority after M0 (21 November 2026)
 
 Prioritise document-first UX over peripheral modules once M0 is validated: (1) upload-first prototype, (2) deterministic source inventory/coverage/deduplication, (3) AI classification proposals with human approval, (4) consolidated exceptions and draft reporting, (5) synthetic regression, Mac/browser usability and accountant pilot. Planned only; no delivery claims for v1.3.1. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## P0 priority correction — report fidelity first (21 November 2026)
+
+Before polishing the proposed Otto Auto workflow, secure the old approved MA/UFS report templates, define a canonical layout/style schema, reproduce their typography/spacing/table design deterministically and pass golden-master visual and accounting checks. Preserve the M0 stability gate. Otto Auto can then simplify intake while reusing the approved report renderer. Planned, no implementation claimed. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
