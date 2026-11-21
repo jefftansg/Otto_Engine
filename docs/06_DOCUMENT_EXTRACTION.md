@@ -36,3 +36,7 @@ Truncation and line-wrapping can lose context. Hash and row strings do not provi
 - [User Workflows Ux](08_USER_WORKFLOWS_UX.md)
 - [Security And Privacy](17_SECURITY_AND_PRIVACY.md)
 - [Test Strategy](18_TEST_STRATEGY.md)
+
+## Proposed document-first extraction (21 November 2026)
+
+Accept unordered mixed bank statements and books, prior-year financial statements and templates in one batch. Create evidence inventory by entity, account, period and type; cite field-level extracted balances and dates; detect missing months, overlap and duplicate content; distinguish scan-only files and mock/demo-modified statements from valid bank evidence. Never infer nonexistent period statements from filenames. Current extractor remains unchanged. See [Otto Auto proposal](25_AI_FIRST_AUTO_EXPERIENCE.md).
