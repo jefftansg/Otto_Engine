@@ -11,3 +11,7 @@
 ## Planned Otto Auto guardrails (21 November 2026)
 
 Use docs/25_AI_FIRST_AUTO_EXPERIENCE.md as the target UX specification. Its requirements and tests remain planned. Do not claim they ship in v1.3.1. AI can propose source-linked classifications; no silent posting, invented balances, fabricated disclosures or acceptance of date-edited demo statements as authentic bank evidence. Preserve double-entry arithmetic, one shared ledger, traceability, corrections, authorised status labels and legacy ZIP compatibility. Keep source statements out of GitHub.
+
+## Proposed Otto Auto safeguards (21 November 2026)
+
+See docs/25_AI_FIRST_AUTO_EXPERIENCE.md. Preserve v1.3.1 release claims. Never silently post AI proposals, invent figures, treat a modified demo statement as genuine evidence, or mark incomplete reports final. Maintain a single deterministic double-entry ledger, source provenance, clear review states and legacy ZIP compatibility.
