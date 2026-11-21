@@ -57,3 +57,7 @@ Saved history contains extraction summaries, not the original PDFs. Removal pres
 ## OCBC extraction fix — 21 November 2026
 
 OCBC statements: upload text-based PDFs under Documents. Otto recognises BALANCE B/F (opening), BALANCE C/F (closing) and OCBC period headings. Confirm the company reporting dates and review the extracted figures under Bank. This does not guarantee every transaction was extracted. Missing months and conflicting amounts still require review.
+
+## Future Otto Auto experience — not part of this release
+
+An upload-first, AI-assisted, exception-driven Otto Auto workflow is documented as a product direction, not a v1.3.1 feature. Continue to use the Company-first steps above in this version. See [Otto Auto specification](docs/25_AI_FIRST_AUTO_EXPERIENCE.md).
