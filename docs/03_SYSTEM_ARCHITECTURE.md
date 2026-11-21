@@ -71,3 +71,7 @@ Browser sessions and downloads cross confidentiality boundaries. Package depende
 - [Document Extraction](06_DOCUMENT_EXTRACTION.md)
 - [Security And Privacy](17_SECURITY_AND_PRIVACY.md)
 - [Test Strategy](18_TEST_STRATEGY.md)
+
+## Proposed Otto Auto architecture (21 November 2026)
+
+Raw files and hashes → staged extraction with provenance → optional AI proposals → exception/approval queue → Decimal double-entry ledger → deterministic bank reconciliation and validation → frozen report snapshot → draft Management Accounts/UFS/PDF/XLSX. Approved changes only enter accounting records; AI never silently posts, alters cutoff dates or substitutes for source evidence. The existing Streamlit application architecture above remains current. See [Otto Auto proposal](25_AI_FIRST_AUTO_EXPERIENCE.md).
