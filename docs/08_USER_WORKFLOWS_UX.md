@@ -63,3 +63,7 @@ Routing has backend checks. Mac rendering, accessibility and unsaved-change reco
 - [Clarification Engine](09_CLARIFICATION_ENGINE.md)
 - [Report Specifications](10_REPORT_SPECIFICATIONS.md)
 - [Test Strategy](18_TEST_STRATEGY.md)
+
+## Planned Otto Auto default workflow (21 November 2026)
+
+**Upload → Auto-analyse → Review material exceptions → Generate/download.** Users begin at one drop zone without company-detail forms. Otto proposes source-backed company/FYE and balances, displays month coverage, asks only material questions, and offers clearly labelled draft MA/UFS/workpapers. Advanced remains accessible on the same ledger. The five-stage Company-first Guided workflow above is current v1.3.1, not this proposed future default. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
