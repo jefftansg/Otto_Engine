@@ -63,3 +63,7 @@ Remain in documentation and preparation scope pending explicit implementation ap
 ## Otto Auto pending design decisions (21 November 2026)
 
 Determine OCR/batch limits, AI provider or local inference and client consent, configurable materiality/provisional approval gates, user-template mapping without statutory disclosure loss, and measured success targets for migration from Guided to Auto. Keep these unresolved until separately designed and tested. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Report design prerequisites (P0, 21 November 2026)
+
+Obtain the specific previously accepted MA and UFS documents (prefer original editable DOCX/XLSX plus PDFs) and confirm fonts, sizes, margins, section sequence, numbering and template use rights. Decide canonical PDF/DOCX rendering strategy only after comparison. Until then, golden-master fidelity and editable Word claims remain unverified. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
