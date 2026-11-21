@@ -84,3 +84,7 @@ Direct retrieval of the full Companies Act sections and detailed ASC framework t
 ### 21 November 2026 — document removal UI
 
 The obsolete-upload/history removal change introduces no regulatory, framework, filing, licensing or accounting-policy changes. It preserves recorded accounting/evidence data and requires bank balances to be reverified after saved statement-history removal.
+
+## OCBC extraction fix — 21 November 2026
+
+OCBC extraction-format fix: no change to regulatory authorities, frameworks, filing rules, dependencies or licensing. It improves source-format recognition only.

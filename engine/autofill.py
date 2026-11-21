@@ -119,7 +119,7 @@ def _label_balance(lines,patterns,prefer_last=False):
         return None,[f'Conflicting labelled balance amounts detected ({len(different)} distinct values); check statement manually.']
     return vals[-1 if prefer_last else 0][0],[]
 
-def _period(lines):
+def _period(lines, ocbc_statement=False):
     joined='\n'.join(lines)
     patterns=[
       r'(?:Statement\s+Period|Period\s+Covered|For\s+the\s+Period|Period\s+From)\s*[:\-]?\s*('+DATE_RX+r')\s*(?:to|through|until|\-|–|—)\s*('+DATE_RX+r')',
@@ -130,6 +130,17 @@ def _period(lines):
         if m:
             a,b=_date(m.group(1)),_date(m.group(2))
             if a and b and a<=b:return a,b
+    if ocbc_statement:
+        # OCBC prints the period beside the account title, without "Period"/"From".
+        # Match only a complete heading line, never dates buried in transaction text.
+        periods=set()
+        heading=r'^(?:BUSINESS\s+GROWTH\s+ACCOUNT\s+)?('+DATE_RX+r')\s+TO\s+('+DATE_RX+r')$'
+        for line in lines:
+            m=re.fullmatch(heading,line,re.I)
+            if m:
+                a,b=_date(m.group(1)),_date(m.group(2))
+                if a and b and a<=b:periods.add((a,b))
+        if len(periods)==1:return next(iter(periods))
     return None,None
 
 def extract_bank_statement(doc):
@@ -144,9 +155,9 @@ def extract_bank_statement(doc):
     if not lines:return dict(detected=False,source=doc.name,warnings=['No readable statement text.'])
     text='\n'.join(lines)
     is_bank=bool(re.search(r'\b(?:BANK\s+STATEMENT|ACCOUNT\s+STATEMENT|TRANSACTION\s+HISTORY|STATEMENT\s+OF\s+ACCOUNT|BALANCE\s+BROUGHT\s+FORWARD)\b',text,re.I))
-    op,op_err=_label_balance(lines,[r'Opening\s+(?:Ledger\s+)?Balance',r'Balance\s+Brought\s+Forward',r'Brought\s+Forward\s+Balance',r'Beginning\s+Balance'])
-    cl,cl_err=_label_balance(lines,[r'Closing\s+(?:Ledger\s+)?Balance',r'Balance\s+Carried\s+Forward',r'Carried\s+Forward\s+Balance',r'Ending\s+Balance'],prefer_last=True)
-    start,end=_period(lines)
+    op,op_err=_label_balance(lines,[r'Opening\s+(?:Ledger\s+)?Balance',r'Balance\s+Brought\s+Forward',r'Brought\s+Forward\s+Balance',r'Beginning\s+Balance',r'Balance\s+B\s*/\s*F'])
+    cl,cl_err=_label_balance(lines,[r'Closing\s+(?:Ledger\s+)?Balance',r'Balance\s+Carried\s+Forward',r'Carried\s+Forward\s+Balance',r'Ending\s+Balance',r'Balance\s+C\s*/\s*F'],prefer_last=True)
+    start,end=_period(lines, ocbc_statement=bool(is_bank and re.search(r'\bOCBC\b',text,re.I)))
     if op is not None or cl is not None:is_bank=True
     account=''
     for i,line in enumerate(lines[:80]):
