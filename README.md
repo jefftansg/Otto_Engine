@@ -122,3 +122,7 @@ See [M0 Baseline Audit — Kickoff and Initial Findings](docs/milestones/M0_BASE
 ## Planned Otto Auto experience (21 November 2026)
 
 **Product direction, not implemented in v1.3.1:** a document-first default: upload bank statements, bookkeeping files and report templates; Otto identifies source-backed details and missing months; review only material exceptions; generate clearly labelled draft Management Accounts/UFS and workpapers. Advanced keeps detailed accounting controls on the same ledger. Optional AI interpretation proposes classifications but cannot post without approval or bypass deterministic reconciliations. The current Company-first five-stage Guided workflow remains unchanged in this release. See [Otto Auto specification](docs/25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Planned Otto Auto (21 November 2026)
+
+**Not implemented in v1.3.1.** Target default: upload statements, bookkeeping and templates; automatically identify evidence-backed details and missing periods; review material exceptions; download draft Management Accounts/UFS/workpapers. Optional AI proposes categories, while humans approve postings and the deterministic ledger reconciles totals. Advanced retains full controls. Current Company-first Guided flow remains unchanged. See [Otto Auto specification](docs/25_AI_FIRST_AUTO_EXPERIENCE.md).
