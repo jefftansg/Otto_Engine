@@ -75,3 +75,7 @@ Removing an uploaded source or saved statement extraction summary does not rever
 ## OCBC extraction fix — 21 November 2026
 
 OCBC abbreviated balance labels are treated as explicit source proposals, subject to the existing ambiguity, account, coverage and continuity checks. Recognition does not approve a balance or post transactions. Accounting recognition and measurement rules are unchanged.
+
+## Otto Auto accounting invariants (planned, 21 November 2026)
+
+AI extraction/classification is advisory only; approved transactions continue through deterministic Decimal double entry, bank reconciliation, period cutoff, reversals and source identity rules. An absent monthly statement, inconsistent opening/closing balances, or a date-altered demo document cannot establish financial completeness. Provisional drafts must be labelled; unresolved material errors prohibit authorised reports. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
