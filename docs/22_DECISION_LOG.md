@@ -86,3 +86,7 @@ Observed decisions describe source behaviour. Original approval identities and d
 ## OCBC extraction fix — 21 November 2026
 
 Decision 016 — support explicit OCBC summary labels. User-authorized parser repair recognises B/F and C/F with existing conservative amount selection. Unprefixed dates are accepted only as complete OCBC statement headings; differing heading periods remain unresolved. Use synthetic fixtures and keep client bank statements out of version control.
+
+## Decision 017 — Otto Auto product direction (21 November 2026)
+
+Approved product direction, implementation planned: improve on the current cumbersome Guided setup using default document-first intake, evidence-driven automatic preparation, exception-only questions, and report generation; preserve Advanced and one ledger. AI may propose but not post, invent source evidence, override reconciliations or authorise reports. The v1.3.1 Company-first interface remains the implemented baseline. New requirements OTTO-AUTO-001–008 and proposed tests follow. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
