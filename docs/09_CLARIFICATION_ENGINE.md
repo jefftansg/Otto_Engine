@@ -49,3 +49,7 @@ Acknowledging a question can affect readiness lists earlier than substantive rev
 - [User Workflows Ux](08_USER_WORKFLOWS_UX.md)
 - [Report Specifications](10_REPORT_SPECIFICATIONS.md)
 - [Test Strategy](18_TEST_STRATEGY.md)
+
+## Exception-first dialogue (planned, 21 November 2026)
+
+Cluster material questions, present source citations and one next action, and persist decision history. For FYE 30 Nov 2026, Dec 2025 through Oct 2026 covers 11 months; request authentic November 2026 evidence or label through-October outputs provisional. A prior-month edited demo is never valid month-end evidence. Answers do not automatically approve journals. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
