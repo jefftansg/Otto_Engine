@@ -88,3 +88,7 @@ OCBC summary extraction: implemented B/F and C/F balance labels and OCBC stateme
 ## Planned Otto Auto traceability (21 November 2026)
 
 OTTO-AUTO-001 → TEST-OTTO-AUTO-001 (upload); 002 → 002 (provenance); 003 → 003 and 009 (gaps, duplicate and authentic evidence); 004 → 004 (AI proposals); 005 → 005 (exception queue); 006 → 006 (reports); 007 → 007 (Advanced and ZIP); 008 → 008 (UX measurement). **All Planned, not implemented/tested.** See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Template-fidelity requirements (all Planned / visually untested, 21 November 2026)
+
+OTTO-DES-001–009 map to TEST-OTTO-DES-001–009 in [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md). Priority P0. OTTO-REP-002 remains Blocked: prior user-approved report examples unavailable in reviewed repo. Gate requires owner-approved golden-master outputs, not PDF file signatures.
