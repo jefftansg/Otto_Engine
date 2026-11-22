@@ -79,3 +79,7 @@ Before polishing the proposed Otto Auto workflow, secure the old approved MA/UFS
 ## P0 reporting completeness workstream (22 November 2026)
 
 Preserve M0 stabilisation. Before Auto UX expansion and commercial service launch, prioritize the reporting workstream (M6, with necessary M3 ledger and framework checks): baseline arithmetic audit → cash flow detail and MA export → equity components → comparative data → completeness and approval gates → template fidelity and reconciliation → regression/UAT/accounting approval. See [Complete financial statements and reporting readiness](27_FINANCIAL_STATEMENT_COMPLETENESS.md). The engine already has preliminary cash and equity summaries; no version bump or completed feature claim. Broader audit/filing automation remains outside current service scope.
+
+## Multi-bank priority (22 November 2026)
+
+After preserving M0 stability, complete M2 multi-bank SGD before final consolidated cash-flow acceptance under M6. A manual pilot is prepared on the development branch. Next: automated account identity/coverage and safe transfer review, migration, regression and owner acceptance; then finish OTTO-FS-001–006. See [multi-bank pilot](28_MULTI_BANK_SGD_PILOT.md).
