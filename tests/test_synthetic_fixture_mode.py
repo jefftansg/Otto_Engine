@@ -64,6 +64,20 @@ class SyntheticFixtureModeTests(unittest.TestCase):
         self.assertEqual(b['groups'][0]['errors'],[])
         self.assertIn('SYNTHETIC TEST',b['inventory'][0]['status'])
 
+    def test_otto_qa_test_institution_is_supported_only_in_test_mode(self):
+        item,doc=fixture()
+        doc.text_excerpt=doc.text_excerpt.replace('OCBC BANK','OTTO QA TEST FINANCIAL INSTITUTION - TEST ENVIRONMENT')
+        item['bytes']=doc.text_excerpt.encode()
+        item['sha256']=sha256(item['bytes']).hexdigest()
+        doc.sha256=item['sha256']
+        test_cfg=dict(CFG,synthetic_test_mode=True)
+        a=analyse_documents([item],test_cfg,inspect({item['name']:doc}))
+        self.assertEqual(len(a['groups']),1)
+        self.assertEqual(a['groups'][0]['bank'],'OTTO TEST BANK')
+        self.assertFalse(a['groups'][0]['errors'])
+        ordinary=analyse_documents([item],CFG,inspect({item['name']:doc}))
+        self.assertEqual(ordinary['groups'],[])
+
     def test_test_workspace_rejects_unmarked_bank_source(self):
         item,doc=fixture(marked=False)
         cfg=dict(CFG,synthetic_test_mode=True)
