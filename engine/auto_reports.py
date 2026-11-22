@@ -37,6 +37,9 @@ def frozen_report(pkg, analysis, issues):
         from .auto_multi import source_readiness
         complete=source_readiness(frozen.config,analysis.get('bank_intake'))
         balances_confirmed=all(m.get('confirmed') and m.get('coverage_confirmed') for m in frozen.config['bank_accounts'])
+    if frozen.config.get('synthetic_test_mode'):
+        # Exercise extraction and reconciliation only: artificial evidence can never make a real report ready.
+        complete=False
     ready=bool(complete and frozen.config.get('fy_confirmed') and balances_confirmed
                and frozen.config.get('other_records_confirmed') and not result['errors'] and not active)
     semantic_config={k:v for k,v in frozen.config.items() if k!='issue_register'}
@@ -47,7 +50,9 @@ def frozen_report(pkg, analysis, issues):
     for kind in templates:
         key,tokens=layout(frozen.config,kind)
         templates[kind].update(id=key,typography=tokens,font_substitution='Helvetica replaces Arial/Liberation Sans; visual approval pending')
-    meta=dict(snapshot=snapshot, status='DRAFT - REVIEW REQUIRED' if ready else 'PROVISIONAL - INCOMPLETE RECORDS',
+    report_status=('SYNTHETIC TEST ONLY - NOT CLIENT READY' if frozen.config.get('synthetic_test_mode')
+                   else ('DRAFT - REVIEW REQUIRED' if ready else 'PROVISIONAL - INCOMPLETE RECORDS'))
+    meta=dict(snapshot=snapshot, status=report_status,
               templates=templates, template_approved=False, authorised=False,
               renderer_sha256=sha256(Path(__file__).with_name('reports.py').read_bytes()).hexdigest(),
               exceptions=deepcopy(active), inventory=deepcopy(inventory))
@@ -59,12 +64,13 @@ def frozen_report(pkg, analysis, issues):
 def export_bundle(result, meta):
     if result.get('multi_bank') and result['errors']:
         raise ValueError('Resolve multi-bank ledger/source errors before export.')
-    outputs={'Management_Accounts_PROVISIONAL.pdf':management_pdf(result),
-             'Financial_Workpapers_PROVISIONAL.xlsx':xlsx_report(result),
+    test_label='SYNTHETIC_TEST_ONLY_' if result['config'].get('synthetic_test_mode') else ''
+    outputs={test_label+'Management_Accounts_PROVISIONAL.pdf':management_pdf(result),
+             test_label+'Financial_Workpapers_PROVISIONAL.xlsx':xlsx_report(result),
              'Source_inventory.json':json.dumps(meta['inventory'],indent=2).encode(),
              'Exceptions.json':json.dumps(meta['exceptions'],indent=2).encode()}
     if result['config'].get('entity_type')=='Private limited company':
-        outputs['Unaudited_FS_PROVISIONAL.pdf']=financial_statements_pdf(result)
+        outputs[test_label+'Unaudited_FS_PROVISIONAL.pdf']=financial_statements_pdf(result)
     manifest={k:v for k,v in meta.items() if k not in ('inventory','exceptions')}
     manifest['files']={name:sha256(payload).hexdigest() for name,payload in outputs.items()}
     outputs['Report_manifest.json']=json.dumps(manifest,indent=2).encode()
