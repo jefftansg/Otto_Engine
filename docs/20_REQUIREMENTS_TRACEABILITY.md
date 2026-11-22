@@ -105,3 +105,7 @@ OTTO-DES-001–009 map to TEST-OTTO-DES-001–009 in [Report Design System](26_R
 | OTTO-FS-006 authorisation gate | TEST-OTTO-FS-006 | Planned; existing draft controls only | M6/M7 |
 
 Detailed acceptance vectors: [Complete financial statements and reporting readiness](27_FINANCIAL_STATEMENT_COMPLETENESS.md). None of the new acceptance cases have been executed; baseline evidence remains unchanged.
+
+## Multi-bank pilot traceability
+
+OTTO-BANK-002 / TEST-OTTO-BANK-002: partial candidate; synthetic cases in tests/test_multi_bank.py, with independent balances and transfers. Automated account extraction, coverage and cutoff cases, regression execution and UAT pending. [Pilot specification](28_MULTI_BANK_SGD_PILOT.md).
