@@ -1,4 +1,4 @@
-"""Otto Financial Report Engine v1.3.1: branded, issue-driven guided mode."""
+"""Otto Financial Report Engine: local Auto and shared accounting views."""
 from pathlib import Path
 from datetime import date, datetime
 import hashlib
@@ -12,6 +12,7 @@ from engine.autofill import extract_acra_profile,extract_bank_statement,consolid
 
 ROOT = Path(__file__).parent
 ASSETS = ROOT / 'assets'
+VERSION = (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
 st.set_page_config(
     page_title='Otto | Financial Report Engine',
     page_icon=str(ASSETS / 'otto_icon.png'),
@@ -41,13 +42,13 @@ hero_image, hero_text = st.columns([1.05, 5.6])
 with hero_image:
     st.image(str(ASSETS / 'otto_mascot.png'), width=182)
 with hero_text:
-    st.markdown('''<div class="otto-app-title">Otto</div>
+    st.markdown(f'''<div class="otto-app-title">Otto</div>
 <div class="otto-app-subtitle">Financial Report Engine</div>
 <div class="otto-app-tagline">Clear numbers for a brighter tomorrow</div>
-<div class="otto-version">Engine version 1.3.1</div>
+<div class="otto-version">Engine version {VERSION}</div>
 <div class="otto-app-caption">Bookkeeping · Management Accounts · Financial Statements</div>''',unsafe_allow_html=True)
 st.info('Upload your documents, review the proposals and prepare draft financial reports. Nothing is recorded from an upload without your approval.')
-st.caption('Unreleased development candidate · Otto Auto + multi-bank SGD · Release version retained at 1.3.1')
+st.caption('Unreleased development candidate · Otto Auto + multi-bank SGD · Prerelease build; not a final release')
 if st.session_state.is_demo:
     st.warning('You are viewing a FICTIONAL demonstration company. Use **Create blank client** in the sidebar to start with your own company.')
 
@@ -58,7 +59,7 @@ def clear_auto_review_cache():
 
 with st.sidebar:
     st.image(str(ASSETS / 'otto_wordmark.png'), width=235)
-    st.markdown('**Engine version 1.3.1**')
+    st.markdown(f'**Engine version {VERSION}**')
     auto_progress_area=st.empty()
     source_upload_area=st.container()
     st.divider()

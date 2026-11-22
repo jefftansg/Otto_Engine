@@ -120,7 +120,7 @@ class AutoMultiUITests(unittest.TestCase):
         self.assertEqual(at.session_state['pkg'].bank,before)
         at.selectbox(key='workspace_view').select('Auto').run();self.assertFalse(at.exception)
         self.assertTrue(any(h.value=='Otto Auto' for h in at.header));self.assertEqual(at.session_state['pkg'].bank,before)
-        self.assertTrue(any('1.3.1' in str(m.value) for m in at.markdown))
+        self.assertTrue(any((ROOT/'VERSION').read_text().strip() in str(m.value) for m in at.markdown))
 
     def test_saved_manual_pilot_opens_in_auto_and_stale_edits_block_bundle(self):
         p=fixture();at=self.app(Package.from_zip(p.to_zip()))

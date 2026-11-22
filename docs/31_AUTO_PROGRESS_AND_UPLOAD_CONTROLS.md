@@ -21,3 +21,8 @@ Below the upload drop box, expand **Remove uploaded files**, choose **Select upl
 Pinned local environment: macOS arm64, Python 3.9.6. `PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s tests -v`: **196 tests passed, no skips** (189 existing plus seven new). `tests/test_auto_progress.py` covers read-only stage calculation, reviewed-account reconciliation, current bundle completion, missing-source/broken-ledger rollback, actual setup submission and automatic transition without posting, rejected unverified/missing identity, sidebar removal before setup, last-file acknowledgement, same-name source isolation, preservation of accounting/history, cached proposal invalidation and unchanged legacy confirmation.
 
 An isolated empty-client browser preview checks sidebar placement and visibility. Financial attestations and removal actions are tested only with synthetic AppTest fixtures. No user session, client source, posted record, release version, accounting rule, dependency or regulatory determination is changed by this UI work.
+
+
+### Current candidate identifier — 23 November 2026
+
+This functionality is now labelled **1.4.0-dev.1**, following the user’s explicit version-number change request. Prior references to retaining 1.3.1 describe the preceding build. Numbering alone does not approve templates, financial facts or a GitHub merge.

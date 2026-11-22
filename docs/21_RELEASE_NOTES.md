@@ -107,3 +107,8 @@ Prevent account-name proposals from using transaction counterparties; support ch
 ### Unreleased candidate follow-up — sidebar progress and source controls
 
 Added compact five-stage preparation progress/current/next in the Auto sidebar. Confirm setup now acknowledges the saved identity/dates and advances blank bank workspaces to account review without posting. Explicit source-removal controls are available beside the uploader before setup. Current source and frozen-report revisions drive progress rollback. Full regression: 196 tests pass, no skips, macOS arm64/Python 3.9.6. Version stays 1.3.1; no merge, release or template sign-off. See [details](31_AUTO_PROGRESS_AND_UPLOAD_CONTROLS.md).
+
+
+### 23 November 2026 — 1.4.0-dev.1 candidate identifier
+
+The user authorised a distinct version after older v1.3.1 folders caused confusion. Current Auto/multi-bank candidate is **1.4.0-dev.1**, read from `VERSION` by the UI and launcher and preserved in source archives/manifests. See RELEASE_NOTES_v1.4.0-dev.1.md and QUICK_START_v1.4.0-dev.1.md. Earlier notes retaining 1.3.1 describe previous candidates. PR #21 stays draft/unmerged; no final release or financial/template approval is implied.

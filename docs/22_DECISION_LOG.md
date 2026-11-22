@@ -111,3 +111,8 @@ User reported that a transfer counterparty became the company name in a bank-onl
 ### 22 November 2026 — preparation progress in sidebar
 
 Keep the upload drop box and compact progress/current/next panel together in the independently scrolling sidebar. Stage completion reflects source/setup/ledger/current-bundle checks and never professional authorisation. Source removal keeps recorded accounting and prior approval history; stale originals and bundles roll progress back. Confirm setup advances only the empty bank registry, never an import. No accounting policy or release version change. See docs/31 and seven new synthetic regressions.
+
+
+### 23 November 2026 — distinguish development builds from stable releases
+
+Use **1.4.0-dev.1** for the current candidate, following explicit user instruction to change numbering. `VERSION` is the shared source for UI, launcher and archive identity; increment the dev counter for subsequent candidates. Stable historical v1.3.1 is retained. No automatic final-version promotion, merge, accounting or template approval.

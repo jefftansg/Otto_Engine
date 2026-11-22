@@ -126,3 +126,8 @@ OTTO-AUTO-001/002 and OTTO-BANK-002 gain header-only identity and scoped daily-e
 | Requirement | Unreleased implementation | Evidence / limits |
 |---|---|---|
 | Auto progress/current/next without main-page scrolling; setup acknowledgement; accessible source removal | `engine/auto_progress.py`, `auto._progress`, `_setup`, `_sidebar_file_controls`, `app.py` sidebar placeholders | `tests/test_auto_progress.py` (7); full suite 196 pass. Preparation checks, draft reports; PR21 unmerged, version 1.3.1. See docs/31. |
+
+
+### Candidate build identity — 23 November 2026
+
+Current build is **1.4.0-dev.1** (user-authorised). UI/launcher/source packager share `VERSION`; prerelease ZIPs include matching Quick Start, release notes and source manifest. Branding/AppTest regression and archive integrity/manifest validation cover this change. Historical 1.3.1 references remain release history; PR21 is still draft/unmerged.
