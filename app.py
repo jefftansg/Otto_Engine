@@ -59,6 +59,7 @@ def clear_auto_review_cache():
 with st.sidebar:
     st.image(str(ASSETS / 'otto_wordmark.png'), width=235)
     st.markdown('**Engine version 1.3.1**')
+    auto_progress_area=st.empty()
     source_upload_area=st.container()
     st.divider()
     st.header('Your client')
@@ -180,7 +181,7 @@ if 'advanced_page' not in st.session_state: st.session_state['advanced_page']=0
 
 if st.session_state['app_mode']=='Auto':
     from auto import render
-    render(p,inspect_cached,register_evidence,suggest,upload_area=source_upload_area)
+    render(p,inspect_cached,register_evidence,suggest,upload_area=source_upload_area,progress_area=auto_progress_area)
     st.stop()
 
 # Multi-bank detailed views bypass single-account editors and importers.

@@ -27,7 +27,10 @@ def _setup(p,a):
     proposal=a['proposals']
     if a['conflicts']:
         st.warning('Sources disagree on: '+', '.join(a['conflicts'])+'. Confirm the correct company before importing.')
-    with st.expander('Review company and reporting period', expanded=not cfg.get('fy_confirmed')):
+    if cfg.get('fy_confirmed'):
+        st.success('Company setup confirmed · '+cfg.get('company_name','')+' · '+cfg.get('fy_start','')+' to '+cfg.get('fy_end',''))
+    label='Company setup — confirmed (edit)' if cfg.get('fy_confirmed') else 'Review company and reporting period'
+    with st.expander(label, expanded=not cfg.get('fy_confirmed')):
         fields=[f for row in a['inventory'] for f in row['fields'] if f['field'] in ('company_name','uen','fy_end')]
         if fields:st.dataframe(fields,hide_index=True,width='stretch')
         st.caption('Dates on bank statements show their coverage, not necessarily the company’s financial year. Confirm the reporting dates once. Missing information stays unknown.')
@@ -49,7 +52,12 @@ def _setup(p,a):
                         raise ValueError('Confirm the company, UEN and valid reporting dates.')
                     if (p.bank or p.claims or p.journals or p.invoices) and cfg.get('uen') and uen.strip().upper()!=cfg['uen'].strip().upper():
                         raise ValueError('This workspace already has accounting records. Start a new company to change its UEN.')
-                    cfg.update(company_name=name.strip(),uen=uen.strip().upper(),fy_start=low.isoformat(),fy_end=high.isoformat(),fy_confirmed=True,bank_balances_confirmed=False,entity_type=entity,reporting_framework=framework)
+                    changed=(name.strip(),uen.strip().upper(),low.isoformat(),high.isoformat())!=(cfg.get('company_name'),cfg.get('uen'),cfg.get('fy_start'),cfg.get('fy_end'))
+                    cfg.update(company_name=name.strip(),uen=uen.strip().upper(),fy_start=low.isoformat(),fy_end=high.isoformat(),fy_confirmed=True,entity_type=entity,reporting_framework=framework)
+                    if changed:cfg['bank_balances_confirmed']=False
+                    if 'bank_accounts' not in cfg and not any((p.bank,p.claims,p.journals,p.invoices,p.evidence)) and any(r['type']=='Bank statement' for r in a['inventory']):
+                        cfg['bank_accounts']=[];cfg['auto_enabled']=True
+                    st.session_state['auto_setup_notice']='Company setup saved. Next: review bank account identity, coverage and balances.'
                     cfg['auto_setup_provenance']=dict(fields=fields,confirmed_at=date.today().isoformat())
                     st.rerun()
                 except ValueError as exc:st.error(str(exc))
@@ -163,15 +171,18 @@ def _categories(p,suggest):
             except (ValueError,TypeError) as exc:st.error(str(exc))
 
 
-def render(p,inspect,register_evidence,suggest,upload_area=None):
+def render(p,inspect,register_evidence,suggest,upload_area=None,progress_area=None):
     st.header('Otto Auto')
     st.write('Add documents in the sidebar. Review what needs attention. Download your draft reports.')
     st.caption('Auto preview · Local document analysis · No cloud AI connected · Draft report layouts awaiting template approval')
+    notice=st.session_state.pop('auto_setup_notice',None)
+    if notice:st.toast(notice,icon='✅')
     files=st.session_state.setdefault('guided_files',[])
     with upload_area if upload_area is not None else st.sidebar:
         st.markdown('**Upload documents**')
         upload=st.file_uploader('Drop bank statements, bookkeeping records and report references here',type=['pdf','csv','xlsx','xls'],accept_multiple_files=True,
                                 key='auto_upload_'+str(st.session_state.get('guided_upload_version',0)),help='Up to 50 files, 25 MB per file and 100 MB total. No company form is required before upload.')
+        _sidebar_file_controls(p,files,inspect)
     if upload:
         incoming=[dict(name=f.name,bytes=f.getvalue(),sha256=sha256(f.getvalue()).hexdigest()) for f in upload]
         merged=merge_uploads(files,incoming)
@@ -182,10 +193,11 @@ def render(p,inspect,register_evidence,suggest,upload_area=None):
             st.session_state['guided_files']=merged;st.rerun()
     if 'bank_accounts' in p.config:
         from auto_multi import render as render_multi_auto
-        render_multi_auto(p,files,inspect,suggest)
+        render_multi_auto(p,files,inspect,suggest,progress_area=progress_area)
         return
     try:a=analyse(files,p.config,inspect)
     except ValueError as exc:st.error(str(exc));return
+    _progress(p,files,a,None,progress_area)
     if a['inventory']:
         p.config['auto_inventory']=deepcopy(a['inventory'])
         st.subheader('What Otto found')
@@ -249,7 +261,7 @@ def render(p,inspect,register_evidence,suggest,upload_area=None):
     records,questions=_issues(p,a,proposal)
     _inbox(p,records,questions)
     _other_records(p)
-    _reports(p,a,records)
+    _reports(p,a,records,progress_area=progress_area)
 
 
 def _other_records(p):
@@ -264,7 +276,7 @@ def _other_records(p):
                 p.config['simple_questions']=responses;p.config['other_records_confirmed']=checked and all(v!='Not sure' for v in responses.values());st.rerun()
 
 
-def _reports(p,a,records,strict=False):
+def _reports(p,a,records,strict=False,progress_area=None):
     st.subheader('Generate and download')
     st.caption('Choose a versioned draft layout. Reference layouts use the supplied reports’ typography as a starting point; exact visual fidelity and owner sign-off are pending. Arial/Liberation Sans are substituted with Helvetica in PDF. Client text, signatures and figures are never copied. DOCX export is not available.')
     for kind,label in (('ma','Management Accounts layout'),('ufs','UFS layout')):
@@ -283,6 +295,7 @@ def _reports(p,a,records,strict=False):
         if st.button('Generate provisional report package',key='auto_generate',disabled=strict and bool(result['errors'])):
             st.session_state['auto_report_bundle']=dict(revision=meta['report_revision'],data=export_bundle(result,meta))
         bundle=st.session_state.get('auto_report_bundle',{})
+        _progress(p,st.session_state.get('guided_files',[]),a,a.get('bank_intake'),progress_area,bundle_current=bundle.get('revision')==meta['report_revision'])
         if bundle.get('revision')==meta['report_revision']:
             st.download_button('Download provisional MA, UFS and workpapers',bundle['data'],file_name='Otto_Provisional_Reports.zip',mime='application/zip')
         elif bundle:st.info('Records changed. Generate a new package to use the current ledger snapshot.')
@@ -301,3 +314,45 @@ def current_report(p,inspect):
         records,_=issues(p,a,a['bank_intake'])
     else:records,_=_issues(p,a,bank_proposal(a,p.config,p.bank))
     return frozen_report(p,a,records)
+
+
+
+def _progress(p,files,analysis,banks,area,bundle_current=False):
+    if area is None:return
+    from engine.auto_progress import workflow_progress
+    state=workflow_progress(p,files,analysis,banks,bundle_current=bundle_current)
+    with area.container():
+        st.markdown('**Progress · '+str(state['completed'])+'/'+str(state['total'])+' stages**')
+        st.progress(state['completed']/state['total'])
+        short={'documents':'Upload','company':'Company','accounts':'Bank','records':'Records','reports':'Drafts'}
+        st.caption(' · '.join((':'+('green' if stage['done'] else 'orange' if stage['status']=='Current' else 'gray')+'['+('✓ ' if stage['done'] else '→ ' if stage['status']=='Current' else '○ ')+short[stage['id']]+']') for stage in state['stages']))
+        st.markdown('**Now: '+state['current']+'**')
+        st.caption('Next: '+state['next'])
+        with st.expander('Stage details'):
+            for i,stage in enumerate(state['stages'],1):st.caption(str(i)+' '+stage['label']+' · '+stage['status'])
+            st.caption('Preparation checks only. Reports remain drafts.')
+
+
+def _sidebar_file_controls(p,files,inspect):
+    notice=st.session_state.pop('guided_deleted_notice',None)
+    if notice:st.success(notice)
+    if not files:return
+    from guided import _delete_uploads
+    names={upload_id(f):f['name'] for f in files}
+    st.caption(str(len(files))+' uploaded file(s) in this workspace')
+    with st.expander('Remove uploaded files'):
+        st.caption('Removes session uploads only. Originals on your computer and recorded transactions/evidence are kept.')
+        selected=st.multiselect('Select uploaded files to remove',list(names),format_func=lambda k:names[k]+' · '+k[:8],key='auto_remove_'+str(st.session_state.get('guided_upload_version',0)))
+        if st.button('Remove selected uploads',disabled=not selected,key='auto_remove_selected'):
+            bank_hashes={s.get('sha256') for m in p.config.get('bank_accounts',[]) for s in m.get('statements',[])}
+            for f in files:
+                if upload_id(f) not in selected:continue
+                try:
+                    from engine.autofill import extract_bank_statement
+                    if extract_bank_statement(inspect(f['name'],f['bytes'])).get('detected'):bank_hashes.add(f['sha256'])
+                except Exception:bank_hashes.add(f['sha256'])  # Unreadable sources can still be removed; require recheck.
+            if _delete_uploads(p,selected,bank_hashes):
+                st.session_state.pop('auto_report_bundle',None)
+                st.session_state.pop('auto_ai_proposals',None)
+                if hasattr(inspect,'clear'):inspect.clear()
+                st.rerun()

@@ -121,3 +121,8 @@ OTTO-AUTO-001–007 local subsets now share the OTTO-BANK-002 reviewed source/ac
 ## OCBC daily export / account-owner correction
 
 OTTO-AUTO-001/002 and OTTO-BANK-002 gain header-only identity and scoped daily-export summary/transaction checks; the shared sidebar uploader addresses the main-page navigation defect. Full local suite: 189 passing, no skips. Bank-only source analysis does not infer ACRA status or UEN. Partial periods, date-basis decisions and all professional/template acceptance remain open. [Exact verification](30_OCBC_DAILY_HEADER_FIX.md).
+
+
+| Requirement | Unreleased implementation | Evidence / limits |
+|---|---|---|
+| Auto progress/current/next without main-page scrolling; setup acknowledgement; accessible source removal | `engine/auto_progress.py`, `auto._progress`, `_setup`, `_sidebar_file_controls`, `app.py` sidebar placeholders | `tests/test_auto_progress.py` (7); full suite 196 pass. Preparation checks, draft reports; PR21 unmerged, version 1.3.1. See docs/31. |

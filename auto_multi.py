@@ -9,19 +9,21 @@ from multi_bank_ui import render_details
 from engine.core import generate
 
 
-def render(p,files,inspect,suggest):
-    from auto import _setup,_categories,_inbox,_other_records,_reports
+def render(p,files,inspect,suggest,progress_area=None):
+    from auto import _setup,_categories,_inbox,_other_records,_reports,_progress
     from guided import _upload_deletion_controls
     try:
         a=analyse(files,p.config,inspect)
         banks=analyse_documents(files,p.config,inspect)
     except ValueError as exc:st.error(str(exc));return
     p.config['auto_enabled']=True
+    _progress(p,files,a,banks,progress_area)
     if a['inventory']:
         p.config['auto_inventory']=deepcopy(a['inventory'])
-        st.subheader('What Otto found')
-        st.dataframe([dict(File=r['name'],Type=r['type'],Status=r['status']) for r in a['inventory']],hide_index=True,width='stretch')
-        _upload_deletion_controls(p,a['parsed'],inspect,'auto_multi')
+        with st.expander('Uploaded document inventory',expanded=not p.config.get('fy_confirmed')):
+            st.subheader('What Otto found')
+            st.dataframe([dict(File=r['name'],Type=r['type'],Status=r['status']) for r in a['inventory']],hide_index=True,width='stretch')
+            _upload_deletion_controls(p,a['parsed'],inspect,'auto_multi')
     elif p.config.get('auto_inventory'):
         st.info('Saved source history is available. Re-upload originals in the sidebar to recheck coverage.')
         with st.expander('Saved source inventory — originals unavailable'):st.json(p.config['auto_inventory'])
@@ -42,4 +44,4 @@ def render(p,files,inspect,suggest):
     _inbox(p,records,questions)
     _other_records(p)
     a['bank_intake']=banks
-    _reports(p,a,records,strict=True)
+    _reports(p,a,records,strict=True,progress_area=progress_area)

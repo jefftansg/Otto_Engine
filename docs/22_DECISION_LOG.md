@@ -106,3 +106,8 @@ User requested GitHub update after discovering the isolated pilot omitted Otto A
 ## Decision 021 — source identity and always-accessible intake
 
 User reported that a transfer counterparty became the company name in a bank-only session, requested a fix, and asked for sidebar upload to avoid main-page scrolling. Share header-only owner extraction, recognise the exact checked OCBC daily-details summary, preserve unresolved date-basis/partial-period exceptions, and place upload directly below the sidebar version. Never rename existing books, infer UEN or clear genuine completeness errors to suppress a parser warning. [Tests and limits](30_OCBC_DAILY_HEADER_FIX.md).
+
+
+### 22 November 2026 — preparation progress in sidebar
+
+Keep the upload drop box and compact progress/current/next panel together in the independently scrolling sidebar. Stage completion reflects source/setup/ledger/current-bundle checks and never professional authorisation. Source removal keeps recorded accounting and prior approval history; stale originals and bundles roll progress back. Confirm setup advances only the empty bank registry, never an import. No accounting policy or release version change. See docs/31 and seven new synthetic regressions.

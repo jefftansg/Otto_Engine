@@ -71,3 +71,8 @@ Routing has backend checks. Mac rendering, accessibility and unsaved-change reco
 ## Unreleased sidebar document intake — 22 November 2026
 
 Auto document upload appears below the sidebar version label, before Your client, so main-page review does not require scrolling back to a drop zone. The existing shared inventory, source decisions and review states are preserved. Detailed multi-bank upload uses the sidebar as well; saved ZIP restoration remains separate. [Verification](30_OCBC_DAILY_HEADER_FIX.md).
+
+
+### Unreleased sidebar progress (22 November 2026)
+
+Auto displays preparation progress, current stage and next action above its sidebar uploader. Setup confirmation advances blank bank workspaces to account review; source removal is available before setup. Exact labels and stage criteria: [Auto progress and upload controls](31_AUTO_PROGRESS_AND_UPLOAD_CONTROLS.md).

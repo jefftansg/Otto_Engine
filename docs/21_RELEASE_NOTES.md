@@ -102,3 +102,8 @@ Default Auto, shared uploads, per-account approval/coverage/staging, guarded tra
 ## Unreleased OCBC daily-details and sidebar fix — 22 November 2026
 
 Prevent account-name proposals from using transaction counterparties; support checked Ledger Balance summaries for the specific OCBC daily-details layout; preserve print-date coverage and posting/value-date review exceptions. Move Auto/detailed multi-bank document upload near the top sidebar. 189 tests pass locally; see [fix evidence](30_OCBC_DAILY_HEADER_FIX.md). Release label remains 1.3.1 and PR #21 remains unmerged.
+
+
+### Unreleased candidate follow-up — sidebar progress and source controls
+
+Added compact five-stage preparation progress/current/next in the Auto sidebar. Confirm setup now acknowledges the saved identity/dates and advances blank bank workspaces to account review without posting. Explicit source-removal controls are available beside the uploader before setup. Current source and frozen-report revisions drive progress rollback. Full regression: 196 tests pass, no skips, macOS arm64/Python 3.9.6. Version stays 1.3.1; no merge, release or template sign-off. See [details](31_AUTO_PROGRESS_AND_UPLOAD_CONTROLS.md).

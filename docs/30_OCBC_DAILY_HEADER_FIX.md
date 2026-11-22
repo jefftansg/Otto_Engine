@@ -20,3 +20,6 @@ New tests reproduce bank-only company inference without ACRA/UEN, inline header 
 Read-only re-analysis of the 12 supplied bank PDFs, excluding the separately supplied Business Profile, produced one consistent account holder, one SGD/OCBC account group, no company conflict, no UEN proposal and no generic missing-closing-label warnings. The partial final-month export remains incomplete. Some monthly posting/value-date cutoffs remain transaction-review exceptions; this record does not approve a posting date policy. No private original, client value, identifier, diagnostic output or screenshot containing client data is committed.
 
 An isolated empty-client browser preview confirms that the upload drop box is visible below the sidebar version label while the main Auto page is available. No live client reset, financial attestation, posting, source deletion or production-session restart was performed. Version **1.3.1** and all earlier accounting/template acceptance boundaries remain unchanged.
+
+
+Follow-up: the compact progress panel now sits between the version label and uploader; explicit removal controls sit below the drop box. See [Auto progress and upload controls](31_AUTO_PROGRESS_AND_UPLOAD_CONTROLS.md) for setup acknowledgement and source-removal behaviour.
