@@ -52,4 +52,4 @@ Existing-client conversion needs backup, mapping and opening-evidence acceptance
 
 ## Combined Auto entry point
 
-The later [Auto + multi-bank integration record](29_AUTO_MULTI_BANK_INTEGRATION.md) adds default Auto, the shared uploader, account review, category/transfer protection, exceptions and frozen export controls. Its 170-test engineering record supersedes the earlier manual-only entry-point description; remaining accounting, migration and template acceptance gates still apply.
+The later [Auto + multi-bank integration record](29_AUTO_MULTI_BANK_INTEGRATION.md) adds default Auto, the shared uploader, account review, category/transfer protection, exceptions and frozen export controls. Its 171-test engineering record supersedes the earlier manual-only entry-point description; remaining accounting, migration and template acceptance gates still apply.

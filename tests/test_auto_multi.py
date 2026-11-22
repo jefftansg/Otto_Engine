@@ -149,3 +149,14 @@ class AutoMultiUITests(unittest.TestCase):
         at.button(key='auto_enable_multi').click().run()
         self.assertFalse(at.exception);self.assertEqual(at.session_state['pkg'].bank,[])
         self.assertTrue(at.button(key='auto_generate').disabled)
+
+
+    def test_source_approval_checkbox_resets_when_reporting_context_changes(self):
+        at=self.app(package(),sources());self.assertFalse(at.exception)
+        checkbox=next(c for c in at.checkbox if c.label.startswith('I checked the originals'))
+        checkbox.check().run();self.assertFalse(at.exception)
+        self.assertTrue(any(c.value for c in at.checkbox if c.label.startswith('I checked the originals')))
+        at.session_state['pkg'].config['fy_end']='2025-11-30'
+        at.run();self.assertFalse(at.exception)
+        self.assertTrue(all(not c.value for c in at.checkbox if c.label.startswith('I checked the originals')))
+        self.assertEqual(at.session_state['pkg'].bank,[])

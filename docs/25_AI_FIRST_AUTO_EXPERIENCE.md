@@ -60,4 +60,4 @@ Decide AI provider/on-device processing and consent; OCR scope; exact reporting 
 
 ## 22 November 2026 implementation candidate
 
-The local upload-first Auto subset is now integrated with the multi-bank SGD development branch. It uses conservative extraction/rules, not a connected LLM, and requires reviewer approval before source staging, categories or transfer links. See [implemented flow, 170-test evidence and remaining gaps](29_AUTO_MULTI_BANK_INTEGRATION.md). Full PRD delivery, master-template fidelity and professional acceptance are not asserted; visible release version stays 1.3.1.
+The local upload-first Auto subset is now integrated with the multi-bank SGD development branch. It uses conservative extraction/rules, not a connected LLM, and requires reviewer approval before source staging, categories or transfer links. See [implemented flow, 171-test evidence and remaining gaps](29_AUTO_MULTI_BANK_INTEGRATION.md). Full PRD delivery, master-template fidelity and professional acceptance are not asserted; visible release version stays 1.3.1.

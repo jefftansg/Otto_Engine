@@ -5,6 +5,13 @@ from engine.bank_intake import (analyse_documents,approve_account,staged_rows,ap
                                review_recorded_rows,suggest_transfers,approve_transfer)
 
 
+def _reset_confirmation(key,revision):
+    marker=key+'_revision'
+    if st.session_state.get(marker)!=revision:
+        st.session_state[key]=False
+        st.session_state[marker]=revision
+
+
 def render_intake(p,prefix,files=None,analysis=None):
     st.subheader('Identify and group bank statements')
     st.caption('Upload originals for every account and every reporting month. DBS, OCBC and UOB text statements are supported conservatively. Scans, ambiguous fields and unsupported layouts require source review. Analysis never posts entries.')
@@ -24,6 +31,8 @@ def render_intake(p,prefix,files=None,analysis=None):
             for error in row['errors']:st.warning(error)
     for group in analysis['groups']:
         key=prefix+group['key'];cov=group['coverage']
+        _reset_confirmation(key+'source_check',group['revision'])
+        _reset_confirmation(key+'link_check',group['revision'])
         with st.expander(group['bank']+' '+group['masked_account']+' · '+('Coverage complete — review required' if not group['errors'] else 'Needs attention'),expanded=True):
             st.write('Account holder: '+(group['company'] or 'Not identified — verify original')+' · Currency: '+(group['currency'] or 'Unknown — verify SGD on original'))
             st.dataframe(cov['months'],hide_index=True,width='stretch')
@@ -35,8 +44,8 @@ def render_intake(p,prefix,files=None,analysis=None):
                 code=st.text_input('Bank control code (1000–1099)',value=existing['code'] if existing else free)
                 reviewer=st.text_input('Reviewer name',key=key+'reviewer')
                 evidence=st.text_input('Review evidence / original statement location',key=key+'evidence')
-                checked=st.checkbox('I checked the originals: same company, same account, SGD currency, exact reporting coverage and printed balances')
-                link=st.checkbox('If linking an existing manually entered account, I verified that its rows belong to this account')
+                checked=st.checkbox('I checked the originals: same company, same account, SGD currency, exact reporting coverage and printed balances',key=key+'source_check')
+                link=st.checkbox('If linking an existing manually entered account, I verified that its rows belong to this account',key=key+'link_check')
                 if st.form_submit_button('Approve account identity and coverage',disabled=bool(group['errors'])):
                     if approve_account(p,analysis,group['key'],code,group['revision'],reviewer,evidence,checked,link):
                         st.success('Source coverage approved. Opening journals and transaction review are still required.');st.rerun()
@@ -47,10 +56,11 @@ def render_intake(p,prefix,files=None,analysis=None):
             st.caption('Proposed transactions remain unclassified (9999). Verify every source row and gross deposits/withdrawals; matching net movement alone does not prove completeness.')
             if proposal['rows']:st.dataframe(proposal['rows'],hide_index=True,width='stretch')
             for error in proposal['errors']:st.warning(error)
+            _reset_confirmation(key+'rows_check',proposal['revision'])
             with st.form(key+'transactions'):
                 reviewer=st.text_input('Transaction reviewer')
                 evidence=st.text_input('Transaction review evidence / source location')
-                checked=st.checkbox('I matched all transaction dates, gross receipts/payments, references and totals against the originals')
+                checked=st.checkbox('I matched all transaction dates, gross receipts/payments, references and totals against the originals',key=key+'rows_check')
                 if st.form_submit_button('Approve and stage proposed transactions',disabled=bool(proposal['errors']) or not proposal['rows']):
                     if approve_import(p,analysis,group['key'],proposal['revision'],reviewer,evidence,checked):st.success('Staged once for classification.');st.rerun()
                     else:st.error('Approval rejected; refresh and review the current proposal.')
