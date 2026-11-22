@@ -16,11 +16,9 @@ def build_release(root, destination=None):
     def git(*args):
         return subprocess.check_output(['git', '-C', str(root), *args])
     commit = git('rev-parse', 'HEAD').decode().strip()
-    app = git('show', 'HEAD:app.py').decode()
-    match = re.search(r'Engine version (\d+\.\d+\.\d+)', app)
-    if not match:
-        raise ValueError('Cannot identify the engine version in committed app.py.')
-    version = match.group(1)
+    version = git('show', 'HEAD:VERSION').decode().strip()
+    if not re.fullmatch(r'\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?', version):
+        raise ValueError('Invalid committed VERSION.')
     prefix = 'Otto_Engine_v'+version
     destination = Path(destination or root.parent/(prefix+'.zip'))
     stamp = datetime.fromtimestamp(int(git('show', '-s', '--format=%ct', 'HEAD')), timezone.utc)

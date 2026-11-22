@@ -94,3 +94,25 @@ Approved product direction, implementation planned: improve on the current cumbe
 ## Decision 018 — report consistency outranks workflow polish (21 November 2026)
 
 Product priority clarified: matching the previously approved financial-report layouts, font sizes, whitespace, table formatting and pagination is more important than merely reducing data-entry steps. Choose template-first generation with an immutable approved style/version; require independent numeric and visual acceptance. No claim of exact match until historical examples received and owner signs off. Preserve current v1.3.1 baseline. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
+
+## Decision 019 — review-first SGD multi-bank candidate (22 November 2026)
+
+User authorised evaluation/fixes to development/multi-bank-sgd and PR #21, then local automatic identification/grouping/per-account coverage and reviewer-approved suggestions. Use institution plus full-number-derived hash rather than masked suffix for grouping, explicit source review rather than automatic posting, and stable source-linked IDs. Preserve independent account reconciliation, review history, legacy ZIP/report output and Lighthouse StudioWorks' internal service model. Keep unsupported timing/FX/overdraft policies unresolved, pilot isolated from legacy editors, release label unchanged and PR unmerged until acceptance. Wider integration and the separate OTTO-FS-001–006 work remain dependencies. Engineering evidence: [verification record](milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md).
+
+## Decision 020 — preserve Auto while adding multi-bank controls
+
+User requested GitHub update after discovering the isolated pilot omitted Otto Auto. Selectively integrate PR #19 local Auto capabilities into PR #21, restore default Auto, and reuse account-aware source and detailed controls without migrating existing populated single-bank books or merging either PR. Keep version 1.3.1, explicit candidate labels, local processing, approved-transfer/category invariants, client cache isolation and provisional snapshot/export controls. Accounting and template acceptance remain open. [Evidence](29_AUTO_MULTI_BANK_INTEGRATION.md).
+
+## Decision 021 — source identity and always-accessible intake
+
+User reported that a transfer counterparty became the company name in a bank-only session, requested a fix, and asked for sidebar upload to avoid main-page scrolling. Share header-only owner extraction, recognise the exact checked OCBC daily-details summary, preserve unresolved date-basis/partial-period exceptions, and place upload directly below the sidebar version. Never rename existing books, infer UEN or clear genuine completeness errors to suppress a parser warning. [Tests and limits](30_OCBC_DAILY_HEADER_FIX.md).
+
+
+### 22 November 2026 — preparation progress in sidebar
+
+Keep the upload drop box and compact progress/current/next panel together in the independently scrolling sidebar. Stage completion reflects source/setup/ledger/current-bundle checks and never professional authorisation. Source removal keeps recorded accounting and prior approval history; stale originals and bundles roll progress back. Confirm setup advances only the empty bank registry, never an import. No accounting policy or release version change. See docs/31 and seven new synthetic regressions.
+
+
+### 23 November 2026 — distinguish development builds from stable releases
+
+Use **1.4.0-dev.1** for the current candidate, following explicit user instruction to change numbering. `VERSION` is the shared source for UI, launcher and archive identity; increment the dev counter for subsequent candidates. Stable historical v1.3.1 is retained. No automatic final-version promotion, merge, accounting or template approval.

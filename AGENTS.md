@@ -15,3 +15,7 @@ Use docs/25_AI_FIRST_AUTO_EXPERIENCE.md as the target UX specification. Its requ
 ## Proposed Otto Auto safeguards (21 November 2026)
 
 See docs/25_AI_FIRST_AUTO_EXPERIENCE.md. Preserve v1.3.1 release claims. Never silently post AI proposals, invent figures, treat a modified demo statement as genuine evidence, or mark incomplete reports final. Maintain a single deterministic double-entry ledger, source provenance, clear review states and legacy ZIP compatibility.
+
+## Unreleased Auto + multi-bank candidate (22 November 2026)
+
+The development branch selectively integrates Auto and reviewed multi-bank controls; see docs/29_AUTO_MULTI_BANK_INTEGRATION.md for tested scope and limits. Historical release claims remain 1.3.1. Preserve one ledger, transfer/source-bound category revisions, no-post-before-review, provisional frozen reports in every view, client cache isolation and existing single-account behavior. This does not approve the full PRD, master templates, accounting policy, release or GitHub merge.

@@ -69,3 +69,7 @@ Repository v1.3.1 uses ReportLab and XlsxWriter with bundled demonstrations. Exi
 - [Test strategy](18_TEST_STRATEGY.md)
 - [Roadmap](19_DEVELOPMENT_ROADMAP.md)
 - [Otto Auto proposal](25_AI_FIRST_AUTO_EXPERIENCE.md)
+
+## Combined candidate verification — 22 November 2026
+
+Classic legacy sample PDF character/font/position and workbook cell/formula equality were checked against 001539e after importing the Auto layout engine. Multi-bank Auto defaults to classic; reference compact/standard profiles are optional and unapproved. All three profiles rendered the synthetic combined snapshot (57 pages total) with bounded text and independent cash figures. Frozen snapshots/manifests record renderer/layout/source identities; native Excel printing, exact approved-master fidelity and owner approval remain pending. [Record](29_AUTO_MULTI_BANK_INTEGRATION.md).

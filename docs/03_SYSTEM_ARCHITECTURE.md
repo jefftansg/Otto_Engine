@@ -79,3 +79,7 @@ Raw files and hashes → staged extraction with provenance → optional AI propo
 ## Proposed Otto Auto architecture (21 November 2026)
 
 Original documents → staged extraction and field-level provenance → optional AI proposals → exception/approval queue → deterministic Decimal double-entry ledger → reconciliation and cutoff checks → frozen report snapshot → draft PDF/XLSX. AI is not a posting or accounting authority. Existing application architecture above remains the current release. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Unreleased Auto + multi-bank integration
+
+app.py defaults to auto.render; auto_multi.render reuses bank_intake_ui and multi_bank_ui.render_details against the same Package. engine.auto_multi owns current-source readiness and shared exceptions; engine.auto_reports freezes snapshots and exports. Account-aware detailed views replace unsafe single-account editors for registered workspaces. [Integration controls/evidence](29_AUTO_MULTI_BANK_INTEGRATION.md).

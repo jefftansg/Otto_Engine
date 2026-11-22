@@ -92,3 +92,7 @@ OTTO-AUTO-001–008 specify single-screen batch upload, source-backed company/FY
 ## P0 complete financial statements (22 November 2026)
 
 OTTO-FS-001–006 are approved development direction: cash flow statement; component equity roll-forward; comparative evidence; framework-specific completeness; common MA/UFS export and template fidelity; draft/authorisation gates. Acceptance scenarios and calculations are defined in [Complete financial statements and reporting readiness](27_FINANCIAL_STATEMENT_COMPLETENESS.md). These extend OTTO-ACCT-004, REP-001, UFS-001/002 and DES-001–009 without superseding M0. Implementation and verification pending. Otto is Lighthouse StudioWorks' internal tool, not a customer-facing software/ licensing product.
+
+## OTTO-BANK-002 pilot (22 November 2026)
+
+Prioritise multi-bank SGD before completing consolidated cash flow reporting. Development candidate: registry, reviewed manually staged bank rows, account-level reconciliation, same-date explicit transfer pairing, isolated manual pilot UI and ZIP/report integration. Automated intake/coverage/transfer suggestions and full tests/UAT remain open; status Partial candidate, not verified. See [multi-bank pilot](28_MULTI_BANK_SGD_PILOT.md).

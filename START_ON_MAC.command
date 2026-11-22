@@ -1,8 +1,9 @@
 #!/bin/zsh
 set -e
 printf '\033]0;Otto Financial Report Engine\007'
-echo "Starting Otto Financial Report Engine v1.3.1..."
 cd "$(dirname "$0")"
+OTTO_VERSION=$(cat VERSION)
+echo "Starting Otto Financial Report Engine v${OTTO_VERSION}..."
 if ! command -v python3 >/dev/null 2>&1; then
   echo "Python 3.9 through 3.12 is required. Install it from https://www.python.org/downloads/macos/"
   exit 1

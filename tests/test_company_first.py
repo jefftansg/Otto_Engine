@@ -11,7 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class CompanyFirstTests(unittest.TestCase):
     def app(self):
-        return AppTest.from_file(str(ROOT/'app.py'), default_timeout=30).run()
+        at = AppTest.from_file(str(ROOT/'app.py'), default_timeout=30).run()
+        at.session_state['app_mode']='Guided'
+        return at.run()
 
     def test_manual_setup_clears_company_then_continues_to_documents_and_bank(self):
         at = self.app()
