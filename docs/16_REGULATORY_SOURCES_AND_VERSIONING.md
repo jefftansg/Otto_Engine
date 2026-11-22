@@ -92,3 +92,7 @@ OCBC extraction-format fix: no change to regulatory authorities, frameworks, fil
 ### 22 November 2026 — multi-bank review candidate
 
 The local SGD identification/review/reconciliation implementation changes no regulatory authority, framework election, filing rule, external engagement, dependency or licensing policy. It makes no new compliance determination. Existing framework eligibility and official-source version review remain human acceptance dependencies; test passes do not approve financial statements. Foreign currency, overdraft and complex transfer accounting are deferred rather than assigned an inferred policy. Engine release version remains 1.3.1.
+
+### 22 November 2026 — combined Auto candidate
+
+Integrating the existing local Auto workflow with multi-bank review adds no cloud transmission, inference provider, dependency, licence, authority version or regulatory determination. Existing professional/framework/filing acceptance dependencies remain. No release-version increment or GitHub merge; see [candidate record](29_AUTO_MULTI_BANK_INTEGRATION.md).

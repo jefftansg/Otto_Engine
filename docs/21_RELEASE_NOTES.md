@@ -94,3 +94,7 @@ v1.3.1 parser follow-up: recognise OCBC BALANCE B/F, BALANCE C/F and complete da
 ## Unreleased development candidate — multi-bank SGD review (22 November 2026)
 
 PR #21 receives defect corrections, conservative local bank identity/grouping and exact per-account coverage, reviewer-approved source staging and transfer suggestions, stable source/journal identities, source-preserving ZIP restore and PDF/Excel workpapers. Multi-bank MA adds consolidated cash flows; legacy sample PDF/Excel regression equality is verified. Full test/render/UI evidence and limits: [verification](milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md), [pilot contract](28_MULTI_BANK_SGD_PILOT.md). **Not a release, not merged, version unchanged at 1.3.1.** Owner/accountant acceptance, wider formats, full FS/template gates and CI on the revised head remain prerequisites. Lighthouse StudioWorks' internal service scope is unchanged.
+
+## Unreleased combined Auto + multi-bank candidate — 22 November 2026
+
+Default Auto, shared uploads, per-account approval/coverage/staging, guarded transfers/categories, persistent exceptions and frozen report bundles now run from PR #21. Guided/Advanced remain available against the same package. 170 local tests and three-profile PDF/Excel verification are recorded in [integration evidence](29_AUTO_MULTI_BANK_INTEGRATION.md); GitHub CI is reported on the PR. No GitHub merge, version bump, production release or professional/template approval. Release label stays 1.3.1 with an explicit development-candidate badge.

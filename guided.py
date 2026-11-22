@@ -592,6 +592,9 @@ def render(p, inspect, register_evidence, suggest):
         st.subheader('Final review and reports')
         st.write('Here is what is complete, and what still needs attention. Nothing will be labelled approved automatically.')
         result=generate(p)
+        if cfg.get('auto_enabled'):
+            from auto import current_report
+            result,_=current_report(p,inspect)
         questions=build_questions(p,parsed,_bank_batch(parsed,cfg,p.bank))
         remaining=outstanding(questions,cfg.get('clarification_answers',{}))
         crucial=[q for q in remaining if q['priority']=='Required']

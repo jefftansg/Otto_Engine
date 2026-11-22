@@ -41,3 +41,7 @@ Local scope reduces exposure while confidentiality still depends on machine, fil
 ## Planned Otto Auto privacy controls (21 November 2026)
 
 Document-first intake and any external AI processor require explicit data handling design: consent, provider selection, minimisation, per-client isolation, retention/deletion, audit trail, restricted log content and protection against prompt injection in uploaded files. Provider and hosted architecture remain undecided; do not infer current documents are sent externally. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Unreleased combined Auto controls
+
+Auto uses local extraction/rules and does not connect an AI provider. Optional external proposal JSON is source/revision validated and needs human approval; the engine does not transmit the request itself. Switching client via new/restore/demo clears staged AI proposals and cached report bundles; uploader keys isolate contexts. Source originals are not embedded in workspaces or committed. Financial export snapshots retain hashes/review metadata and no automatic authorisation. [Verification](29_AUTO_MULTI_BANK_INTEGRATION.md).

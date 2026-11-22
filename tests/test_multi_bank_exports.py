@@ -92,7 +92,9 @@ class MultiBankExportTests(unittest.TestCase):
 class MultiBankUITests(unittest.TestCase):
     def app(self,p=None):
         at=AppTest.from_file(str(ROOT/'app.py'),default_timeout=30).run()
-        if p is not None:at.session_state['pkg']=p;at.run()
+        at.session_state['app_mode']='Guided'
+        if p is not None:at.session_state['pkg']=p
+        at.run()
         self.assertFalse(at.exception);return at
 
     def test_pilot_opt_in_empty_and_restored_reconciled_workspace(self):

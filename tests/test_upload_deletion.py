@@ -69,6 +69,8 @@ class UploadDeletionTests(unittest.TestCase):
 class UploadDeletionUITests(unittest.TestCase):
     def app(self, stage):
         at = AppTest.from_file(str(ROOT/'app.py'), default_timeout=30).run()
+        at.session_state['app_mode']='Guided'
+        at.run()
         files = []
         import hashlib
         for path in sorted((ROOT/'example_imports'/'guided_demo').glob('*.pdf')):

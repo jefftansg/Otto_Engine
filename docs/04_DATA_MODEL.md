@@ -73,3 +73,7 @@ Future model additions require raw-source hash, entity/account/period identity, 
 ## Unreleased multi-bank source/review extension — 22 November 2026
 
 An explicit company.json `bank_accounts` registry activates isolated SGD bank controls (1000–1099). Bank rows add `bank_account_code`, `transfer_id`, `source_sha256`, `source_row` and `source_reference`; legacy bank.csv headers are unchanged. Managed source accounts retain hashed identity, masked account, statement summaries, `coverage_review` and `transactions_review` bound to source facts and company/reporting context. Configuration also retains `bank_source_imports`, `bank_import_reviews`, `transfer_reviews` and replaced `bank_review_history`. Originals are not embedded. Used accounts cannot be removed/renumbered by registry editing. See [pilot contract](28_MULTI_BANK_SGD_PILOT.md) for review and restoration boundaries.
+
+## Auto review state in the multi-bank candidate
+
+Auto inventory, category approval/undo history, bank source reviews and transfer reviews remain in the same company/package. Category revisions include source account, transfer ID and source row identity for registered rows. Frozen snapshot hashes canonicalise empty optional CSV cells for restoration equality; final authorisation remains false. New-company/restore/demo actions clear session-only AI staging and frozen bundles. Originals remain outside ZIPs. [Combined contract](29_AUTO_MULTI_BANK_INTEGRATION.md).

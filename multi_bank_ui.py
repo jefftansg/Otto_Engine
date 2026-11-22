@@ -40,6 +40,36 @@ def render(p):
             st.success('Company details saved. Recheck bank coverage for changed identity or dates.');st.rerun()
     render_intake(p,prefix)
     c=p.config
+    render_details(p,prefix)
+    render_transfers(p,prefix)
+    c=p.config
+    st.subheader('3 · Reconciliation and draft reports')
+    r=generate(p)
+    if p.config.get('auto_enabled'):
+        from auto import current_report
+        from engine.importers import inspect_document
+        r,_=current_report(p,inspect_document)
+    st.dataframe(r['bank_reconciliations'],hide_index=True,width='stretch')
+    cols=st.columns(3)
+    cols[0].metric('Closing bank ledger (SGD)',str(r['ledger_end']))
+    cols[1].metric('Profit / loss (SGD)',str(r['profit']))
+    cols[2].metric('Blocking errors',len(r['errors']))
+    for error in r['errors']: st.error(error)
+    for warning in r['warnings']: st.warning(warning)
+    if not r['errors']:
+        st.info('Arithmetic checks passed for this draft only. Human review and framework/disclosure checks remain required.')
+    else:
+        st.warning('Resolve blocking errors before downloading pilot accounting reports.')
+    if not r['errors']:
+        st.download_button('Draft management accounts PDF',management_pdf(r),'Management_Accounts_DRAFT.pdf','application/pdf')
+        if c.get('entity_type')=='Private limited company':
+            st.download_button('Draft UFS PDF',financial_statements_pdf(r),'UFS_DRAFT.pdf','application/pdf')
+        st.download_button('Draft Excel workpapers',xlsx_report(r),'Workpapers_DRAFT.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    st.download_button('Save pilot workspace ZIP',p.to_zip(),'Otto_Multi_Bank_Workspace.zip','application/zip')
+
+
+def render_details(p,prefix):
+    c=p.config
     st.subheader('1 · Bank account registry')
     st.caption('Use unique bank codes 1000–1099 and privacy-safe names. Enter independently reviewed opening and closing statement balances. Tick both checks only after manually inspecting original statements and full FY coverage.')
     with st.form(prefix+'registry'):
@@ -70,24 +100,3 @@ def render(p):
                 if st.form_submit_button('Apply '+label.lower()):
                     setattr(p,attr,[{k:str(r.get(k) or '') for k in cols} for r in edited if any(str(v or '').strip() for v in r.values())])
                     st.success('Records saved to current workspace; review validation below.');st.rerun()
-    render_transfers(p,prefix)
-    c=p.config
-    st.subheader('3 · Reconciliation and draft reports')
-    r=generate(p)
-    st.dataframe(r['bank_reconciliations'],hide_index=True,width='stretch')
-    cols=st.columns(3)
-    cols[0].metric('Closing bank ledger (SGD)',str(r['ledger_end']))
-    cols[1].metric('Profit / loss (SGD)',str(r['profit']))
-    cols[2].metric('Blocking errors',len(r['errors']))
-    for error in r['errors']: st.error(error)
-    for warning in r['warnings']: st.warning(warning)
-    if not r['errors']:
-        st.info('Arithmetic checks passed for this draft only. Human review and framework/disclosure checks remain required.')
-    else:
-        st.warning('Resolve blocking errors before downloading pilot accounting reports.')
-    if not r['errors']:
-        st.download_button('Draft management accounts PDF',management_pdf(r),'Management_Accounts_DRAFT.pdf','application/pdf')
-        if c.get('entity_type')=='Private limited company':
-            st.download_button('Draft UFS PDF',financial_statements_pdf(r),'UFS_DRAFT.pdf','application/pdf')
-        st.download_button('Draft Excel workpapers',xlsx_report(r),'Workpapers_DRAFT.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    st.download_button('Save pilot workspace ZIP',p.to_zip(),'Otto_Multi_Bank_Workspace.zip','application/zip')

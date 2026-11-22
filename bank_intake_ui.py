@@ -5,14 +5,16 @@ from engine.bank_intake import (analyse_documents,approve_account,staged_rows,ap
                                review_recorded_rows,suggest_transfers,approve_transfer)
 
 
-def render_intake(p,prefix):
+def render_intake(p,prefix,files=None,analysis=None):
     st.subheader('Identify and group bank statements')
     st.caption('Upload originals for every account and every reporting month. DBS, OCBC and UOB text statements are supported conservatively. Scans, ambiguous fields and unsupported layouts require source review. Analysis never posts entries.')
-    files=st.file_uploader('Bank statements — PDF, CSV or Excel',type=['pdf','csv','xlsx','xls'],accept_multiple_files=True,help='Maximum 25 MB per file; 50 files and 100 MB per batch. Originals remain local and are not embedded in workspace ZIPs.',key=prefix+'statements')
+    if files is None:
+        files=st.file_uploader('Bank statements — PDF, CSV or Excel',type=['pdf','csv','xlsx','xls'],accept_multiple_files=True,help='Maximum 25 MB per file; 50 files and 100 MB per batch. Originals remain local and are not embedded in workspace ZIPs.',key=prefix+'statements')
     if not files:return
     try:
-        batch=[dict(name=f.name,bytes=f.getvalue(),sha256=sha256(f.getvalue()).hexdigest()) for f in files]
-        analysis=analyse_documents(batch,p.config)
+        if analysis is None:
+            batch=[dict(name=f.name,bytes=f.getvalue(),sha256=sha256(f.getvalue()).hexdigest()) for f in files]
+            analysis=analyse_documents(batch,p.config)
     except ValueError as exc:
         st.error(str(exc));return
     st.dataframe([dict(file=r['name'],status=r['status'],bank=r.get('bank',''),account=r.get('masked_account',''),currency=r.get('currency') or 'Unknown',issues='; '.join(r['errors'])) for r in analysis['inventory']],hide_index=True,width='stretch')
