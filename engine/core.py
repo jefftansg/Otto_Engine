@@ -13,6 +13,7 @@ from collections import defaultdict
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
+from .multi_bank import registry, transfer_pairs
 
 D = Decimal
 CENT = D('0.01')
@@ -117,6 +118,8 @@ class Package:
           'invoices.csv':['invoice_no','date','due_date','customer','amount','amount_paid','evidence_ref'],
           'evidence.csv':['evidence_ref','document_type','source_file','remarks','review_status'],
         }
+        if 'bank_accounts' in self.config or any('bank_account_code' in r or 'transfer_id' in r for r in self.bank):
+            columns['bank.csv'] += ['bank_account_code','transfer_id']
         bio=io.BytesIO()
         with zipfile.ZipFile(bio,'w',compression=zipfile.ZIP_DEFLATED) as z:
             z.writestr('company.json',json.dumps(self.config,indent=2,ensure_ascii=False))
@@ -132,6 +135,10 @@ def _entry(jid, dt, code, debit, credit, description, source, evidence=''):
 def generate(pkg:Package):
     errors=[]; warnings=[]; entries=[]; flow_items=[]
     cfg=pkg.config
+    coa, registered = registry(cfg, COA_MAP, errors)
+    multi = registered is not None
+    cash_codes = set(registered) if multi else {'1000'}
+    bank_movements = defaultdict(lambda:D('0'))
     if not cfg.get('company_name') or not cfg.get('uen'): errors.append('Company name and UEN must be populated.')
     try:
         start=parse_date(cfg['fy_start']); end=parse_date(cfg['fy_end'])
@@ -142,7 +149,7 @@ def generate(pkg:Package):
     if cfg.get('currency','SGD') != 'SGD': errors.append('V1 supports SGD only; no FX conversion.')
     by_dir={d['name'].strip():str(d['loan_account']) for d in cfg.get('directors',[]) if d.get('name')}
     for name,code in by_dir.items():
-        if code not in COA_MAP or COA_MAP[code]['type']!='Liability': errors.append(f'Director {name}: invalid director loan account {code}.')
+        if code not in coa or coa[code]['type']!='Liability': errors.append(f'Director {name}: invalid director loan account {code}.')
     bank_ref=set(); claim_ids=set(); inv_ids=set(); evidence_ids=set()
     for item in pkg.evidence:
         ref=item.get('evidence_ref','').strip()
@@ -151,7 +158,27 @@ def generate(pkg:Package):
         if item.get('review_status','').lower() not in ('reviewed','verified','approved'):
             warnings.append('Evidence not reviewed: '+(ref or '(unidentified)'))
 
+    pairs = transfer_pairs(pkg.bank, registered, start, end, parse_date, money, errors) if multi else {}
+    # Preflight duplicate source references across each bank before pairing.
+    from collections import Counter
+    refs = Counter((str(r.get('bank_account_code','')).strip(), str(r.get('reference','')).strip()) for r in pkg.bank) if multi else Counter()
+    rejected = set()
+    if multi:
+        for i,r in enumerate(pkg.bank,1):
+            k=(str(r.get('bank_account_code','')).strip(),str(r.get('reference','')).strip())
+            if not k[1] or refs[k]>1:
+                errors.append(f'Bank row {i}: blank or duplicate reference within account {k[0]}.')
+                rejected.add(i)
+                if i in pairs: rejected.add(pairs[i])
+            if k[0] not in cash_codes:
+                errors.append(f'Bank row {i}: missing or unregistered bank account {k[0]}.')
+                rejected.add(i)
     for i,r in enumerate(pkg.bank,1):
+        if i in rejected: continue
+        bank_code = str(r.get('bank_account_code','')).strip() if multi else '1000'
+        if not multi and (r.get('transfer_id') or r.get('bank_account_code') not in (None,'','1000')):
+            errors.append(f'Bank row {i}: multi-bank fields require an explicit registry.')
+            continue
         try:
             dt=parse_date(r.get('date',''),f'Bank row {i} date')
             if not start <= dt <= end:
@@ -161,20 +188,31 @@ def generate(pkg:Package):
             if credit<0 or debit<0 or (credit>0)==(debit>0):
                 errors.append(f'Bank row {i}: enter exactly one positive deposit or withdrawal.'); continue
             ref=r.get('reference','').strip()
+            if multi and (r.get('transfer_id') or r.get('account_code') == 'TRANSFER'):
+                if i not in pairs:
+                    errors.append(f'Bank row {i}: unresolved transfer; not posted.')
+                    continue
+                # Each bank leg has its own source evidence but shares one journal.
+                jid=f'TRANSFER-{min(i,pairs[i]):04d}'
+                bank_movements[bank_code] += credit-debit
+                entries.append(_entry(jid,dt,bank_code,credit,debit,r.get('description',''),'Bank transfer',r.get('evidence_ref','')))
+                continue
             if ref:
-                if ref in bank_ref: errors.append(f'Duplicate bank reference: {ref}')
-                bank_ref.add(ref)
+                key=(bank_code,ref) if multi else ref
+                if key in bank_ref: errors.append(f'Duplicate bank reference: {ref}')
+                bank_ref.add(key)
             else: warnings.append(f'Bank row {i}: no bank reference; review for duplicates.')
             code=str(r.get('account_code','9999')).strip() or '9999'
-            if code not in COA_MAP: errors.append(f'Bank row {i}: unknown account {code}.'); continue
-            if code=='1000': errors.append(f'Bank row {i}: counter-account cannot also be the bank account.'); continue
+            if code not in coa: errors.append(f'Bank row {i}: unknown account {code}.'); continue
+            if code in cash_codes or code=='1000': errors.append(f'Bank row {i}: counter-account cannot also be the bank account.'); continue
             if code=='9999': errors.append(f'Bank row {i}: unresolved classification (suspense).')
             jid=f'BANK-{i:04d}'
             desc=r.get('description','')
             ev=r.get('evidence_ref','')
-            entries.extend([_entry(jid,dt,'1000',credit,debit,desc,'Bank',ev),
+            bank_movements[bank_code] += credit-debit
+            entries.extend([_entry(jid,dt,bank_code,credit,debit,desc,'Bank',ev),
                             _entry(jid,dt,code,debit,credit,desc,'Bank',ev)])
-            cat=COA_MAP[code]['cashflow']
+            cat=coa[code]['cashflow']
             if cat == 'Noncash':
                 errors.append(
                     f'Bank row {i}: cash movement mapped to noncash account {code}. '
@@ -200,8 +238,8 @@ def generate(pkg:Package):
             director=r.get('director','').strip()
             loan=by_dir.get(director)
             if not loan: errors.append(f'Claim {cid}: unknown director {director!r}.'); continue
-            if code not in COA_MAP: errors.append(f'Claim {cid}: unknown account {code}.'); continue
-            if COA_MAP[code]['type'] not in ('Expense','Asset'):
+            if code not in coa: errors.append(f'Claim {cid}: unknown account {code}.'); continue
+            if code in cash_codes or coa[code]['type'] not in ('Expense','Asset'):
                 errors.append(f'Claim {cid}: expected an expense or asset account, got {code}.'); continue
             desc=r.get('description','') or r.get('merchant','')
             ev=r.get('evidence_ref','')
@@ -216,7 +254,7 @@ def generate(pkg:Package):
             dt=parse_date(r.get('date',''),f'Manual row {i} date')
             if dt>end: errors.append(f'Manual journal row {i} after financial year end.'); continue
             code=str(r.get('account_code','')).strip()
-            if code not in COA_MAP: errors.append(f'Manual row {i}: invalid account {code}'); continue
+            if code not in coa or (multi and code=='1000' and code not in cash_codes): errors.append(f'Manual row {i}: invalid account {code}'); continue
             debit=money(r.get('debit',''),f'manual row {i} debit')
             credit=money(r.get('credit',''),f'manual row {i} credit')
             if debit<0 or credit<0 or (debit>0)==(credit>0): errors.append(f'Manual row {i}: enter one positive debit or credit.'); continue
@@ -238,9 +276,11 @@ def generate(pkg:Package):
     manual_entries = (entry for entry in entries if entry['source'] == 'Manual')
     for jid,lines in _group(manual_entries,'journal_id').items():
         if lines[0]['source']=='Manual':
-            cash=[l for l in lines if l['account_code']=='1000' and start<=l['date']<=end]
+            cash=[l for l in lines if l['account_code'] in cash_codes and start<=l['date']<=end]
             if cash:
-                cats={COA_MAP[l['account_code']]['cashflow'] for l in lines if l['account_code']!='1000'}
+                if multi:
+                    errors.append(f'Manual cash journal {jid}: current-period cash must be entered through reviewed bank rows in multi-bank mode.')
+                cats={coa[l['account_code']]['cashflow'] for l in lines if l['account_code'] not in cash_codes}
                 cat=next(iter(cats)) if len(cats)==1 else 'Unallocated'
                 if cat=='Unallocated': errors.append(f'Manual cash journal {jid} has mixed classifications; split into separate journals.')
                 elif cat == 'Noncash':
@@ -258,38 +298,70 @@ def generate(pkg:Package):
     period=defaultdict(lambda:D('0'))
     for e in entries:
         if start<=e['date']<=end: period[e['account_code']]+=e['debit']-e['credit']
-    revenue=sum((-v for c,v in period.items() if COA_MAP[c]['type']=='Revenue'),D('0'))
-    expenses=sum((v for c,v in period.items() if COA_MAP[c]['type']=='Expense'),D('0'))
+    revenue=sum((-v for c,v in period.items() if coa[c]['type']=='Revenue'),D('0'))
+    expenses=sum((v for c,v in period.items() if coa[c]['type']=='Expense'),D('0'))
     profit=revenue-expenses
-    opening_profit=sum((-v for c,v in prev.items() if COA_MAP[c]['type']=='Revenue'),D('0'))-sum((v for c,v in prev.items() if COA_MAP[c]['type']=='Expense'),D('0'))
-    assets=sum((v for c,v in balances.items() if COA_MAP[c]['type']=='Asset'),D('0'))
-    liabilities=sum((-v for c,v in balances.items() if COA_MAP[c]['type']=='Liability'),D('0'))
-    booked_equity=sum((-v for c,v in balances.items() if COA_MAP[c]['type']=='Equity'),D('0'))
+    opening_profit=sum((-v for c,v in prev.items() if coa[c]['type']=='Revenue'),D('0'))-sum((v for c,v in prev.items() if coa[c]['type']=='Expense'),D('0'))
+    assets=sum((v for c,v in balances.items() if coa[c]['type']=='Asset'),D('0'))
+    liabilities=sum((-v for c,v in balances.items() if coa[c]['type']=='Liability'),D('0'))
+    booked_equity=sum((-v for c,v in balances.items() if coa[c]['type']=='Equity'),D('0'))
     equity=booked_equity+opening_profit+profit
     if assets!=liabilities+equity:
         errors.append('Balance sheet out of balance: assets not equal liabilities plus equity.')
     debits=sum((v for v in balances.values() if v>0),D('0'))
     credits=sum((-v for v in balances.values() if v<0),D('0'))
     if debits!=credits: errors.append('Trial balance totals are unequal.')
-    opening_value = cfg.get('bank_statement_opening')
-    opening_missing = opening_value is None or not str(opening_value).strip()
-    if opening_missing:
-        errors.append('Bank statement opening balance is required.')
-    closing_value = cfg.get('bank_statement_closing')
-    closing_missing = closing_value is None or not str(closing_value).strip()
-    if closing_missing:
-        errors.append('Bank statement closing balance is required.')
-    try:
-        bank_open = D('0') if opening_missing else money(opening_value, 'bank opening balance')
-        bank_end = D('0') if closing_missing else money(closing_value, 'bank closing balance')
-    except ValueError as e:
-        errors.append(str(e));bank_open=bank_end=D('0')
-    ledger_open=prev['1000']
-    ledger_end=balances['1000']
-    if not opening_missing and bank_open != ledger_open: errors.append(f'Opening bank statement {money_str(bank_open)} differs from opening ledger {money_str(ledger_open)}.')
-    if not (opening_missing or closing_missing) and bank_end != bank_open + bank_total:
-        errors.append(f'Bank statement closing does not reconcile with imported bank transactions: {money_str(bank_open+bank_total)} expected, {money_str(bank_end)} entered.')
-    if not closing_missing and bank_end != ledger_end: errors.append(f'Closing bank statement {money_str(bank_end)} differs from bank ledger {money_str(ledger_end)}.')
+    bank_reconciliations=[]
+    if multi:
+        bank_open=bank_end=ledger_open=ledger_end=D('0')
+        opening_missing=closing_missing=False
+        bank_total=sum(bank_movements.values(),D('0'))
+        for code,meta in registered.items():
+            parsed=[]
+            for key in ('opening','closing'):
+                value=meta.get(key)
+                try:
+                    if value is None or not str(value).strip(): raise ValueError('not provided')
+                    parsed.append(money(value,f'bank {code} {key}'))
+                except ValueError:
+                    errors.append(f'Bank {code}: invalid or missing statement {key} balance.')
+                    parsed.append(None)
+            op,cl=parsed
+            lo,le=prev[code],balances[code]
+            movement=bank_movements[code]
+            if op is not None and op!=lo: errors.append(f'Bank {code}: opening statement differs from opening ledger.')
+            if op is not None and cl is not None and op+movement!=cl: errors.append(f'Bank {code}: statement movement does not reconcile.')
+            if cl is not None and cl!=le: errors.append(f'Bank {code}: closing statement differs from closing ledger.')
+            if lo<0 or le<0 or (op is not None and op<0) or (cl is not None and cl<0): errors.append(f'Bank {code}: overdraft presentation not supported in this increment.')
+            opening_missing |= op is None
+            closing_missing |= cl is None
+            bank_open += op if op is not None else D('0')
+            bank_end += cl if cl is not None else D('0')
+            ledger_open += lo
+            ledger_end += le
+            bank_reconciliations.append({'code':code,'name':coa[code]['name'],'opening':op,'closing':cl,
+                'movement':movement,'ledger_open':lo,'ledger_close':le,
+                'difference':None if cl is None else cl-le})
+    else:
+        opening_value = cfg.get('bank_statement_opening')
+        opening_missing = opening_value is None or not str(opening_value).strip()
+        if opening_missing:
+            errors.append('Bank statement opening balance is required.')
+        closing_value = cfg.get('bank_statement_closing')
+        closing_missing = closing_value is None or not str(closing_value).strip()
+        if closing_missing:
+            errors.append('Bank statement closing balance is required.')
+        try:
+            bank_open = D('0') if opening_missing else money(opening_value, 'bank opening balance')
+            bank_end = D('0') if closing_missing else money(closing_value, 'bank closing balance')
+        except ValueError as e:
+            errors.append(str(e));bank_open=bank_end=D('0')
+        ledger_open=prev['1000']
+        ledger_end=balances['1000']
+        if not opening_missing and bank_open != ledger_open: errors.append(f'Opening bank statement {money_str(bank_open)} differs from opening ledger {money_str(ledger_open)}.')
+        if not (opening_missing or closing_missing) and bank_end != bank_open + bank_total:
+            errors.append(f'Bank statement closing does not reconcile with imported bank transactions: {money_str(bank_open+bank_total)} expected, {money_str(bank_end)} entered.')
+        if not closing_missing and bank_end != ledger_end: errors.append(f'Closing bank statement {money_str(bank_end)} differs from bank ledger {money_str(ledger_end)}.')
     cashflows=defaultdict(lambda:D('0'))
     for f in flow_items: cashflows[f['category']]+=f['cash_movement']
     for category in ('Operating','Investing','Financing','Unallocated'):
@@ -322,7 +394,7 @@ def generate(pkg:Package):
         if e['evidence_ref'] and e['evidence_ref'] not in evidence_ids:
             warnings.append(f"Evidence ref {e['evidence_ref']} (journal {e['journal_id']}) is absent from evidence.csv.")
         if not e['evidence_ref'] and e['source']!='Manual': warnings.append(f"Missing evidence reference for {e['journal_id']}.")
-    if not cfg.get('bank_balances_confirmed'):
+    if not multi and not cfg.get('bank_balances_confirmed'):
         warnings.append('Opening/closing bank statement balances have not been confirmed. Statement arithmetic alone is insufficient to establish the opening ledger position.')
     if not cfg.get('fy_confirmed',False):
         warnings.append('Financial year start and year-end have not been explicitly confirmed in the setup wizard.')
@@ -343,6 +415,7 @@ def generate(pkg:Package):
             'bank_close':bank_end,'bank_delta':bank_total,'ledger_open':ledger_open,'ledger_end':ledger_end,
             'bank_open_missing': opening_missing,
             'bank_close_missing': closing_missing,
+            'coa':coa,'bank_reconciliations':bank_reconciliations,'multi_bank':multi,
             'trial_debit':debits,'trial_credit':credits,'errors':errors,'warnings':warnings,'package':pkg}
 
 
@@ -356,8 +429,8 @@ def balance_sheet_rows(result):
     rows=[]
     for group in ('Asset','Liability','Equity'):
         for code,v in sorted(result['balances'].items()):
-            if COA_MAP[code]['type']!=group or not v:continue
-            rows.append([code,COA_MAP[code]['name'],money_str(v if group=='Asset' else -v)])
+            if result.get('coa', COA_MAP)[code]['type']!=group or not v:continue
+            rows.append([code,result.get('coa', COA_MAP)[code]['name'],money_str(v if group=='Asset' else -v)])
         if group=='Equity':
             if result['opening_profit']:rows.append(['','Prior-period unclosed profit / loss',money_str(result['opening_profit'])])
             rows.append(['','Current-year profit / loss',money_str(result['profit'])])
@@ -368,8 +441,8 @@ def profit_rows(result):
     rows=[]
     for group in ('Revenue','Expense'):
         for code,v in sorted(result['period'].items()):
-            if COA_MAP[code]['type']==group and v:
-                rows.append([code,COA_MAP[code]['name'],money_str(-v if group=='Revenue' else v)])
+            if result.get('coa', COA_MAP)[code]['type']==group and v:
+                rows.append([code,result.get('coa', COA_MAP)[code]['name'],money_str(-v if group=='Revenue' else v)])
     return rows
 
 
@@ -377,7 +450,7 @@ def trial_rows(result):
     rows=[]
     for code,amount in sorted(result['balances'].items()):
         if amount:
-            rows.append([code,COA_MAP[code]['name'],money_str(max(amount,D(0))),money_str(max(-amount,D(0)))])
+            rows.append([code,result.get('coa', COA_MAP)[code]['name'],money_str(max(amount,D(0))),money_str(max(-amount,D(0)))])
     rows.append(['','TOTAL',money_str(result['trial_debit']),money_str(result['trial_credit'])])
     return rows
 
