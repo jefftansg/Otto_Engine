@@ -75,3 +75,7 @@ Prioritise document-first UX over peripheral modules once M0 is validated: (1) u
 ## P0 priority correction — report fidelity first (21 November 2026)
 
 Before polishing the proposed Otto Auto workflow, secure the old approved MA/UFS report templates, define a canonical layout/style schema, reproduce their typography/spacing/table design deterministically and pass golden-master visual and accounting checks. Preserve the M0 stability gate. Otto Auto can then simplify intake while reusing the approved report renderer. Planned, no implementation claimed. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
+
+## P0 reporting completeness workstream (22 November 2026)
+
+Preserve M0 stabilisation. Before Auto UX expansion and commercial service launch, prioritize the reporting workstream (M6, with necessary M3 ledger and framework checks): baseline arithmetic audit → cash flow detail and MA export → equity components → comparative data → completeness and approval gates → template fidelity and reconciliation → regression/UAT/accounting approval. See [Complete financial statements and reporting readiness](27_FINANCIAL_STATEMENT_COMPLETENESS.md). The engine already has preliminary cash and equity summaries; no version bump or completed feature claim. Broader audit/filing automation remains outside current service scope.
