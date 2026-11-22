@@ -14,6 +14,8 @@ def _reset_confirmation(key,revision):
 
 def render_intake(p,prefix,files=None,analysis=None):
     st.subheader('Identify and group bank statements')
+    test_mode=p.config.get('synthetic_test_mode') is True
+    if test_mode:st.error('SYNTHETIC TEST WORKSPACE: coverage and approvals below assess test fixtures only, not the authenticity of bank-issued statements.')
     st.caption('Upload originals for every account and every reporting month. DBS, OCBC and UOB text statements are supported conservatively. Scans, ambiguous fields and unsupported layouts require source review. Analysis never posts entries.')
     if files is None:
         files=st.file_uploader('Bank statements — PDF, CSV or Excel',type=['pdf','csv','xlsx','xls'],accept_multiple_files=True,help='Maximum 25 MB per file; 50 files and 100 MB per batch. Originals remain local and are not embedded in workspace ZIPs.',key=prefix+'statements')
@@ -44,7 +46,7 @@ def render_intake(p,prefix,files=None,analysis=None):
                 code=st.text_input('Bank control code (1000–1099)',value=existing['code'] if existing else free)
                 reviewer=st.text_input('Reviewer name',key=key+'reviewer')
                 evidence=st.text_input('Review evidence / original statement location',key=key+'evidence')
-                checked=st.checkbox('I checked the originals: same company, same account, SGD currency, exact reporting coverage and printed balances',key=key+'source_check')
+                checked=st.checkbox(('I checked the labelled synthetic fixtures for identity, dates and balance continuity (TEST ONLY)' if test_mode else 'I checked the originals: same company, same account, SGD currency, exact reporting coverage and printed balances'),key=key+'source_check')
                 link=st.checkbox('If linking an existing manually entered account, I verified that its rows belong to this account',key=key+'link_check')
                 if st.form_submit_button('Approve account identity and coverage',disabled=bool(group['errors'])):
                     if approve_account(p,analysis,group['key'],code,group['revision'],reviewer,evidence,checked,link):
@@ -60,7 +62,7 @@ def render_intake(p,prefix,files=None,analysis=None):
             with st.form(key+'transactions'):
                 reviewer=st.text_input('Transaction reviewer')
                 evidence=st.text_input('Transaction review evidence / source location')
-                checked=st.checkbox('I matched all transaction dates, gross receipts/payments, references and totals against the originals',key=key+'rows_check')
+                checked=st.checkbox(('I matched the extracted rows to synthetic test fixtures only' if test_mode else 'I matched all transaction dates, gross receipts/payments, references and totals against the originals'),key=key+'rows_check')
                 if st.form_submit_button('Approve and stage proposed transactions',disabled=bool(proposal['errors']) or not proposal['rows']):
                     if approve_import(p,analysis,group['key'],proposal['revision'],reviewer,evidence,checked):st.success('Staged once for classification.');st.rerun()
                     else:st.error('Approval rejected; refresh and review the current proposal.')

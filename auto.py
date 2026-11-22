@@ -71,7 +71,7 @@ def _issues(p,a,proposal):
                                'Full-year completeness and balance continuity are not yet established.',
                                'Add missing statements or correct the inconsistent source.',severity='Required',details=details,source_required=True))
     problems=[r['name']+': '+' | '.join(r['reasons']) for r in a['inventory']
-              if r.get('demo') or r['status']=='Excluded company mismatch' or r['status']=='Needs review']
+              if (r.get('demo') and not p.config.get('synthetic_test_mode')) or r['status'] in ('Excluded company mismatch','Needs review','Excluded from synthetic test workspace')]
     if problems:
         items.append(_item('auto-source-review','Review excluded or unreadable files','Some files cannot establish bank evidence.',
                            'Retain as supporting records or remove obsolete files; provide genuine readable bank evidence.',
@@ -167,6 +167,8 @@ def render(p,inspect,register_evidence,suggest):
     st.header('Otto Auto')
     st.write('Upload your documents. Review what needs attention. Download your draft reports.')
     st.caption('Auto preview · Local document analysis · No cloud AI connected · Draft report layouts awaiting template approval')
+    if p.config.get('synthetic_test_mode'):
+        st.error('SYNTHETIC TEST DATA — NOT OFFICIAL BANK OR ACRA RECORDS. Only use for fixture parsing, reconciliation and provisional report tests. Never send these outputs to a client.')
     files=st.session_state.setdefault('guided_files',[])
     upload=st.file_uploader('Drop bank statements, bookkeeping records and report references here',type=['pdf','csv','xlsx','xls'],accept_multiple_files=True,
                             key='auto_upload_'+str(st.session_state.get('guided_upload_version',0)),help='Up to 50 files, 25 MB per file and 100 MB total. No company form is required before upload.')

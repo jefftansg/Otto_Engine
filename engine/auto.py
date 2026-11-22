@@ -108,6 +108,7 @@ def analyse(files, config, inspect=inspect_document):
         raise ValueError('Use at most 50 files and 100 MB per batch.')
     inventory=[]; parsed=[]; seen={}; groups=defaultdict(list); proposals=defaultdict(list)
     expected=canonical_name(config.get('company_name'))
+    synthetic_test_mode=config.get('synthetic_test_mode') is True
     for item in files:
         row=dict(id=upload_id(item), name=item['name'], sha256=item['sha256'], type='Needs review',
                  status='Needs review', reasons=[], fields=[], company='')
@@ -125,12 +126,18 @@ def analyse(files, config, inspect=inspect_document):
             row['reasons'].append(str(exc));inventory.append(row);continue
         row['demo']=demonstration(doc)
         row['company']=acra.get('fields',{}).get('company_name') or company_name(doc)
-        if row['demo']:
+        row['authenticity']='synthetic_fixture' if row['demo'] else 'unverified_original'
+        if row['demo'] and not synthetic_test_mode:
             row.update(type='Demonstration / fictional document',status='Excluded from bank evidence')
-            row['reasons'].append('Fictional or demonstration marker detected; cannot establish actual bank coverage.')
+            row['reasons'].append('Synthetic evidence cannot establish actual bank coverage. Enable Synthetic Test Mode in a new workspace to test it.')
+        elif synthetic_test_mode and not row['demo'] and (acra.get('detected') or bank.get('detected')):
+            row.update(type='Original-looking source',status='Excluded from synthetic test workspace')
+            row['reasons'].append('Only explicitly labelled synthetic bank/profile fixtures are allowed in Synthetic Test Mode.')
         else:
+            if row['demo']:
+                row['reasons'].append('SYNTHETIC TEST ONLY: this fixture is not authentic company or bank evidence.')
             if acra.get('detected') and acra.get('fields'):
-                row.update(type='Company profile',status='Review proposed company fields')
+                row.update(type='Company profile',status='Synthetic test profile — review fields' if row['demo'] else 'Review proposed company fields')
                 mismatch=(config.get('uen') and acra['fields'].get('uen') and config['uen'].strip().upper()!=acra['fields']['uen'].strip().upper())
                 mismatch=mismatch or (expected and row['company'] and expected!=canonical_name(row['company']))
                 if mismatch:
@@ -139,7 +146,7 @@ def analyse(files, config, inspect=inspect_document):
                 for key,value in ({} if mismatch else acra['fields']).items():
                     row['fields'].append(provenance(doc,value,key));proposals[key].append(row['fields'][-1])
             elif bank.get('detected'):
-                row.update(type='Bank statement',status='Review statement')
+                row.update(type='Bank statement',status='Synthetic test statement — not authentic evidence' if row['demo'] else 'Review statement')
                 row['bank']=bank
                 if row['company']:
                     proposals['company_name'].append(provenance(doc,row['company'],'company_name'))
@@ -172,7 +179,7 @@ def analyse(files, config, inspect=inspect_document):
         normalise=canonical_name if key=='company_name' else lambda v:str(v).strip().upper()
         if len({normalise(p['value']) for p in values})==1:agreed[key]=values[0]
     return dict(inventory=inventory,parsed=parsed,accounts=accounts,proposals=agreed,
-                context=digest({k:config.get(k) for k in ('company_name','uen','fy_start','fy_end','fy_confirmed')}),
+                context=digest({k:config.get(k) for k in ('company_name','uen','fy_start','fy_end','fy_confirmed','synthetic_test_mode')}),
                 conflicts=[k for k in proposals if k not in agreed],
                 fingerprint=digest([(r['id'],r['sha256']) for r in inventory]))
 
@@ -182,7 +189,7 @@ def bank_proposal(analysis, config, existing):
     errors=[];rows=[];sources=[]
     if 'bank_accounts' in config:
         errors.append('Use account-by-account review for this multi-bank workspace; legacy import is blocked.')
-    if analysis['context']!=digest({k:config.get(k) for k in ('company_name','uen','fy_start','fy_end','fy_confirmed')}):
+    if analysis['context']!=digest({k:config.get(k) for k in ('company_name','uen','fy_start','fy_end','fy_confirmed','synthetic_test_mode')}):
         errors.append('Setup changed after analysis; analyse the sources again.')
     if not (config.get('fy_confirmed') and config.get('company_name') and config.get('uen')):
         errors.append('Confirm company identity and reporting dates.')

@@ -47,10 +47,20 @@ def _styles(profile=None):
 
 def _page(canvas,doc):
     canvas.saveState(); w,h=doc.pagesize
+    if getattr(doc,'synthetic_test_mode',False):
+        canvas.saveState()
+        canvas.translate(w/2,h/2)
+        canvas.rotate(30)
+        canvas.setFillColor(colors.HexColor('#E4E4E4'))
+        canvas.setFont('Helvetica-Bold',32)
+        canvas.drawCentredString(0,0,'SYNTHETIC TEST ONLY')
+        canvas.setFont('Helvetica-Bold',16)
+        canvas.drawCentredString(0,-24,'NOT FOR CLIENT USE')
+        canvas.restoreState()
     canvas.setStrokeColor(colors.HexColor('#D7DFE5'))
     canvas.line(doc.leftMargin,h-17*mm,w-doc.rightMargin,h-17*mm)
     canvas.setFont('Helvetica',7); canvas.setFillColor(GREY)
-    canvas.drawString(doc.leftMargin,11*mm,'Otto Financial Report Engine | DRAFT')
+    canvas.drawString(doc.leftMargin,11*mm,('Otto | SYNTHETIC TEST DATA | NOT FOR CLIENT USE' if getattr(doc,'synthetic_test_mode',False) else 'Otto Financial Report Engine | DRAFT'))
     canvas.drawRightString(w-doc.rightMargin,11*mm,f'Page {doc.page}')
     canvas.restoreState()
 
@@ -109,6 +119,8 @@ def _section(story, styles, title, rows, widths, wrap=None):
 
 
 def _status(result):
+    if result['config'].get('synthetic_test_mode'):
+        return 'SYNTHETIC TEST ONLY - NOT AUTHENTIC EVIDENCE OR CLIENT-READY FINANCIAL STATEMENTS'
     if result.get('auto_report'):
         return result['auto_report']['status'] + ' | TEMPLATE APPROVAL PENDING'
     return 'INCOMPLETE DRAFT - ERRORS PRESENT' if result['errors'] else 'DRAFT - DIRECTOR / ACCOUNTANT REVIEW REQUIRED'
@@ -134,6 +146,7 @@ def management_pdf(result):
     buf=io.BytesIO();w,h=landscape(A4)
     doc=SimpleDocTemplate(buf,pagesize=(w,h),leftMargin=15*mm,rightMargin=15*mm,
                           topMargin=23*mm,bottomMargin=19*mm, title='Draft Management Accounts')
+    doc.synthetic_test_mode=bool(result['config'].get('synthetic_test_mode'))
     s=_styles(layout(result['config'],'ma')[1]);story=[];c=result['config'];p=result['package']
     inner=w-30*mm
     _header(story,s,result,'MANAGEMENT ACCOUNTS | Internal draft reporting package')
@@ -269,6 +282,7 @@ def financial_statements_pdf(result):
     buf=io.BytesIO();w,h=A4
     doc=SimpleDocTemplate(buf,pagesize=A4,leftMargin=19*mm,rightMargin=19*mm,
                          topMargin=23*mm,bottomMargin=20*mm,title='Unaudited Financial Statements - Draft')
+    doc.synthetic_test_mode=bool(result['config'].get('synthetic_test_mode'))
     s=_styles(layout(result['config'],'ufs')[1]);story=[];c=result['config'];inner=w-38*mm
     _header(story,s,result,'UNAUDITED FINANCIAL STATEMENTS | PREPARATION DRAFT')
     _paragraph(story,s,'This document is a preparation draft derived from supplied bookkeeping records. It is NOT yet a director-approved, fully disclosed or certified set of financial statements. Financial reporting framework eligibility, recognition, accounting policies, disclosures, going concern, tax treatment and audit exemption must be independently reviewed.')
@@ -389,6 +403,14 @@ def xlsx_report(result):
         if rows:ws.autofilter(0,0,max(0,len(rows)-1),max(0,len(rows[0])-1))
         return ws
     c=result['config'];p=result['package']
+    if c.get('synthetic_test_mode'):
+        sheet('SYNTHETIC TEST ONLY',[
+          ['WARNING','THIS WORKBOOK CONTAINS FICTIONAL TEST DATA'],
+          ['Usage','Parser, reconciliation and report-layout testing only'],
+          ['Authenticity','NOT bank-issued or ACRA-issued evidence'],
+          ['Client delivery','PROHIBITED - NOT FOR CLIENT USE'],
+          ['Financial reporting','Not verified, not approved, not complete']
+        ],[29,72])
     if result.get('auto_report'):
         meta=result['auto_report']
         sheet('Report snapshot', [['Field','Value'],['Snapshot',meta['snapshot']],['Status',meta['status']],
