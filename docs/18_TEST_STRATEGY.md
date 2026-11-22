@@ -116,3 +116,7 @@ TEST-OTTO-AUTO-001–009 test batch upload, provenance, bank month gaps/overlaps
 ## P0 visual report test suite (planned; not executed, 21 November 2026)
 
 TEST-OTTO-DES-001–009 cover master-template versioning, typography token consistency, page geometry, table/number alignment, field mapping, PDF vs prospective DOCX geometry, golden-master page renders, owner approval, and Auto/Advanced reproducibility. Include long company names, negative values, sparse schedules, long descriptions and multi-page notes. Passes of PDF-signature tests do NOT count as visual acceptance. Do not claim historical parity without reference documents. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
+
+## P0 complete-statement acceptance suite (22 November 2026; not executed)
+
+TEST-OTTO-FS-001–006 are defined with hand-calculated cash/equity vectors and positive/negative cases in [Complete financial statements and reporting readiness](27_FINANCIAL_STATEMENT_COMPLETENESS.md). Check noncash/director funding, transfers, unallocated cash, comparative absence, first-year evidence, framework alternatives, entity guard in renderer/CLI, cross-report numerical tie-outs, template golden masters and immutable approval gates. Run the original regression suite and record real pass/fail results, platform, commit and reviewer decisions. Do not count existing signature checks or proposed scenarios as full financial statement acceptance.
