@@ -169,6 +169,14 @@ def extract_bank_statement(doc):
     bank=''
     for b in ('OCBC','DBS','POSB','UOB','STANDARD CHARTERED','MAYBANK','CIMB','HSBC','RHB','BANK OF CHINA'):
         if re.search(r'\b'+re.escape(b)+r'\b',text[:2500],re.I):bank=b;break
+    from .ocbc_daily import extract as extract_daily
+    daily=extract_daily(doc)
+    if daily:
+        return dict(detected=True,source=doc.name,sha256=doc.sha256,bank='OCBC',account_id=account_id,masked_account=masked,
+                    daily_profile=daily['profile'],opening=daily['opening'],closing=daily['closing'],
+                    period_start=daily['period_start'],period_end=daily['period_end'],requested_period_end=daily['requested_period_end'],
+                    printed_on=daily['printed_on'],coverage_verified_through=daily['coverage_verified_through'],
+                    warnings=daily['errors'])
     warnings=op_err+cl_err
     if op is None:warnings.append('No unambiguous labelled opening balance found.')
     if cl is None:warnings.append('No unambiguous labelled closing balance found.')
@@ -227,6 +235,8 @@ def consolidate_statement_balances(summaries,fy_start,fy_end):
 
 def propose_bank_rows(doc):
     """Best-effort auto mapping; ambiguous signed amount exports are excluded from this shortcut."""
+    from .ocbc_daily import extract as extract_daily,propose_rows as daily_rows
+    if extract_daily(doc):return daily_rows(doc)
     candidates=[];exceptions=[]
     if not doc.tables and re.search(r'\bOCBC\b',doc.text_excerpt,re.I):
         return _ocbc_text_rows(doc)

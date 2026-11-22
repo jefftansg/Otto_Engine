@@ -102,3 +102,7 @@ User authorised evaluation/fixes to development/multi-bank-sgd and PR #21, then 
 ## Decision 020 — preserve Auto while adding multi-bank controls
 
 User requested GitHub update after discovering the isolated pilot omitted Otto Auto. Selectively integrate PR #19 local Auto capabilities into PR #21, restore default Auto, and reuse account-aware source and detailed controls without migrating existing populated single-bank books or merging either PR. Keep version 1.3.1, explicit candidate labels, local processing, approved-transfer/category invariants, client cache isolation and provisional snapshot/export controls. Accounting and template acceptance remain open. [Evidence](29_AUTO_MULTI_BANK_INTEGRATION.md).
+
+## Decision 021 — source identity and always-accessible intake
+
+User reported that a transfer counterparty became the company name in a bank-only session, requested a fix, and asked for sidebar upload to avoid main-page scrolling. Share header-only owner extraction, recognise the exact checked OCBC daily-details summary, preserve unresolved date-basis/partial-period exceptions, and place upload directly below the sidebar version. Never rename existing books, infer UEN or clear genuine completeness errors to suppress a parser warning. [Tests and limits](30_OCBC_DAILY_HEADER_FIX.md).

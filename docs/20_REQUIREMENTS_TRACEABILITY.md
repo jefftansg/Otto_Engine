@@ -117,3 +117,7 @@ OTTO-BANK-002 / TEST-OTTO-BANK-002 now has an engineering candidate for conserva
 ## Combined Auto + multi-bank engineering candidate
 
 OTTO-AUTO-001–007 local subsets now share the OTTO-BANK-002 reviewed source/account/transfer controls in one default Auto view. Ten combined-flow tests plus the ported Auto/OCBC and all existing regressions pass (171 total locally). Safe detailed views preserve source identities, transfer approvals, the shared ledger and provisional exports; existing populated single-account migration and bespoke multi-bank Guided tabs remain pending. Full Auto PRD, OTTO-FS-001–006, master-template and owner/accounting acceptance remain partial/open. [Exact evidence and limits](29_AUTO_MULTI_BANK_INTEGRATION.md).
+
+## OCBC daily export / account-owner correction
+
+OTTO-AUTO-001/002 and OTTO-BANK-002 gain header-only identity and scoped daily-export summary/transaction checks; the shared sidebar uploader addresses the main-page navigation defect. Full local suite: 189 passing, no skips. Bank-only source analysis does not infer ACRA status or UEN. Partial periods, date-basis decisions and all professional/template acceptance remain open. [Exact verification](30_OCBC_DAILY_HEADER_FIX.md).

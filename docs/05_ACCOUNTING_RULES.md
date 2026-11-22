@@ -87,3 +87,7 @@ Maintain independent statement opening/movement/closing reconciliations for ever
 ## Auto integration — unchanged accounting policy
 
 Auto, Guided and Advanced read the same deterministic package. Multi-bank category approval cannot overwrite an approved transfer leg; legacy one-account imports reject registered multi-bank packages. Multi-bank ledger/source errors block bundle exports, while preserved source/transfer reviews and current-original completeness remain separate checks. Snapshot/manifest labels remain provisional and unauthorised. No recognition, cutoff, assurance, framework or filing policy changes. [Integration evidence](29_AUTO_MULTI_BANK_INTEGRATION.md).
+
+## OCBC daily-details source controls — 22 November 2026
+
+Account holders are header facts; transaction counterparties never identify the reporting entity. A scoped Ledger Balance proposal must tie opening plus printed credits less debits; staging also checks gross counts/totals and running balances. Selected future To dates cannot extend verified coverage past print date. Posting/value-date differences require review rather than silent date substitution. No new recognition, cutoff or overdraft policy is introduced. [Evidence](30_OCBC_DAILY_HEADER_FIX.md).

@@ -163,13 +163,15 @@ def _categories(p,suggest):
             except (ValueError,TypeError) as exc:st.error(str(exc))
 
 
-def render(p,inspect,register_evidence,suggest):
+def render(p,inspect,register_evidence,suggest,upload_area=None):
     st.header('Otto Auto')
-    st.write('Upload your documents. Review what needs attention. Download your draft reports.')
+    st.write('Add documents in the sidebar. Review what needs attention. Download your draft reports.')
     st.caption('Auto preview · Local document analysis · No cloud AI connected · Draft report layouts awaiting template approval')
     files=st.session_state.setdefault('guided_files',[])
-    upload=st.file_uploader('Drop bank statements, bookkeeping records and report references here',type=['pdf','csv','xlsx','xls'],accept_multiple_files=True,
-                            key='auto_upload_'+str(st.session_state.get('guided_upload_version',0)),help='Up to 50 files, 25 MB per file and 100 MB total. No company form is required before upload.')
+    with upload_area if upload_area is not None else st.sidebar:
+        st.markdown('**Upload documents**')
+        upload=st.file_uploader('Drop bank statements, bookkeeping records and report references here',type=['pdf','csv','xlsx','xls'],accept_multiple_files=True,
+                                key='auto_upload_'+str(st.session_state.get('guided_upload_version',0)),help='Up to 50 files, 25 MB per file and 100 MB total. No company form is required before upload.')
     if upload:
         incoming=[dict(name=f.name,bytes=f.getvalue(),sha256=sha256(f.getvalue()).hexdigest()) for f in upload]
         merged=merge_uploads(files,incoming)
@@ -196,7 +198,7 @@ def render(p,inspect,register_evidence,suggest):
         st.info('Restored source history is available below. Re-upload the originals to recheck them.')
         with st.expander('Saved source inventory — originals unavailable'):st.json(p.config.get('auto_inventory',[]))
     else:
-        st.info('Start by dropping your files above. Otto will identify the company information and statement coverage it can read.')
+        st.info('Start by adding your files in the sidebar drop box. Otto will identify the company information and statement coverage it can read.')
         return
     if not any((p.bank,p.claims,p.journals,p.invoices,p.evidence)) and not p.config.get('bank_balances_confirmed'):
         from engine.bank_intake import analyse_documents

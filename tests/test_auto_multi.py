@@ -160,3 +160,14 @@ class AutoMultiUITests(unittest.TestCase):
         at.run();self.assertFalse(at.exception)
         self.assertTrue(all(not c.value for c in at.checkbox if c.label.startswith('I checked the originals')))
         self.assertEqual(at.session_state['pkg'].bank,[])
+
+
+    def test_document_drop_box_is_in_sidebar_not_the_main_review_page(self):
+        at=self.app();self.assertFalse(at.exception)
+        sidebar=[w for w in at.sidebar.get('file_uploader') if w.label=='Drop bank statements, bookkeeping records and report references here']
+        main=[w for w in at.main.get('file_uploader') if w.label=='Drop bank statements, bookkeeping records and report references here']
+        self.assertEqual(len(sidebar),1);self.assertEqual(main,[])
+        p,files=reviewed();at=self.app(p,files);self.assertFalse(at.exception)
+        self.assertEqual(len([w for w in at.sidebar.get('file_uploader') if w.label=='Drop bank statements, bookkeeping records and report references here']),1)
+        self.assertFalse(any('Bank statements — PDF' in w.label for w in at.main.get('file_uploader')))
+        self.assertEqual(generate(at.session_state['pkg'])['ledger_end'],1800)

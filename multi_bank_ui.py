@@ -9,7 +9,7 @@ from engine.bank_intake import apply_registry
 from bank_intake_ui import render_intake, render_transfers
 
 
-def render(p):
+def render(p,upload_area=None):
     prefix='multi_bank_'+str(id(p))+'_'+str(st.session_state.get('guided_upload_version',0))
     st.header('Multi-bank SGD — development pilot')
     st.warning('Working drafts only. Manually stage reviewed bank rows and opening journals. Supported text statements can be identified and grouped locally for review. Cross-date transfers, FX and overdrafts are unsupported. Save original statements separately; workspace ZIPs retain source fingerprints and review records, not original PDFs.')
@@ -38,7 +38,7 @@ def render(p):
                     account['confirmed']=False
                     account['coverage_confirmed']=False
             st.success('Company details saved. Recheck bank coverage for changed identity or dates.');st.rerun()
-    render_intake(p,prefix)
+    render_intake(p,prefix,upload_area=upload_area)
     c=p.config
     render_details(p,prefix)
     render_transfers(p,prefix)

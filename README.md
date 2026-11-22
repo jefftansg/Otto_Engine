@@ -144,3 +144,7 @@ The development branch adds an explicit manual-entry multi-bank pilot, per-accou
 ## Unreleased multi-bank SGD review candidate
 
 The development pilot supports local supported-format bank identification/grouping, independent source coverage and bank reconciliation, reviewed transaction staging and explicit transfer suggestions. It remains Lighthouse StudioWorks' internal preparation engine. Existing single-account workspaces retain their workflow; migration is not automatic. See [pilot usage and acceptance gates](docs/28_MULTI_BANK_SGD_PILOT.md) and [verification evidence](docs/milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md). PR #21 remains unmerged and the release label remains **1.3.1**; engineering test success does not approve UFS or template fidelity.
+
+## Sidebar upload and OCBC daily-details correction
+
+The unreleased candidate keeps Auto document upload near the top of the sidebar. OCBC daily-details account names come from the header, not transfer counterparties; Ledger Balance proposals require reconciliation, and exports printed before period-end remain incomplete. No ACRA document is required merely to identify the account holder; missing UEN stays unknown. [Fix and 189-test evidence](docs/30_OCBC_DAILY_HEADER_FIX.md).

@@ -23,7 +23,7 @@ def render(p,files,inspect,suggest):
         st.dataframe([dict(File=r['name'],Type=r['type'],Status=r['status']) for r in a['inventory']],hide_index=True,width='stretch')
         _upload_deletion_controls(p,a['parsed'],inspect,'auto_multi')
     elif p.config.get('auto_inventory'):
-        st.info('Saved source history is available. Re-upload originals above to recheck coverage.')
+        st.info('Saved source history is available. Re-upload originals in the sidebar to recheck coverage.')
         with st.expander('Saved source inventory — originals unavailable'):st.json(p.config['auto_inventory'])
     _setup(p,a)
     prefix='auto_multi_'+str(st.session_state.get('guided_upload_version',0))+'_'

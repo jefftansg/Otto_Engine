@@ -96,3 +96,7 @@ The local SGD identification/review/reconciliation implementation changes no reg
 ### 22 November 2026 — combined Auto candidate
 
 Integrating the existing local Auto workflow with multi-bank review adds no cloud transmission, inference provider, dependency, licence, authority version or regulatory determination. Existing professional/framework/filing acceptance dependencies remain. No release-version increment or GitHub merge; see [candidate record](29_AUTO_MULTI_BANK_INTEGRATION.md).
+
+### 22 November 2026 — OCBC identity/layout parser fix
+
+Header-identity extraction, checked Ledger Balance mapping and sidebar placement change no authority version, dependency, licence, framework, filing determination or accounting policy. Print-date and posting/value-date exceptions remain evidence/review controls. No release increment or merge. [Record](30_OCBC_DAILY_HEADER_FIX.md).

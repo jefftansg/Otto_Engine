@@ -59,6 +59,7 @@ def clear_auto_review_cache():
 with st.sidebar:
     st.image(str(ASSETS / 'otto_wordmark.png'), width=235)
     st.markdown('**Engine version 1.3.1**')
+    source_upload_area=st.container()
     st.divider()
     st.header('Your client')
     if st.button('＋ Start a new company',width='stretch',type='primary'):
@@ -179,13 +180,13 @@ if 'advanced_page' not in st.session_state: st.session_state['advanced_page']=0
 
 if st.session_state['app_mode']=='Auto':
     from auto import render
-    render(p,inspect_cached,register_evidence,suggest)
+    render(p,inspect_cached,register_evidence,suggest,upload_area=source_upload_area)
     st.stop()
 
 # Multi-bank detailed views bypass single-account editors and importers.
 if 'bank_accounts' in p.config:
     from multi_bank_ui import render as render_multi_bank
-    render_multi_bank(p)
+    render_multi_bank(p,upload_area=source_upload_area)
     st.stop()
 if not any((p.bank,p.claims,p.journals,p.invoices,p.evidence)) and not p.config.get('bank_balances_confirmed'):
     with st.expander('Experimental: multiple SGD bank accounts'):

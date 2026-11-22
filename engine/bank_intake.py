@@ -12,6 +12,7 @@ import re
 from .importers import inspect_document
 from .autofill import (extract_bank_statement,consolidate_statement_balances,propose_bank_rows,DATE_RX,_date)
 from .multi_bank import fingerprint,row_facts,pair_hash
+from .bank_headers import header_lines,account_holder
 
 MAX_FILES=50
 MAX_BYTES=100*1024*1024
@@ -42,14 +43,11 @@ def _location(doc,text):
 
 
 def identify(doc):
-    lines=_source_lines(doc);head=[]
-    for line in lines[:80]:
-        if re.search(r'\b(?:Transaction\s+(?:Value|Date)|Date\s+Description|Date\s+Details)\b',line,re.I):break
-        head.append(line)
+    lines=_source_lines(doc);head=header_lines(doc)
     bank_patterns={'OCBC':r'^(?:Bank\s*[:|]?\s*)?(?:OCBC\b|OVERSEA-CHINESE\s+BANKING)',
                    'DBS':r'^(?:Bank\s*[:|]?\s*)?(?:DBS\b|DEVELOPMENT\s+BANK\s+OF\s+SINGAPORE)',
                    'UOB':r'^(?:Bank\s*[:|]?\s*)?(?:UOB\b|UNITED\s+OVERSEAS\s+BANK)'}
-    banks={bank for bank,rx in bank_patterns.items() if any(re.search(rx,line,re.I) for line in head)}
+    banks={bank for bank,rx in bank_patterns.items() if any(re.search(rx,re.sub(r'^.*?\bBIC Name\s+','',line,flags=re.I),re.I) for line in head)}
     errors=[];locations=[]
     bank=next(iter(banks)) if len(banks)==1 else ''
     if not bank:errors.append('Bank identity is missing, unsupported or ambiguous; review the original.')
@@ -67,15 +65,13 @@ def identify(doc):
         match=re.search(r'\b(?:Account\s+|Statement\s+)?(?:Currency|CCY)\s*[:|]?\s*(SGD|USD|EUR|GBP|AUD|JPY|CNH|CNY|HKD|MYR)\b',line,re.I)
         if match:currencies.add(match.group(1).upper())
         if re.search(r'\bSGD\s+(?:CURRENT|SAVINGS|BUSINESS|ACCOUNT)\b|\bACCOUNT\b.*\(SGD\)',line,re.I):currencies.add('SGD')
+    for line in head:
+        match=re.match(r'^Account Number\s+[\d -]+\s*-\s*([A-Z]{3})\b',line,re.I)
+        if match:currencies.add(match.group(1).upper())
     currency=next(iter(currencies)) if len(currencies)==1 else None
     if len(currencies)>1:errors.append('Conflicting statement currencies; do not combine currency subaccounts.')
     if currency and currency!='SGD':errors.append('Only SGD account statements are supported.')
-    owner=''
-    for line in head:
-        match=re.match(r'^(?:Company\s+Name|Account\s+Name|Account\s+Holder)\s*[:|]?\s+(.+)$',line,re.I)
-        if match:owner=match.group(1).strip();break
-        match=re.fullmatch(r'([A-Z0-9][A-Z0-9 &.,()/\'-]*?\b(?:PTE\.?\s+LTD\.?|PRIVATE LIMITED|LLP))\s*(?:STATEMENT OF ACCOUNT)?',line)
-        if match:owner=match.group(1).strip();break
+    holder=account_holder(doc);owner=holder['value'];errors.extend(holder['errors'])
     summary=extract_bank_statement(doc)
     periods=set()
     period_rx=r'^(?:(?:Statement\s+Period(?:\s+From)?|Period\s+Covered|For\s+the\s+Period|Period\s+From|From|BUSINESS\s+GROWTH\s+ACCOUNT|CURRENT\s+ACCOUNT|BUSINESS\s+ACCOUNT|UOB\s+BIZTRANS\s+ACCOUNT)\s*[:|]?\s*)?('+DATE_RX+r')\s*(?:TO|THROUGH|UNTIL|–|—|\s-\s)\s*('+DATE_RX+r')$'
@@ -85,7 +81,11 @@ def identify(doc):
             a,b=_date(match.group(1)),_date(match.group(2))
             if a and b and a<=b:periods.add((a,b))
             else:errors.append('Invalid statement period.')
-    if len(periods)==1:summary['period_start'],summary['period_end']=next(iter(periods))
+    if len(periods)==1:
+        summary['period_start'],summary['period_end']=next(iter(periods))
+        if summary.get('daily_profile'):
+            summary['period_end']=summary.get('coverage_verified_through')
+            errors.extend(summary.get('warnings',[]))
     else:
         summary['period_start']=summary['period_end']=None
         errors.append('Explicit statement period is missing or conflicting; filenames and statement dates do not prove coverage.')
@@ -105,7 +105,7 @@ def identify(doc):
         if key in ('period_start','period_end') and not line:
             line=next((line for line in head if re.match(period_rx,line,re.I)),None);snippet=line
         if key in ('opening','closing'):
-            line=next((line for line in lines if re.search(r'Opening|Brought|B/F' if key=='opening' else r'Closing|Carried|C/F',line,re.I)),None);snippet=line
+            line=next((line for line in lines if re.search(r'Opening|Brought|B/F' if key=='opening' else r'Closing|Carried|C/F|Ledger Balance',line,re.I)),None);snippet=line
         for _,_,raw_number in accounts:
             if snippet:snippet=snippet.replace(raw_number,masked)
         locations.append(dict(field=key,value=value,page=_location(doc,line) if line else None,excerpt=(snippet or '')[:250],sha256=doc.sha256))
@@ -288,7 +288,7 @@ def staged_rows(pkg,analysis,key):
         for idx,r in enumerate(proposed,1):
             if not summary['period_start']<=r['date']<=summary['period_end']:errors.append(doc.name+': row date is outside its statement period.')
             row=dict(r,bank_account_code=meta['code'],account_code='9999',transfer_id='',source_sha256=doc.sha256,
-                     source_row=str(idx),source_reference=str(r.get('reference') or ''),reference='SRC-'+doc.sha256[:16]+'-'+str(idx),
+                     source_row=str(idx),source_reference=str(r.get('source_reference') or r.get('reference') or ''),reference='SRC-'+doc.sha256[:16]+'-'+str(idx),
                      evidence_ref='DOC-'+doc.sha256[:12].upper())
             rows.append(row)
     old={str(r.get('reference')) for r in pkg.bank if str(r.get('bank_account_code'))==meta['code']}

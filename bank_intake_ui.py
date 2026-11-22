@@ -12,11 +12,12 @@ def _reset_confirmation(key,revision):
         st.session_state[marker]=revision
 
 
-def render_intake(p,prefix,files=None,analysis=None):
+def render_intake(p,prefix,files=None,analysis=None,upload_area=None):
     st.subheader('Identify and group bank statements')
     st.caption('Upload originals for every account and every reporting month. DBS, OCBC and UOB text statements are supported conservatively. Scans, ambiguous fields and unsupported layouts require source review. Analysis never posts entries.')
     if files is None:
-        files=st.file_uploader('Bank statements — PDF, CSV or Excel',type=['pdf','csv','xlsx','xls'],accept_multiple_files=True,help='Maximum 25 MB per file; 50 files and 100 MB per batch. Originals remain local and are not embedded in workspace ZIPs.',key=prefix+'statements')
+        with upload_area if upload_area is not None else st.sidebar:
+            files=st.file_uploader('Bank statements — PDF, CSV or Excel',type=['pdf','csv','xlsx','xls'],accept_multiple_files=True,help='Maximum 25 MB per file; 50 files and 100 MB per batch. Originals remain local and are not embedded in workspace ZIPs.',key=prefix+'statements')
     if not files:return
     try:
         if analysis is None:

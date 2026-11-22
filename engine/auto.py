@@ -31,17 +31,8 @@ def demonstration(doc):
 
 
 def company_name(doc):
-    # Only explicitly labelled company fields or a company-name heading.
-    lines = doc.text_excerpt.splitlines()[:80]
-    for line in lines:
-        match = re.match(r'^\s*(?:Company Name|Account Name|Account Holder)\s*:\s*(.+?)\s*$', line, re.I)
-        if match:
-            return match.group(1)
-    for line in lines:
-        match = re.fullmatch(r'\s*([A-Z0-9][A-Z0-9 &.,()/\'-]*?\b(?:PTE\.?\s+LTD\.?|PRIVATE LIMITED|LLP))\s*(?:STATEMENT OF ACCOUNT)?\s*', line)
-        if match:
-            return match.group(1)
-    return ''
+    from .bank_headers import account_holder
+    return account_holder(doc)['value']
 
 
 def _date(value):
@@ -56,7 +47,7 @@ def provenance(doc, value, field):
     lines = [line.strip() for line in source_lines if str(value).upper() in line.upper()]
     if field in ('opening', 'closing'):
         needle = 'B/F' if field == 'opening' else 'C/F'
-        label=r'OPENING|BROUGHT|BEGINNING' if field=='opening' else r'CLOSING|CARRIED|ENDING'
+        label=r'OPENING|BROUGHT|BEGINNING' if field=='opening' else r'CLOSING|CARRIED|ENDING|LEDGER BALANCE'
         lines = [line.strip() for line in source_lines if needle in line.upper() or re.search(label,line,re.I)]
     if field in ('period_start','period_end') and not lines:
         lines=[line.strip() for line in source_lines if re.search(r'\d{1,2}\s+[A-Z]{3,9}\s+\d{4}\s+TO\s+\d{1,2}\s+[A-Z]{3,9}\s+\d{4}',line,re.I)]
@@ -208,7 +199,7 @@ def bank_proposal(analysis, config, existing):
         if end<low or start>high:continue  # Opening/comparative evidence never posts current-year transactions.
         proposed,warnings=propose_bank_rows(doc)
         errors.extend(doc.name+': '+w for w in warnings)
-        if not proposed:errors.append(doc.name+': no reliable transaction rows; use a bank CSV/Excel export or Advanced mapping.')
+        if not proposed and not (b.get('daily_profile') and not warnings and b.get('opening')==b.get('closing')):errors.append(doc.name+': no reliable transaction rows; use a bank CSV/Excel export or Advanced mapping.')
         if any(not low<=_date(r['date'])<=high for r in proposed):errors.append(doc.name+': rows outside the reporting period.')
         if b.get('opening') is None or b.get('closing') is None:
             errors.append(doc.name+': balance amounts are missing.')
