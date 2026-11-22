@@ -112,3 +112,8 @@ Added compact five-stage preparation progress/current/next in the Auto sidebar. 
 ### 23 November 2026 — 1.4.0-dev.1 candidate identifier
 
 The user authorised a distinct version after older v1.3.1 folders caused confusion. Current Auto/multi-bank candidate is **1.4.0-dev.1**, read from `VERSION` by the UI and launcher and preserved in source archives/manifests. See RELEASE_NOTES_v1.4.0-dev.1.md and QUICK_START_v1.4.0-dev.1.md. Earlier notes retaining 1.3.1 describe previous candidates. PR #21 stays draft/unmerged; no final release or financial/template approval is implied.
+
+
+### 23 November 2026 — 1.4.0-dev.2 Bizfile routing correction
+
+Separate follow-up to merged PR #21: company profiles/supporting records are no longer subjected to bank-statement identity requirements in mixed intake. Bank checks remain strict for bank sources. See [details and evidence](32_COMPANY_PROFILE_INTAKE_FIX.md).

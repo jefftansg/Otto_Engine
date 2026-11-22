@@ -116,3 +116,8 @@ Keep the upload drop box and compact progress/current/next panel together in the
 ### 23 November 2026 — distinguish development builds from stable releases
 
 Use **1.4.0-dev.1** for the current candidate, following explicit user instruction to change numbering. `VERSION` is the shared source for UI, launcher and archive identity; increment the dev counter for subsequent candidates. Stable historical v1.3.1 is retained. No automatic final-version promotion, merge, accounting or template approval.
+
+
+### 23 November 2026 — apply bank checks only to bank sources
+
+Route extracted company profiles before bank identification and label non-bank fields Not applicable. Keep profile identity conflicts, duplicates and unreadable-source review; preserve exact bank grouping/revisions and all explicit approval gates. Candidate advances to 1.4.0-dev.2 for a distinguishable download. See docs/32.

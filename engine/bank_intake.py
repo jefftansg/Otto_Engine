@@ -10,7 +10,7 @@ from decimal import Decimal
 from hashlib import sha256
 import re
 from .importers import inspect_document
-from .autofill import (extract_bank_statement,consolidate_statement_balances,propose_bank_rows,DATE_RX,_date)
+from .autofill import (extract_acra_profile,extract_bank_statement,consolidate_statement_balances,propose_bank_rows,DATE_RX,_date)
 from .multi_bank import fingerprint,row_facts,pair_hash
 from .bank_headers import header_lines,account_holder
 
@@ -152,9 +152,25 @@ def analyse_documents(files,config,inspect=inspect_document):
             inventory.append(dict(name=f['name'],sha256=actual,status='Excluded exact duplicate',errors=['Identical content to '+seen[actual]],provenance=[]));continue
         seen[actual]=f['name']
         try:
-            doc=inspect(f['name'],f['bytes']);row=identify(doc);documents[actual]=doc
-            row['status']='Needs review' if row['errors'] else 'Identified - reviewer confirmation required'
-            if row['account_key'] and not row['demo']:groups[row['account_key']].append(row)
+            doc=inspect(f['name'],f['bytes']);documents[actual]=doc
+            profile=extract_acra_profile(doc) if f['name'].lower().endswith('.pdf') else dict(detected=False)
+            if profile.get('detected'):
+                fields=profile['fields'];errors=[]
+                if ((config.get('uen') and fields.get('uen') and config['uen'].strip().upper()!=fields['uen'].strip().upper()) or
+                    (config.get('company_name') and fields.get('company_name') and name_key(config['company_name'])!=name_key(fields['company_name']))):
+                    errors.append('Company profile differs from the current workspace; review company identity.')
+                row=dict(name=doc.name,sha256=actual,type='Company profile',status='Review proposed company fields',
+                         company=fields.get('company_name'),errors=errors,
+                         provenance=[dict(field=k,value=v,sha256=actual) for k,v in fields.items()])
+            else:
+                row=identify(doc)
+                if row['bank'] or row['account_key'] or extract_bank_statement(doc).get('detected'):
+                    row['type']='Bank statement'
+                    row['status']='Needs review' if row['errors'] else 'Identified - reviewer confirmation required'
+                    if row['account_key'] and not row['demo']:groups[row['account_key']].append(row)
+                else:
+                    row=dict(name=doc.name,sha256=actual,type='Supporting record / template',
+                             status='Retained for manual mapping',errors=[],provenance=[])
         except Exception as exc:row=dict(name=f['name'],sha256=actual,status='Unreadable / unsupported',errors=[str(exc)],provenance=[])
         inventory.append(row)
     results=[]

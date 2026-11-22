@@ -25,7 +25,12 @@ def render_intake(p,prefix,files=None,analysis=None,upload_area=None):
             analysis=analyse_documents(batch,p.config)
     except ValueError as exc:
         st.error(str(exc));return
-    st.dataframe([dict(file=r['name'],status=r['status'],bank=r.get('bank',''),account=r.get('masked_account',''),currency=r.get('currency') or 'Unknown',issues='; '.join(r['errors'])) for r in analysis['inventory']],hide_index=True,width='stretch')
+    st.caption('Bank identity, account and currency checks apply only to bank statements. Company profiles and supporting records are retained separately.')
+    st.dataframe([dict(file=r['name'],document_type=r.get('type','Unidentified source'),status=r['status'],
+                       bank=r.get('bank','') if r.get('type')=='Bank statement' else 'Not applicable',
+                       account=r.get('masked_account','') if r.get('type')=='Bank statement' else 'Not applicable',
+                       currency=(r.get('currency') or 'Unknown') if r.get('type')=='Bank statement' else 'Not applicable',
+                       issues='; '.join(r['errors'])) for r in analysis['inventory']],hide_index=True,width='stretch')
     for row in analysis['inventory']:
         with st.expander('Source fields · '+row['name']):
             if row['provenance']:st.dataframe(row['provenance'],hide_index=True,width='stretch')
