@@ -239,7 +239,7 @@ def generate(pkg:Package):
             loan=by_dir.get(director)
             if not loan: errors.append(f'Claim {cid}: unknown director {director!r}.'); continue
             if code not in coa: errors.append(f'Claim {cid}: unknown account {code}.'); continue
-            if code in cash_codes or coa[code]['type'] not in ('Expense','Asset'):
+            if code in cash_codes or code=='1000' or coa[code]['type'] not in ('Expense','Asset'):
                 errors.append(f'Claim {cid}: expected an expense or asset account, got {code}.'); continue
             desc=r.get('description','') or r.get('merchant','')
             ev=r.get('evidence_ref','')
