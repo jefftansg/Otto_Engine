@@ -189,7 +189,7 @@ def bank_proposal(analysis, config, existing):
     errors=[];rows=[];sources=[]
     if 'bank_accounts' in config:
         errors.append('Use account-by-account review for this multi-bank workspace; legacy import is blocked.')
-    if analysis['context']!=digest({k:config.get(k) for k in ('company_name','uen','fy_start','fy_end','fy_confirmed')}):
+    if analysis['context']!=digest({k:config.get(k) for k in ('company_name','uen','fy_start','fy_end','fy_confirmed','synthetic_test_mode')}):
         errors.append('Setup changed after analysis; analyse the sources again.')
     if not (config.get('fy_confirmed') and config.get('company_name') and config.get('uen')):
         errors.append('Confirm company identity and reporting dates.')
