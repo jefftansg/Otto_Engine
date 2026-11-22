@@ -62,3 +62,7 @@ The current renderer gives illustrative disclosures and review text. Entity- and
 - [Singapore Compliance](12_SINGAPORE_COMPLIANCE.md)
 - [Accounting Framework Eligibility](14_ACCOUNTING_FRAMEWORK_ELIGIBILITY.md)
 - [Open Questions](23_OPEN_QUESTIONS.md)
+
+## P0 completeness and issue gate (22 November 2026)
+
+Cash flows and equity movements are required components of complete company financial statements under the applicable framework, subject to documented permitted alternatives or relief. Audit exemption alone does not remove these requirements. Verify applicable framework and edition, comparisons, note disclosures and director particulars; do not zero-fill missing evidence or label incomplete reports ready for issue. Sole proprietor reporting remains entity-appropriate. Detailed controls OTTO-FS-001–006: [Complete financial statements and reporting readiness](27_FINANCIAL_STATEMENT_COMPLETENESS.md). Existing working sections are partial; implementation and professional review pending.

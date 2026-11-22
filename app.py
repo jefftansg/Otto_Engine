@@ -1,4 +1,4 @@
-"""Otto Financial Report Engine v1.3.1: branded, issue-driven guided mode."""
+"""Otto Financial Report Engine: local Auto and shared accounting views."""
 from pathlib import Path
 from datetime import date, datetime
 import hashlib
@@ -12,6 +12,7 @@ from engine.autofill import extract_acra_profile,extract_bank_statement,consolid
 
 ROOT = Path(__file__).parent
 ASSETS = ROOT / 'assets'
+VERSION = (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
 st.set_page_config(
     page_title='Otto | Financial Report Engine',
     page_icon=str(ASSETS / 'otto_icon.png'),
@@ -41,28 +42,37 @@ hero_image, hero_text = st.columns([1.05, 5.6])
 with hero_image:
     st.image(str(ASSETS / 'otto_mascot.png'), width=182)
 with hero_text:
-    st.markdown('''<div class="otto-app-title">Otto</div>
+    st.markdown(f'''<div class="otto-app-title">Otto</div>
 <div class="otto-app-subtitle">Financial Report Engine</div>
 <div class="otto-app-tagline">Clear numbers for a brighter tomorrow</div>
-<div class="otto-version">Engine version 1.3.1</div>
+<div class="otto-version">Engine version {VERSION}</div>
 <div class="otto-app-caption">Bookkeeping · Management Accounts · Financial Statements</div>''',unsafe_allow_html=True)
-st.info('Set up your company, add its accounting records, and prepare draft unaudited financial statements. Nothing is recorded from an upload without your approval.')
+st.info('Upload your documents, review the proposals and prepare draft financial reports. Nothing is recorded from an upload without your approval.')
+st.caption('Unreleased development candidate · Otto Auto + multi-bank SGD · Prerelease build; not a final release')
 if st.session_state.is_demo:
     st.warning('You are viewing a FICTIONAL demonstration company. Use **Create blank client** in the sidebar to start with your own company.')
 
+def clear_auto_review_cache():
+    for key in ('auto_ai_proposals','auto_report_bundle'):
+        st.session_state.pop(key,None)
+
+
 with st.sidebar:
     st.image(str(ASSETS / 'otto_wordmark.png'), width=235)
-    st.markdown('**Engine version 1.3.1**')
+    st.markdown(f'**Engine version {VERSION}**')
+    auto_progress_area=st.empty()
+    source_upload_area=st.container()
     st.divider()
     st.header('Your client')
     if st.button('＋ Start a new company',width='stretch',type='primary'):
+        clear_auto_review_cache()
         st.session_state.pkg=Package(empty_company())
         st.session_state.upload_hash=''
         st.session_state.is_demo=False
         st.session_state['guided_files']=[]
         st.session_state['guided_file_decisions']={}
         st.session_state['guided_stage']=0
-        st.session_state['app_mode']='Guided'
+        st.session_state['app_mode']='Auto'
         st.session_state['advanced_page']=0
         st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
         st.session_state['guided_category_revision']=st.session_state.get('guided_category_revision',0)+1
@@ -74,31 +84,34 @@ with st.sidebar:
     st.caption('Save after every working session. You can reload your company later.')
     with st.expander('Restore a saved company or try a demo'):
         upload=st.file_uploader('Open a previously saved workspace ZIP',type=['zip'],
-            help='Only for saved workspaces. Upload ACRA records and bank PDFs in Guided Mode.',key='restore_workspace')
+            help='Only for saved workspaces. Upload ACRA records and bank PDFs in Auto or Guided Mode.',key='restore_workspace')
         if upload is not None:
             data=upload.getvalue();h=hashlib.sha256(data).hexdigest()
             if h!=st.session_state.upload_hash:
                 try:
-                    st.session_state.pkg=Package.from_zip(data)
+                    restored=Package.from_zip(data)
+                    clear_auto_review_cache()
+                    st.session_state.pkg=restored
                     st.session_state.upload_hash=h
                     st.session_state.is_demo=False
                     st.session_state['guided_files']=[]
                     st.session_state['guided_file_decisions']={}
                     st.session_state['guided_stage']=0
-                    st.session_state['app_mode']='Guided'
+                    st.session_state['app_mode']='Auto'
                     st.session_state['advanced_page']=0
                     st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
                     st.session_state['guided_category_revision']=st.session_state.get('guided_category_revision',0)+1
                     st.rerun()
                 except Exception as exc:st.error(f'Unable to open saved workspace: {exc}')
         if st.button('Open fictional example company',width='stretch'):
+            clear_auto_review_cache()
             st.session_state.pkg=Package.from_directory(SAMPLE)
             st.session_state.upload_hash=''
             st.session_state.is_demo=True
             st.session_state['guided_files']=[]
             st.session_state['guided_file_decisions']={}
             st.session_state['guided_stage']=0
-            st.session_state['app_mode']='Guided'
+            st.session_state['app_mode']='Auto'
             st.session_state['advanced_page']=0
             st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
             st.session_state['guided_category_revision']=st.session_state.get('guided_category_revision',0)+1
@@ -106,23 +119,21 @@ with st.sidebar:
             st.rerun()
     st.divider()
     st.markdown('**Working mode**')
-    if st.session_state.get('app_mode','Guided')=='Advanced':
-        st.warning('Professional accounting controls are open. Changes update the same company workspace.')
-        if st.button('← Return to Guided Mode',width='stretch',type='primary'):
-            st.session_state['app_mode']='Guided'
-            st.rerun()
-    else:
-        st.caption('Guided Mode is recommended. The next screen can direct you to professional controls when needed.')
-        with st.expander('Detailed bookkeeping tools (optional)'):
-            st.caption('Use this only to correct journals, director claims or detailed account classifications.')
-            if st.button('Open Advanced Mode',width='stretch'):
-                st.session_state['app_mode']='Advanced'
-                st.session_state['advanced_page']=1
-                st.rerun()
+    mode=st.session_state.get('app_mode','Auto')
+    if mode not in ('Auto','Guided','Advanced'):mode='Auto'
+    if st.session_state.get('workspace_view_last_mode')!=mode:
+        st.session_state['workspace_view']=mode
+    st.session_state['workspace_view_last_mode']=mode
+    selected=st.selectbox('Workspace view',['Auto','Guided','Advanced'],index=['Auto','Guided','Advanced'].index(mode),key='workspace_view')
+    if selected!=mode:
+        st.session_state['app_mode']=selected
+        st.session_state['workspace_view_last_mode']=selected
+        st.rerun()
+    st.caption('Auto starts with your documents. All views use the same accounting workspace.')
     st.divider()
     st.markdown('**How it works**')
-    st.caption('Company → Documents → Bank → Other records → Reports')
-    st.caption('PDF, Excel and CSV files are added in Guided Mode. The saved-workspace ZIP above is only for reopening existing work.')
+    st.caption('Upload → Analyse → Review accounts and exceptions → Generate draft reports')
+    st.caption('Add original documents in Auto. Use the ZIP control above to restore saved accounting data. Multi-bank detailed tools preserve account identities and reviews.')
     with st.expander('Privacy and service limits'):
         st.caption('Files are processed locally in the running application. Keep original financial documents separately; source files are not embedded in the saved ZIP.')
         st.caption('Bookkeeping, management accounts and draft unaudited statements only. No corporate tax, GST or ACRA/XBRL filing. No ACRA certification.')
@@ -166,8 +177,25 @@ def suggest(row):
     if any(x in text for x in ('office rental','workspace rent','monthly rent')):return '5200'
     return ''
 
-if 'app_mode' not in st.session_state: st.session_state['app_mode']='Guided'
+if 'app_mode' not in st.session_state: st.session_state['app_mode']='Auto'
 if 'advanced_page' not in st.session_state: st.session_state['advanced_page']=0
+
+if st.session_state['app_mode']=='Auto':
+    from auto import render
+    render(p,inspect_cached,register_evidence,suggest,upload_area=source_upload_area,progress_area=auto_progress_area)
+    st.stop()
+
+# Multi-bank detailed views bypass single-account editors and importers.
+if 'bank_accounts' in p.config:
+    from multi_bank_ui import render as render_multi_bank
+    render_multi_bank(p,upload_area=source_upload_area)
+    st.stop()
+if not any((p.bank,p.claims,p.journals,p.invoices,p.evidence)) and not p.config.get('bank_balances_confirmed'):
+    with st.expander('Experimental: multiple SGD bank accounts'):
+        st.caption('Start a separate local review pilot on a blank client. Existing single-account workspaces are not migrated automatically.')
+        if st.button('Enable multi-bank pilot',key='enable_multi_bank'):
+            p.config['bank_accounts']=[]
+            st.rerun()
 
 if st.session_state['app_mode']=='Guided':
     from guided import render
@@ -603,6 +631,9 @@ if page==7:
     else:st.success('Core internal arithmetic/reconciliation checks passed.')
     with st.expander(f'{len(r["warnings"])} review items',expanded=True):
         for msg in r['warnings']:st.warning(msg)
+    if p.config.get('auto_enabled'):
+        from auto import current_report
+        r,_=current_report(p,inspect_cached)
     st.markdown('### Export reports')
     st.caption('Outputs always remain DRAFT. PDF exports include a review register. XLSX includes raw sources, ledger, statements and controls.')
     try:

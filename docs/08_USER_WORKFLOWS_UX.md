@@ -67,3 +67,12 @@ Routing has backend checks. Mac rendering, accessibility and unsaved-change reco
 ## Planned Otto Auto default workflow (21 November 2026)
 
 **Upload → Auto-analyse → Review material exceptions → Generate/download.** Users begin at one drop zone without company-detail forms. Otto proposes source-backed company/FYE and balances, displays month coverage, asks only material questions, and offers clearly labelled draft MA/UFS/workpapers. Advanced remains accessible on the same ledger. The five-stage Company-first Guided workflow above is current v1.3.1, not this proposed future default. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Unreleased sidebar document intake — 22 November 2026
+
+Auto document upload appears below the sidebar version label, before Your client, so main-page review does not require scrolling back to a drop zone. The existing shared inventory, source decisions and review states are preserved. Detailed multi-bank upload uses the sidebar as well; saved ZIP restoration remains separate. [Verification](30_OCBC_DAILY_HEADER_FIX.md).
+
+
+### Unreleased sidebar progress (22 November 2026)
+
+Auto displays preparation progress, current stage and next action above its sidebar uploader. Setup confirmation advances blank bank workspaces to account review; source removal is available before setup. Exact labels and stage criteria: [Auto progress and upload controls](31_AUTO_PROGRESS_AND_UPLOAD_CONTROLS.md).

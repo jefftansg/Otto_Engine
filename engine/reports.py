@@ -12,6 +12,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Table, LongTable,
                                 TableStyle, PageBreak, KeepTogether)
+from .report_layouts import layout
 from .core import COA_MAP, money, money_str, balance_sheet_rows, profit_rows, trial_rows, director_balances
 
 NAVY=colors.HexColor('#152641'); BLUE=colors.HexColor('#2C638A')
@@ -22,7 +23,7 @@ RED=colors.HexColor('#A33A3A')
 def esc(s): return html.escape(str(s if s is not None else ''))
 
 
-def _styles():
+def _styles(profile=None):
     styles=getSampleStyleSheet()
     styles.add(ParagraphStyle(name='SMETitle',fontName='Helvetica-Bold',fontSize=17,leading=22,textColor=NAVY,spaceAfter=8))
     styles.add(ParagraphStyle(name='SMESub',fontName='Helvetica',fontSize=10,leading=15,textColor=GREY,spaceAfter=10))
@@ -31,6 +32,16 @@ def _styles():
     styles.add(ParagraphStyle(name='SMETiny',fontName='Helvetica',fontSize=7.3,leading=10))
     styles.add(ParagraphStyle(name='SMETableHead',fontName='Helvetica-Bold',fontSize=7.4,leading=10,textColor=colors.white))
     styles.add(ParagraphStyle(name='SMEWarn',fontName='Helvetica-Bold',fontSize=8,leading=11,textColor=RED,spaceAfter=5))
+    if profile and profile.get('name')!='Otto classic (legacy)':
+        from reportlab.lib.enums import TA_CENTER
+        styles['SMETitle'].fontSize=profile['title'];styles['SMETitle'].leading=profile['title']+4
+        styles['SMETitle'].textColor=colors.black
+        styles['SMEH2'].fontSize=profile['heading'];styles['SMEH2'].leading=profile['heading']+3
+        styles['SMEH2'].textColor=colors.HexColor(profile['accent'])
+        styles['SMEBody'].fontSize=profile['body'];styles['SMEBody'].leading=profile['body']+3
+        styles['SMETiny'].fontSize=profile['table'];styles['SMETiny'].leading=profile['table']+2
+        styles['SMETableHead'].fontSize=profile['table'];styles['SMETableHead'].leading=profile['table']+2
+        styles['SMETableHead'].textColor=colors.black
     return styles
 
 
@@ -47,9 +58,19 @@ def _page(canvas,doc):
 def _table(rows, widths, styles, wrap=None):
     wrap = set(wrap or [])
     vals=[]
+    wide=styles['SMETableHead'].textColor==colors.black and len(widths)>=7
+    tiny=ParagraphStyle('WideBody',parent=styles['SMETiny'],fontSize=8,leading=10) if wide else styles['SMETiny']
+    head=ParagraphStyle('WideHead',parent=styles['SMETableHead'],fontSize=8,leading=10) if wide else styles['SMETableHead']
+    import re
+    def display(value):
+        text=str(value)
+        if styles['SMETableHead'].textColor==colors.black and re.fullmatch(r'-?[\d,]+\.\d{2}',text):
+            if Decimal(text.replace(',',''))==0:return '-'
+            if text.startswith('-'):return '('+text[1:]+')'
+        return text
     for idx,row in enumerate(rows):
-        vals.append([Paragraph(esc(v).replace('\n','<br/>'),styles['SMETableHead' if idx==0 else 'SMETiny'])
-                     if (idx==0 or c in wrap) else str(v) for c,v in enumerate(row)])
+        vals.append([Paragraph(esc(display(v)).replace('\n','<br/>'),head if idx==0 else tiny)
+                     if (idx==0 or c in wrap) else display(v) for c,v in enumerate(row)])
     t=LongTable(vals,colWidths=widths,repeatRows=1,hAlign='LEFT')
     commands=[('BACKGROUND',(0,0),(-1,0),NAVY),('VALIGN',(0,0),(-1,-1),'TOP'),
         ('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white,colors.HexColor('#F5F8FB')]),
@@ -57,6 +78,19 @@ def _table(rows, widths, styles, wrap=None):
         ('TOPPADDING',(0,0),(-1,-1),5),('LEFTPADDING',(0,0),(-1,-1),5),
         ('RIGHTPADDING',(0,0),(-1,-1),5),('FONTSIZE',(0,1),(-1,-1),7.2),
         ('LINEBELOW',(0,-1),(-1,-1),0.2,colors.HexColor('#DBE2E8'))]
+    if styles['SMETableHead'].textColor==colors.black:
+        commands += [('BACKGROUND',(0,0),(-1,0),colors.white),
+                     ('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white]),
+                     ('LINEBELOW',(0,0),(-1,0),0.6,colors.black),
+                     ('LINEBELOW',(0,-1),(-1,-1),0.6,colors.black),
+                     ('FONTSIZE',(0,1),(-1,-1),tiny.fontSize)]
+        if wide:commands += [('TOPPADDING',(0,0),(-1,-1),3),('BOTTOMPADDING',(0,0),(-1,-1),3)]
+        # Right-align explicitly numeric money cells, leaving codes and dates intact.
+        import re
+        for ridx,row in enumerate(rows[1:],1):
+            for col,value in enumerate(row):
+                if re.fullmatch(r'-?[\d,]+\.\d{2}',str(value)):
+                    commands.append(('ALIGN',(col,ridx),(col,ridx),'RIGHT'))
     t.setStyle(TableStyle(commands));return t
 
 
@@ -74,13 +108,19 @@ def _section(story, styles, title, rows, widths, wrap=None):
     story.append(_table(rows,widths,styles,wrap))
 
 
-def _status(result): return 'INCOMPLETE DRAFT - ERRORS PRESENT' if result['errors'] else 'DRAFT - DIRECTOR / ACCOUNTANT REVIEW REQUIRED'
+def _status(result):
+    if result.get('auto_report'):
+        return result['auto_report']['status'] + ' | TEMPLATE APPROVAL PENDING'
+    return 'INCOMPLETE DRAFT - ERRORS PRESENT' if result['errors'] else 'DRAFT - DIRECTOR / ACCOUNTANT REVIEW REQUIRED'
 
 
 def _header(story,styles,result,subject):
     c=result['config'];_title(story,styles,c.get('company_name',''),subject)
     _paragraph(story,styles,f"UEN: {c.get('uen','')}   |   Period: {result['start'].strftime('%d %B %Y')} - {result['end'].strftime('%d %B %Y')}   |   Currency: SGD")
     _paragraph(story,styles,_status(result),'SMEWarn')
+    if result.get('auto_report'):
+        meta=result['auto_report']
+        _paragraph(story,styles,'Snapshot: '+meta['snapshot']+' | Layouts: '+', '.join(t['id'] for t in meta['templates'].values()),'SMETiny')
 
 
 def _validation(story,styles,result):
@@ -94,7 +134,7 @@ def management_pdf(result):
     buf=io.BytesIO();w,h=landscape(A4)
     doc=SimpleDocTemplate(buf,pagesize=(w,h),leftMargin=15*mm,rightMargin=15*mm,
                           topMargin=23*mm,bottomMargin=19*mm, title='Draft Management Accounts')
-    s=_styles();story=[];c=result['config'];p=result['package']
+    s=_styles(layout(result['config'],'ma')[1]);story=[];c=result['config'];p=result['package']
     inner=w-30*mm
     _header(story,s,result,'MANAGEMENT ACCOUNTS | Internal draft reporting package')
     rows=[['Item','SGD'],['Total assets',money_str(result['assets'])],
@@ -106,14 +146,16 @@ def management_pdf(result):
     story.append(PageBreak())
     _header(story,s,result,'1. Balance Sheet')
     for typ in ('Asset','Liability','Equity'):
-        filtered=[[code,name,amt] for code,name,amt in balance_sheet_rows(result) if code and COA_MAP[code]['type']==typ]
+        filtered=[[code,name,amt] for code,name,amt in balance_sheet_rows(result) if code and result.get('coa', COA_MAP)[code]['type']==typ]
         if typ=='Equity':
             filtered.extend([[code,name,amt] for code,name,amt in balance_sheet_rows(result) if not code])
         _section(story,s,typ.upper(),[['Code','Account','SGD']]+(filtered or [['','No balance','-']]),[22*mm,inner-60*mm,38*mm],wrap=[1])
+    check_start=len(story)
     _section(story,s,'Balance sheet check',[['Metric','SGD'],['Assets',money_str(result['assets'])],
         ['Liabilities + equity',money_str(result['liabilities']+result['equity'])],
         ['Difference',money_str(result['assets']-result['liabilities']-result['equity'])]],
         [inner-38*mm,38*mm])
+    if result.get('multi_bank'):story[check_start:]=[KeepTogether(story[check_start:])]
     story.append(PageBreak())
     _header(story,s,result,'2. Profit and Loss')
     _section(story,s,'Period performance',[['Code','Account','SGD']]+profit_rows(result)+
@@ -139,9 +181,9 @@ def management_pdf(result):
     _header(story,s,result,'5. General Ledger')
     gl=[['Date','Journal','Account','Description','Debit','Credit','Evidence']]
     for e in result['entries']:
-        gl.append([e['date'].isoformat(),e['journal_id'],e['account_code']+' '+COA_MAP[e['account_code']]['name'],
+        gl.append([e['date'].isoformat(),e['journal_id'],e['account_code']+' '+result.get('coa', COA_MAP)[e['account_code']]['name'],
                    e['description'] or '',money_str(e['debit']),money_str(e['credit']),e['evidence_ref']])
-    _section(story,s,'Posted journal lines',gl,[23*mm,24*mm,47*mm,75*mm,25*mm,25*mm,inner-219*mm],wrap=[2,3,6])
+    _section(story,s,'Posted journal lines',gl,[23*mm,24*mm,47*mm,75*mm,25*mm,25*mm,inner-219*mm],wrap=[1,2,3,6] if result.get('multi_bank') else [2,3,6])
     story.append(PageBreak())
     _header(story,s,result,'6. Accounts Receivable Ageing')
     arr=[['Invoice','Customer','Due date','Bucket','Outstanding SGD']]
@@ -171,12 +213,22 @@ def management_pdf(result):
             ['General ledger bank balance',money_str(result['ledger_end'])],
             ['Statement minus ledger difference', statement_difference]],
              [inner-46*mm,46*mm])
+    if result.get('multi_bank'):
+        rows=[['Bank code / name','Opening statement','Bank movement','Closing statement','Ledger closing','Difference']]
+        for bank in result['bank_reconciliations']:
+            rows.append([bank['code']+' '+bank['name']]+[money_str(bank[k]) if bank[k] is not None else 'Not provided' for k in ('opening','movement','closing','ledger_close','difference')])
+        _section(story,s,'Individual account reconciliations',rows,[inner-150*mm]+[30*mm]*5,wrap=[0])
     _paragraph(story,s,'Unpresented cheques, deposits in transit, unrecorded charges and bank feeds not covering the full reporting period require separate review.')
     story.append(PageBreak())
     _header(story,s,result,'8. Source Bank Transactions')
     bankrows=[['Date','Reference','Description','Deposits','Withdrawals','Account','Evidence']]
-    for r in p.bank:bankrows.append([r.get('date',''),r.get('reference',''),r.get('description',''),r.get('deposit',''),r.get('withdrawal',''),r.get('account_code',''),r.get('evidence_ref','')])
-    _section(story,s,'As imported / reviewed',bankrows,[24*mm,39*mm,73*mm,31*mm,31*mm,24*mm,inner-222*mm],wrap=[2,6])
+    for r in p.bank:
+        reference=r.get('reference','')
+        if result.get('multi_bank'):
+            reference=r.get('bank_account_code','')+' / '+reference
+            if r.get('transfer_id'): reference+=' / '+r['transfer_id']
+        bankrows.append([r.get('date',''),reference,r.get('description',''),r.get('deposit',''),r.get('withdrawal',''),r.get('account_code',''),r.get('evidence_ref','')])
+    _section(story,s,'As imported / reviewed',bankrows,[24*mm,39*mm,73*mm,31*mm,31*mm,24*mm,inner-222*mm],wrap=[1,2,6] if result.get('multi_bank') else [2,6])
     story.append(PageBreak())
     _header(story,s,result,'9. Director-Funded Expenses')
     cr=[['Date','Director','Merchant / description','Amount','Expense account','Evidence']]
@@ -199,15 +251,25 @@ def management_pdf(result):
       [['ERROR',v] for v in result['errors']]+[['REVIEW',v] for v in result['warnings']]
       if result['errors'] or result['warnings'] else [['Status','Finding'],['PASS','No internal validation messages. Director review remains required.']],
       [25*mm,inner-25*mm],wrap=[1])
+    if result.get('multi_bank'):
+        story.append(PageBreak())
+        _header(story,s,result,'12. Consolidated Statement of Cash Flows')
+        _section(story,s,'Direct-method working draft',[['Activity','SGD']]+
+            [[key,money_str(result['cashflows'].get(key,0))] for key in ('Operating','Investing','Financing','Unallocated')]+
+            [['Opening cash and bank',money_str(result['ledger_open'])],['Closing cash and bank',money_str(result['ledger_end'])]],
+            [inner-46*mm,46*mm])
+        _paragraph(story,s,'Reviewed transfers between registered bank accounts are excluded from external cash flows. This is an internal working draft, subject to classification and source review.')
     doc.build(story,onFirstPage=_page,onLaterPages=_page)
     return buf.getvalue()
 
 
 def financial_statements_pdf(result):
+    if result['config'].get('entity_type')!='Private limited company':
+        raise ValueError('Corporate UFS requires a private limited company; use management accounts for other entities.')
     buf=io.BytesIO();w,h=A4
     doc=SimpleDocTemplate(buf,pagesize=A4,leftMargin=19*mm,rightMargin=19*mm,
                          topMargin=23*mm,bottomMargin=20*mm,title='Unaudited Financial Statements - Draft')
-    s=_styles();story=[];c=result['config'];inner=w-38*mm
+    s=_styles(layout(result['config'],'ufs')[1]);story=[];c=result['config'];inner=w-38*mm
     _header(story,s,result,'UNAUDITED FINANCIAL STATEMENTS | PREPARATION DRAFT')
     _paragraph(story,s,'This document is a preparation draft derived from supplied bookkeeping records. It is NOT yet a director-approved, fully disclosed or certified set of financial statements. Financial reporting framework eligibility, recognition, accounting policies, disclosures, going concern, tax treatment and audit exemption must be independently reviewed.')
     story.append(Spacer(1,5*mm))
@@ -215,8 +277,17 @@ def financial_statements_pdf(result):
     _paragraph(story,s,'The directors must independently review the accounting records and these draft statements before deciding whether they present a true and fair view in accordance with the applicable Singapore financial reporting framework and Companies Act requirements.')
     _paragraph(story,s,'No representation regarding audit exemption, solvency, ability to pay debts, absence of contingent liabilities or directors\' interests has been automatically asserted by this engine.')
     _paragraph(story,s,'The director(s) named below may complete an appropriately verified directors\' statement after review and approval:')
-    for d in c.get('directors',[]):
-        _paragraph(story,s,f"Signature: ___________________________    {d.get('name','')}    Date: _________________")
+    if layout(c,'ufs')[0]!='classic-v1':
+        directors=c.get('directors',[]) or [dict(name='[Director name to be confirmed]')]
+        for offset in range(0,len(directors),2):
+            pair=directors[offset:offset+2]
+            boxes=[[Paragraph('Signature: ___________________________<br/><br/>'+esc(d.get('name',''))+'<br/>Director<br/>Date: ___________________',s['SMEBody']) for d in pair]]
+            signature_table=Table(boxes,colWidths=[inner/len(pair)]*len(pair))
+            signature_table.setStyle(TableStyle([('BOX',(0,0),(-1,-1),0.5,colors.black),('INNERGRID',(0,0),(-1,-1),0.5,colors.black),('VALIGN',(0,0),(-1,-1),'TOP'),('TOPPADDING',(0,0),(-1,-1),7),('BOTTOMPADDING',(0,0),(-1,-1),7)]))
+            story.append(signature_table)
+    else:
+        for d in c.get('directors',[]):
+            _paragraph(story,s,f"Signature: ___________________________    {d.get('name','')}    Date: _________________")
     _paragraph(story,s,'Board approval date: ____________________')
     story.append(PageBreak())
     _header(story,s,result,'Statement of Financial Position')
@@ -225,8 +296,8 @@ def financial_statements_pdf(result):
     for grp in ('Asset','Liability','Equity'):
         bs.append([grp.upper(),''])
         for code,v in sorted(result['balances'].items()):
-            if COA_MAP[code]['type']==grp and v:
-                bs.append(['    '+COA_MAP[code]['name'],money_str(v if grp=='Asset' else -v)])
+            if result.get('coa', COA_MAP)[code]['type']==grp and v:
+                bs.append(['    '+result.get('coa', COA_MAP)[code]['name'],money_str(v if grp=='Asset' else -v)])
         if grp=='Asset':bs.append(['TOTAL ASSETS',money_str(result['assets'])])
         if grp=='Liability':bs.append(['TOTAL LIABILITIES',money_str(result['liabilities'])])
         if grp=='Equity':
@@ -294,12 +365,20 @@ def financial_statements_pdf(result):
 def xlsx_report(result):
     import xlsxwriter
     buf=io.BytesIO(); workbook=xlsxwriter.Workbook(buf,{'in_memory':True})
+    reference_layout=layout(result['config'],'ma')[0]!='classic-v1'
+    if reference_layout:
+        workbook.formats[0].set_font_name('Arial');workbook.formats[0].set_font_size(10)
     fmt_title=workbook.add_format({'bold':True,'font_size':15,'font_color':'#152641'})
     fmt_head=workbook.add_format({'bold':True,'font_color':'white','bg_color':'#152641','bottom':1,'bottom_color':'#80A0B6'})
     fmt_num=workbook.add_format({'num_format':'#,##0.00;[Red](#,##0.00);-'})
+    if reference_layout:fmt_num.set_num_format('#,##0.00;(#,##0.00);-')
     fmt_warn=workbook.add_format({'font_color':'#B23B3B','text_wrap':True})
     def sheet(name,rows,widths=None):
         ws=workbook.add_worksheet(name[:31]);ws.freeze_panes(1,0);ws.set_tab_color('#2C638A')
+        if reference_layout:
+            ws.set_paper(9);ws.set_landscape();ws.fit_to_pages(1,0)
+            ws.set_margins(0.7,0.7,0.75,0.75);ws.repeat_rows(0)
+            ws.set_footer('&COtto | DRAFT | Page &P of &N')
         if widths:
             for i,w in enumerate(widths):ws.set_column(i,i,w)
         for idx,row in enumerate(rows):
@@ -310,15 +389,19 @@ def xlsx_report(result):
         if rows:ws.autofilter(0,0,max(0,len(rows)-1),max(0,len(rows[0])-1))
         return ws
     c=result['config'];p=result['package']
+    if result.get('auto_report'):
+        meta=result['auto_report']
+        sheet('Report snapshot', [['Field','Value'],['Snapshot',meta['snapshot']],['Status',meta['status']],
+              ['Template approval','Pending'],['Layouts',', '.join(t['id'] for t in meta['templates'].values())]])
     sheet('Overview',[['Metric','Value'],['Company',c.get('company_name','')],['UEN',c.get('uen','')],
          ['Start',c.get('fy_start','')],['End',c.get('fy_end','')],['Framework selected',c.get('reporting_framework','')],
          ['Status',_status(result)],['Total assets',result['assets']],['Total liabilities',result['liabilities']],
          ['Total equity',result['equity']],['Revenue',result['revenue']],['Expenses',result['expenses']],
          ['Profit / loss',result['profit']],['Bank closing',result['ledger_end']]], [32,62])
     sheet('Chart of Accounts',[['Code','Name','Account type','Presentation group','Cash flow class']]+
-          [[c,a['name'],a['type'],a['group'],a['cashflow']] for c,a in sorted(COA_MAP.items())],[14,49,22,30,22])
+          [[c,a['name'],a['type'],a['group'],a['cashflow']] for c,a in sorted(result.get('coa', COA_MAP).items())],[14,49,22,30,22])
     tb_rows=[['Code','Account','Debit','Credit']]+[
-        [code,COA_MAP[code]['name'],max(v,Decimal(0)),max(-v,Decimal(0))]
+        [code,result.get('coa', COA_MAP)[code]['name'],max(v,Decimal(0)),max(-v,Decimal(0))]
         for code,v in sorted(result['balances'].items()) if v]+[
         ['','TOTAL',result['trial_debit'],result['trial_credit']]]
     tb=sheet('Trial Balance',tb_rows,[14,50,22,22])
@@ -347,6 +430,18 @@ def xlsx_report(result):
     if not closing_missing:
         difference = result['bank_close'] - result['ledger_end']
         br.write_formula('B6', '=B4-B5', fmt_num, float(difference))
+    if result.get('multi_bank'):
+        sheet('Bank Accounts',[['Code','Name','Opening statement','Movement','Closing statement','Opening ledger','Closing ledger','Difference']]+
+            [[b['code'],b['name']]+[b[k] if b[k] is not None else 'Not provided' for k in ('opening','movement','closing','ledger_open','ledger_close','difference')] for b in result['bank_reconciliations']], [14,40,22,22,22,22,22,22])
+        sheet('Statement Sources',[['Bank code','Bank','Masked account','File','SHA-256','Period start','Period end','Opening','Closing','Coverage reviewer','Review evidence']]+
+            [[m['code'],m.get('bank',''),m.get('masked_account',''),s.get('source',''),s.get('sha256',''),s.get('period_start',''),s.get('period_end',''),
+              money(s['opening']) if s.get('opening') is not None else 'Not provided',money(s['closing']) if s.get('closing') is not None else 'Not provided',
+              m.get('coverage_review',{}).get('reviewer','Manual registry'),m.get('coverage_review',{}).get('evidence','')]
+             for m in c.get('bank_accounts',[]) for s in m.get('statements',[])],[14,18,20,55,68,18,18,22,22,28,60])
+        sheet('Internal Transfers',[['Pair ID','Bank code','Source reference','Date','Deposit','Withdrawal','Evidence','Reviewer','Approval evidence']]+
+            [[row['transfer_id'],row.get('bank_account_code',''),row.get('reference',''),row.get('date',''),money(row.get('deposit')),money(row.get('withdrawal')),row.get('evidence_ref',''),
+              c.get('transfer_reviews',{}).get(row['transfer_id'],{}).get('reviewer','Manual pair assignment'),c.get('transfer_reviews',{}).get(row['transfer_id'],{}).get('evidence','')]
+             for row in p.bank if row.get('transfer_id')],[30,14,36,18,22,22,28,28,60])
     cf=sheet('Cash Flows',[['Classification','SGD']]+[[key,result['cashflows'].get(key,0)]
         for key in ('Operating','Investing','Financing','Unallocated')]+
         [['Opening bank',result['ledger_open']],['Closing bank',result['ledger_end']]], [40,24])
@@ -363,7 +458,11 @@ def xlsx_report(result):
         for r in rows:
             material.append([safe_numeric(r.get(c,'')) if c in numeric else r.get(c,'') for c in cols])
         sheet(name,[cols]+material,widths)
-    sources('Source Bank',p.bank,['date','description','reference','deposit','withdrawal','account_code','evidence_ref','notes'],[17,64,30,20,20,18,24,40],numeric=('deposit','withdrawal'))
+    bankcols=['date','description','reference','deposit','withdrawal','account_code','evidence_ref','notes']
+    bankwidths=[17,64,30,20,20,18,24,40]
+    if result.get('multi_bank'):
+        bankcols+=['bank_account_code','transfer_id','source_sha256','source_row','source_reference']; bankwidths += [22,26,68,16,32]
+    sources('Source Bank',p.bank,bankcols,bankwidths,numeric=('deposit','withdrawal'))
     sources('Source Claims',p.claims,['claim_id','date','director','merchant','description','amount','expense_account','evidence_ref','notes'],[20,17,32,38,60,20,20,25,35],numeric=('amount',))
     sources('Source Journals',p.journals,['journal_id','date','account_code','debit','credit','description','evidence_ref'],[22,17,17,20,20,70,30],numeric=('debit','credit'))
     sources('Evidence Register',p.evidence,['evidence_ref','document_type','source_file','remarks','review_status'],[26,28,66,52,20])
@@ -372,5 +471,10 @@ def xlsx_report(result):
         [['REVIEW',v] for v in result['warnings']],[18,120])
     workbook.set_properties({'title':'Otto Draft Management Accounts','subject':'Local financial reporting workpapers',
       'comments':'Draft only. Not an ACRA filing or SFRS compliance certification.'})
+    if reference_layout:
+        for fmt in workbook.formats:
+            fmt.set_font_name('Arial')
+            if fmt.font_size==11:fmt.set_font_size(10)
+        fmt_title.set_font_size(14)
     workbook.close()
     return buf.getvalue()

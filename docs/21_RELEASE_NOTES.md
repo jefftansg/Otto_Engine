@@ -90,3 +90,25 @@ Verification for this follow-up: `python -m unittest discover -s tests -v` — 1
 ## OCBC extraction fix — 21 November 2026
 
 v1.3.1 parser follow-up: recognise OCBC BALANCE B/F, BALANCE C/F and complete date headings beside BUSINESS GROWTH ACCOUNT or on a separate line. No values inferred from filenames or transaction totals. Full unittest suite: 109 passed, no failures or skips, local Python 3.9 / M0 pinned environment. Read-only local validation of 11 user-provided statements passed summary extraction and adjacent balance continuity; client files/data were not added to source or fixtures. November fictional material was excluded from this continuity validation. No live posting or balance approval was performed.
+
+## Unreleased development candidate — multi-bank SGD review (22 November 2026)
+
+PR #21 receives defect corrections, conservative local bank identity/grouping and exact per-account coverage, reviewer-approved source staging and transfer suggestions, stable source/journal identities, source-preserving ZIP restore and PDF/Excel workpapers. Multi-bank MA adds consolidated cash flows; legacy sample PDF/Excel regression equality is verified. Full test/render/UI evidence and limits: [verification](milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md), [pilot contract](28_MULTI_BANK_SGD_PILOT.md). **Not a release, not merged, version unchanged at 1.3.1.** Owner/accountant acceptance, wider formats, full FS/template gates and CI on the revised head remain prerequisites. Lighthouse StudioWorks' internal service scope is unchanged.
+
+## Unreleased combined Auto + multi-bank candidate — 22 November 2026
+
+Default Auto, shared uploads, per-account approval/coverage/staging, guarded transfers/categories, persistent exceptions and frozen report bundles now run from PR #21. Guided/Advanced remain available against the same package. 171 local tests and three-profile PDF/Excel verification are recorded in [integration evidence](29_AUTO_MULTI_BANK_INTEGRATION.md); GitHub CI is reported on the PR. No GitHub merge, version bump, production release or professional/template approval. Release label stays 1.3.1 with an explicit development-candidate badge.
+
+## Unreleased OCBC daily-details and sidebar fix — 22 November 2026
+
+Prevent account-name proposals from using transaction counterparties; support checked Ledger Balance summaries for the specific OCBC daily-details layout; preserve print-date coverage and posting/value-date review exceptions. Move Auto/detailed multi-bank document upload near the top sidebar. 189 tests pass locally; see [fix evidence](30_OCBC_DAILY_HEADER_FIX.md). Release label remains 1.3.1 and PR #21 remains unmerged.
+
+
+### Unreleased candidate follow-up — sidebar progress and source controls
+
+Added compact five-stage preparation progress/current/next in the Auto sidebar. Confirm setup now acknowledges the saved identity/dates and advances blank bank workspaces to account review without posting. Explicit source-removal controls are available beside the uploader before setup. Current source and frozen-report revisions drive progress rollback. Full regression: 196 tests pass, no skips, macOS arm64/Python 3.9.6. Version stays 1.3.1; no merge, release or template sign-off. See [details](31_AUTO_PROGRESS_AND_UPLOAD_CONTROLS.md).
+
+
+### 23 November 2026 — 1.4.0-dev.1 candidate identifier
+
+The user authorised a distinct version after older v1.3.1 folders caused confusion. Current Auto/multi-bank candidate is **1.4.0-dev.1**, read from `VERSION` by the UI and launcher and preserved in source archives/manifests. See RELEASE_NOTES_v1.4.0-dev.1.md and QUICK_START_v1.4.0-dev.1.md. Earlier notes retaining 1.3.1 describe previous candidates. PR #21 stays draft/unmerged; no final release or financial/template approval is implied.

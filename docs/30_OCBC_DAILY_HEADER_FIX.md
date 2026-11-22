@@ -1,0 +1,25 @@
+# OCBC daily-details identity, balances and sidebar upload — unreleased fix
+
+22 November 2026. Follow-up to the Auto + multi-bank candidate in PR #21; no GitHub merge, release-version change or accounting authorisation.
+
+## Corrected behaviour
+
+- `engine/bank_headers.py` extracts account holders from the header only, before transaction columns, dated transaction rows and print metadata. It accepts labelled names without a colon, trims adjacent Ledger Balance fields, preserves supported company headings and CSV labels, and returns unknown on conflicting header identities. Transaction counterparties cannot supply a company name or UEN.
+- Auto and multi-bank identification share that helper. A bank-only upload can propose its explicitly labelled account holder; it is not classified as an ACRA profile and does not invent the company UEN. Unconfirmed setup proposals must still be confirmed by the user; existing books are never renamed silently.
+- `engine/ocbc_daily.py` recognises the specific OCBC **Daily Statement of Account - Details** header, institution/BIC fields, explicit period, opening and Ledger Balance, debit/credit counts and gross amounts, and print date. Ledger Balance becomes a closing-balance proposal only after the printed summary arithmetic reconciles. It is not a global synonym for Closing Balance in arbitrary documents. Conflicting balances, missing evidence and debit/overdraft notation remain exceptions.
+- Verified coverage cannot exceed the print date. A requested To date after printing does not establish future coverage: the extracted coverage end is capped, incomplete months stay flagged and full-period approval remains blocked.
+- Daily transaction proposals retain posting dates, source reference/details and descriptions, including counterparties. Unique chronological running-balance reconciliation, printed debit/credit counts and gross totals are required before staging. Zero-activity exports can be valid. Missing rows, mismatched balances and posting dates outside the selected/verified period stay in review; the engine does not silently substitute value dates or backdate entries.
+- Auto's document drop box now sits **near the top of the sidebar, immediately below the version label and above Your client**. It uses the existing shared upload inventory and client-scoped widget version. The detailed multi-bank uploader uses the same location. Main-page review, exceptions and reports remain on the main page. Saved-workspace ZIP restoration remains a separate control.
+
+## Verification
+
+Local pinned M0 environment: macOS arm64, Python 3.9.6. Run `PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s tests -v`: **189 tests pass, no skips** (171 previous cases plus five header-identity, 12 daily-export and one sidebar-placement case). `pip check` and `git diff --check` pass. GitHub CI on the exact pushed head is recorded on PR #21 separately.
+
+New tests reproduce bank-only company inference without ACRA/UEN, inline header columns, missing/conflicting owner fields, counterparty rejection, scoped Ledger Balance support, gross-summary arithmetic, missing/partial print dates, zero activity, descending transactions, omitted rows, ambiguous/corrupt amounts and posting/value-date cutoffs. Existing source approvals, client isolation, ZIP restore, transfers, legacy reports and Guided/Advanced regressions run in the full suite. The sidebar test checks actual sidebar/main element placement and preservation of the existing multi-bank ledger.
+
+Read-only re-analysis of the 12 supplied bank PDFs, excluding the separately supplied Business Profile, produced one consistent account holder, one SGD/OCBC account group, no company conflict, no UEN proposal and no generic missing-closing-label warnings. The partial final-month export remains incomplete. Some monthly posting/value-date cutoffs remain transaction-review exceptions; this record does not approve a posting date policy. No private original, client value, identifier, diagnostic output or screenshot containing client data is committed.
+
+An isolated empty-client browser preview confirms that the upload drop box is visible below the sidebar version label while the main Auto page is available. No live client reset, financial attestation, posting, source deletion or production-session restart was performed. Version **1.3.1** and all earlier accounting/template acceptance boundaries remain unchanged.
+
+
+Follow-up: the compact progress panel now sits between the version label and uploader; explicit removal controls sit below the drop box. See [Auto progress and upload controls](31_AUTO_PROGRESS_AND_UPLOAD_CONTROLS.md) for setup acknowledgement and source-removal behaviour.

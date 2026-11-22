@@ -92,3 +92,42 @@ OTTO-AUTO-001 → TEST-OTTO-AUTO-001 (upload); 002 → 002 (provenance); 003 →
 ## Template-fidelity requirements (all Planned / visually untested, 21 November 2026)
 
 OTTO-DES-001–009 map to TEST-OTTO-DES-001–009 in [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md). Priority P0. OTTO-REP-002 remains Blocked: prior user-approved report examples unavailable in reviewed repo. Gate requires owner-approved golden-master outputs, not PDF file signatures.
+
+## P0 complete financial statements (22 November 2026)
+
+| Requirement | Test | Baseline state | Milestone |
+| --- | --- | --- | --- |
+| OTTO-FS-001 cash flow | TEST-OTTO-FS-001 | Partial; existing summary, expanded acceptance unexecuted | M3/M6 |
+| OTTO-FS-002 equity | TEST-OTTO-FS-002 | Partial; existing simplified roll-forward | M6 |
+| OTTO-FS-003 comparatives | TEST-OTTO-FS-003 | Planned | M6 |
+| OTTO-FS-004 completeness | TEST-OTTO-FS-004 | Planned | M6 |
+| OTTO-FS-005 shared export/layout | TEST-OTTO-FS-005 | Partial; template references still required | M6 |
+| OTTO-FS-006 authorisation gate | TEST-OTTO-FS-006 | Planned; existing draft controls only | M6/M7 |
+
+Detailed acceptance vectors: [Complete financial statements and reporting readiness](27_FINANCIAL_STATEMENT_COMPLETENESS.md). None of the new acceptance cases have been executed; baseline evidence remains unchanged.
+
+## Multi-bank pilot traceability
+
+OTTO-BANK-002 / TEST-OTTO-BANK-002: partial candidate; synthetic cases in tests/test_multi_bank.py, with independent balances and transfers. Automated account extraction, coverage and cutoff cases, regression execution and UAT pending. [Pilot specification](28_MULTI_BANK_SGD_PILOT.md).
+
+## Multi-bank review candidate — 22 November 2026
+
+OTTO-BANK-002 / TEST-OTTO-BANK-002 now has an engineering candidate for conservative local account identification/grouping, per-account source coverage, reviewed transaction staging, reviewer-approved transfer suggestions, isolated reconciliations and persistent source/review metadata. Full regression and numeric/geometry evidence is in [verification record](milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md). Status remains **partial candidate**, not production acceptance: complex cutoffs, wider formats, populated-client migration, bespoke multi-bank Guided navigation and owner/accounting acceptance remain open; default Auto integration is recorded below. OTTO-FS-001 MA cash-flow schedule gains multi-bank evidence; this does not close OTTO-FS-001–006, comparatives or master-template acceptance. OTTO-SVC-001/002 internal Lighthouse service model is preserved. [Current pilot contract](28_MULTI_BANK_SGD_PILOT.md) supersedes the earlier manual-only scope description.
+
+## Combined Auto + multi-bank engineering candidate
+
+OTTO-AUTO-001–007 local subsets now share the OTTO-BANK-002 reviewed source/account/transfer controls in one default Auto view. Ten combined-flow tests plus the ported Auto/OCBC and all existing regressions pass (171 total locally). Safe detailed views preserve source identities, transfer approvals, the shared ledger and provisional exports; existing populated single-account migration and bespoke multi-bank Guided tabs remain pending. Full Auto PRD, OTTO-FS-001–006, master-template and owner/accounting acceptance remain partial/open. [Exact evidence and limits](29_AUTO_MULTI_BANK_INTEGRATION.md).
+
+## OCBC daily export / account-owner correction
+
+OTTO-AUTO-001/002 and OTTO-BANK-002 gain header-only identity and scoped daily-export summary/transaction checks; the shared sidebar uploader addresses the main-page navigation defect. Full local suite: 189 passing, no skips. Bank-only source analysis does not infer ACRA status or UEN. Partial periods, date-basis decisions and all professional/template acceptance remain open. [Exact verification](30_OCBC_DAILY_HEADER_FIX.md).
+
+
+| Requirement | Unreleased implementation | Evidence / limits |
+|---|---|---|
+| Auto progress/current/next without main-page scrolling; setup acknowledgement; accessible source removal | `engine/auto_progress.py`, `auto._progress`, `_setup`, `_sidebar_file_controls`, `app.py` sidebar placeholders | `tests/test_auto_progress.py` (7); full suite 196 pass. Preparation checks, draft reports; PR21 unmerged, version 1.3.1. See docs/31. |
+
+
+### Candidate build identity — 23 November 2026
+
+Current build is **1.4.0-dev.1** (user-authorised). UI/launcher/source packager share `VERSION`; prerelease ZIPs include matching Quick Start, release notes and source manifest. Branding/AppTest regression and archive integrity/manifest validation cover this change. Historical 1.3.1 references remain release history; PR21 is still draft/unmerged.

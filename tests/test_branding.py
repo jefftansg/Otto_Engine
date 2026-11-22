@@ -23,8 +23,8 @@ class OttoBrandingTests(unittest.TestCase):
         self.assertIn("ASSETS / 'otto_icon.png'", app)
         self.assertIn("ASSETS / 'otto_mascot.png'", app)
         self.assertIn("ASSETS / 'otto_wordmark.png'", app)
-        self.assertIn('Engine version 1.3.1</div>', app)
-        self.assertIn("st.markdown('**Engine version 1.3.1**')", app)
+        self.assertIn('Engine version {VERSION}</div>', app)
+        self.assertIn("st.markdown(f'**Engine version {VERSION}**')", app)
 
     def test_saved_workspace_and_reports_use_new_name(self):
         for filename in ('app.py', 'guided.py'):
@@ -37,9 +37,11 @@ class OttoBrandingTests(unittest.TestCase):
         launcher = ROOT / 'START_ON_MAC.command'
         self.assertTrue(launcher.is_file())
         self.assertTrue(bool(launcher.stat().st_mode & 0o111))
-        self.assertIn('Starting Otto Financial Report Engine v1.3.1', launcher.read_text())
-        for filename in ('README.md','QUICK_START_v1.3.1.md','RELEASE_NOTES_v1.3.1.md'):
-            self.assertIn('1.3.1', (ROOT / filename).read_text())
+        self.assertIn('OTTO_VERSION=$(cat VERSION)', launcher.read_text())
+        self.assertIn('Starting Otto Financial Report Engine v${OTTO_VERSION}', launcher.read_text())
+        version=(ROOT/'VERSION').read_text().strip()
+        for filename in ('README.md','QUICK_START_v'+version+'.md','RELEASE_NOTES_v'+version+'.md'):
+            self.assertIn(version, (ROOT / filename).read_text())
 
 
 if __name__ == '__main__':

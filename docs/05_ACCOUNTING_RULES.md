@@ -79,3 +79,15 @@ OCBC abbreviated balance labels are treated as explicit source proposals, subjec
 ## Otto Auto accounting invariants (planned, 21 November 2026)
 
 AI extraction/classification is advisory only; approved transactions continue through deterministic Decimal double entry, bank reconciliation, period cutoff, reversals and source identity rules. An absent monthly statement, inconsistent opening/closing balances, or a date-altered demo document cannot establish financial completeness. Provisional drafts must be labelled; unresolved material errors prohibit authorised reports. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Reviewed multi-bank SGD candidate — 22 November 2026
+
+Maintain independent statement opening/movement/closing reconciliations for every registered account; consolidated agreement cannot clear offsetting bank errors. Identification/coverage analysis never posts. Account/source and transaction review are separate explicit actions; changes to company, dates, source facts or coverage invalidate affected approvals. Same-date equal/opposite SGD transfers require original evidence, an unambiguous two-account pair and explicit reviewer approval. Preserve both source legs, post one balanced journal, and exclude internal movement from external cash flows and P&L. Separate bank charges; do not infer timing differences, FX, overdrafts or settlement policy. No invented opening counterpart or automatic plug. Manual legacy coverage flags are not equivalent to automated source validation. This candidate changes implementation controls, not recognition/measurement or regulatory policy. See [pilot](28_MULTI_BANK_SGD_PILOT.md).
+
+## Auto integration — unchanged accounting policy
+
+Auto, Guided and Advanced read the same deterministic package. Multi-bank category approval cannot overwrite an approved transfer leg; legacy one-account imports reject registered multi-bank packages. Multi-bank ledger/source errors block bundle exports, while preserved source/transfer reviews and current-original completeness remain separate checks. Snapshot/manifest labels remain provisional and unauthorised. No recognition, cutoff, assurance, framework or filing policy changes. [Integration evidence](29_AUTO_MULTI_BANK_INTEGRATION.md).
+
+## OCBC daily-details source controls — 22 November 2026
+
+Account holders are header facts; transaction counterparties never identify the reporting entity. A scoped Ledger Balance proposal must tie opening plus printed credits less debits; staging also checks gross counts/totals and running balances. Selected future To dates cannot extend verified coverage past print date. Posting/value-date differences require review rather than silent date substitution. No new recognition, cutoff or overdraft policy is introduced. [Evidence](30_OCBC_DAILY_HEADER_FIX.md).
