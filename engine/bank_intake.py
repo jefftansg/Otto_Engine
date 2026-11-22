@@ -41,7 +41,7 @@ def _location(doc,text):
     return None
 
 
-def identify(doc):
+def identify(doc, allow_synthetic_bank=False):
     lines=_source_lines(doc);head=[]
     for line in lines[:80]:
         if re.search(r'\b(?:Transaction\s+(?:Value|Date)|Date\s+Description|Date\s+Details)\b',line,re.I):break
@@ -50,6 +50,10 @@ def identify(doc):
                    'DBS':r'^(?:Bank\s*[:|]?\s*)?(?:DBS\b|DEVELOPMENT\s+BANK\s+OF\s+SINGAPORE)',
                    'UOB':r'^(?:Bank\s*[:|]?\s*)?(?:UOB\b|UNITED\s+OVERSEAS\s+BANK)'}
     banks={bank for bank,rx in bank_patterns.items() if any(re.search(rx,line,re.I) for line in head)}
+    # The Otto QA fictional institution is recognized only in the explicitly
+    # enabled synthetic test workflow, never as a genuine supported bank.
+    if allow_synthetic_bank and any(re.search(r'^OTTO QA TEST FINANCIAL INSTITUTION\b',line,re.I) for line in head):
+        banks.add('OTTO TEST BANK')
     errors=[];locations=[]
     bank=next(iter(banks)) if len(banks)==1 else ''
     if not bank:errors.append('Bank identity is missing, unsupported or ambiguous; review the original.')
@@ -152,7 +156,7 @@ def analyse_documents(files,config,inspect=inspect_document):
             inventory.append(dict(name=f['name'],sha256=actual,status='Excluded exact duplicate',errors=['Identical content to '+seen[actual]],provenance=[]));continue
         seen[actual]=f['name']
         try:
-            doc=inspect(f['name'],f['bytes']);row=identify(doc);documents[actual]=doc
+            doc=inspect(f['name'],f['bytes']);row=identify(doc,allow_synthetic_bank=config.get('synthetic_test_mode') is True);documents[actual]=doc
             test_mode=config.get('synthetic_test_mode') is True
             if row['demo'] and test_mode:
                 # In a separately opted-in sandbox, exercise bank parsing and reconciliation.
