@@ -169,6 +169,18 @@ def suggest(row):
 if 'app_mode' not in st.session_state: st.session_state['app_mode']='Guided'
 if 'advanced_page' not in st.session_state: st.session_state['advanced_page']=0
 
+# Pilot workspaces bypass the single-account editors and importers.
+if 'bank_accounts' in p.config:
+    from multi_bank_ui import render as render_multi_bank
+    render_multi_bank(p)
+    st.stop()
+if not any((p.bank,p.claims,p.journals,p.invoices,p.evidence)) and not p.config.get('bank_balances_confirmed'):
+    with st.expander('Experimental: multiple SGD bank accounts'):
+        st.caption('Start a separate manual-entry pilot on a blank client. Existing single-account workspaces are not migrated automatically.')
+        if st.button('Enable multi-bank pilot',key='enable_multi_bank'):
+            p.config['bank_accounts']=[]
+            st.rerun()
+
 if st.session_state['app_mode']=='Guided':
     from guided import render
     render(p,inspect_cached,register_evidence,suggest)
