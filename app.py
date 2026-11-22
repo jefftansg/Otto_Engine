@@ -131,6 +131,18 @@ with st.sidebar:
     st.markdown('**How it works**')
     st.caption('Upload → Analyse → Review accounts and exceptions → Generate draft reports')
     st.caption('Add original documents in Auto. Use the ZIP control above to restore saved accounting data. Multi-bank detailed tools preserve account identities and reviews.')
+    if p.config.get('synthetic_test_mode') is True:
+        st.error('SYNTHETIC TEST MODE — FICTIONAL DATA ONLY. This workspace cannot be used for genuine client financial statements or bank evidence.')
+        st.caption('All PDFs and XLSX exports are marked as synthetic test drafts. Start a new company for real records.')
+    elif not (p.bank or p.claims or p.journals or p.invoices or p.evidence) and not p.config.get('company_name') and not p.config.get('uen'):
+        with st.expander('Developer testing — use fictional sample documents'):
+            st.warning('Only enable this on a blank workspace. Uploaded test PDFs remain labelled synthetic. This is not proof of genuine bank or ACRA records.')
+            if st.button('Enable Synthetic Test Mode',key='enable_synthetic_test_mode'):
+                p.config['synthetic_test_mode']=True
+                st.session_state['guided_files']=[]
+                st.session_state['guided_upload_version']=st.session_state.get('guided_upload_version',0)+1
+                st.rerun()
+
     with st.expander('Privacy and service limits'):
         st.caption('Files are processed locally in the running application. Keep original financial documents separately; source files are not embedded in the saved ZIP.')
         st.caption('Bookkeeping, management accounts and draft unaudited statements only. No corporate tax, GST or ACRA/XBRL filing. No ACRA certification.')
