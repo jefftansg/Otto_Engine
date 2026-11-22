@@ -69,3 +69,7 @@ Bank journal IDs use row indices, references can be blank and journal IDs group 
 ## Proposed Otto Auto model extension (21 November 2026)
 
 Future model additions require raw-source hash, entity/account/period identity, field-level source provenance, staged extraction confidence, AI candidate ID, human decision, exception lifecycle, report snapshot/revision and readiness status. Do not mutate approved journals when an inference changes. Existing v1.3.1 data model remains authoritative until implementation. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Unreleased multi-bank source/review extension — 22 November 2026
+
+An explicit company.json `bank_accounts` registry activates isolated SGD bank controls (1000–1099). Bank rows add `bank_account_code`, `transfer_id`, `source_sha256`, `source_row` and `source_reference`; legacy bank.csv headers are unchanged. Managed source accounts retain hashed identity, masked account, statement summaries, `coverage_review` and `transactions_review` bound to source facts and company/reporting context. Configuration also retains `bank_source_imports`, `bank_import_reviews`, `transfer_reviews` and replaced `bank_review_history`. Originals are not embedded. Used accounts cannot be removed/renumbered by registry editing. See [pilot contract](28_MULTI_BANK_SGD_PILOT.md) for review and restoration boundaries.

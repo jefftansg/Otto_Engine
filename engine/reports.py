@@ -110,10 +110,12 @@ def management_pdf(result):
         if typ=='Equity':
             filtered.extend([[code,name,amt] for code,name,amt in balance_sheet_rows(result) if not code])
         _section(story,s,typ.upper(),[['Code','Account','SGD']]+(filtered or [['','No balance','-']]),[22*mm,inner-60*mm,38*mm],wrap=[1])
+    check_start=len(story)
     _section(story,s,'Balance sheet check',[['Metric','SGD'],['Assets',money_str(result['assets'])],
         ['Liabilities + equity',money_str(result['liabilities']+result['equity'])],
         ['Difference',money_str(result['assets']-result['liabilities']-result['equity'])]],
         [inner-38*mm,38*mm])
+    if result.get('multi_bank'):story[check_start:]=[KeepTogether(story[check_start:])]
     story.append(PageBreak())
     _header(story,s,result,'2. Profit and Loss')
     _section(story,s,'Period performance',[['Code','Account','SGD']]+profit_rows(result)+
@@ -141,7 +143,7 @@ def management_pdf(result):
     for e in result['entries']:
         gl.append([e['date'].isoformat(),e['journal_id'],e['account_code']+' '+result.get('coa', COA_MAP)[e['account_code']]['name'],
                    e['description'] or '',money_str(e['debit']),money_str(e['credit']),e['evidence_ref']])
-    _section(story,s,'Posted journal lines',gl,[23*mm,24*mm,47*mm,75*mm,25*mm,25*mm,inner-219*mm],wrap=[2,3,6])
+    _section(story,s,'Posted journal lines',gl,[23*mm,24*mm,47*mm,75*mm,25*mm,25*mm,inner-219*mm],wrap=[1,2,3,6] if result.get('multi_bank') else [2,3,6])
     story.append(PageBreak())
     _header(story,s,result,'6. Accounts Receivable Ageing')
     arr=[['Invoice','Customer','Due date','Bucket','Outstanding SGD']]
@@ -186,7 +188,7 @@ def management_pdf(result):
             reference=r.get('bank_account_code','')+' / '+reference
             if r.get('transfer_id'): reference+=' / '+r['transfer_id']
         bankrows.append([r.get('date',''),reference,r.get('description',''),r.get('deposit',''),r.get('withdrawal',''),r.get('account_code',''),r.get('evidence_ref','')])
-    _section(story,s,'As imported / reviewed',bankrows,[24*mm,39*mm,73*mm,31*mm,31*mm,24*mm,inner-222*mm],wrap=[2,6])
+    _section(story,s,'As imported / reviewed',bankrows,[24*mm,39*mm,73*mm,31*mm,31*mm,24*mm,inner-222*mm],wrap=[1,2,6] if result.get('multi_bank') else [2,6])
     story.append(PageBreak())
     _header(story,s,result,'9. Director-Funded Expenses')
     cr=[['Date','Director','Merchant / description','Amount','Expense account','Evidence']]
@@ -209,11 +211,21 @@ def management_pdf(result):
       [['ERROR',v] for v in result['errors']]+[['REVIEW',v] for v in result['warnings']]
       if result['errors'] or result['warnings'] else [['Status','Finding'],['PASS','No internal validation messages. Director review remains required.']],
       [25*mm,inner-25*mm],wrap=[1])
+    if result.get('multi_bank'):
+        story.append(PageBreak())
+        _header(story,s,result,'12. Consolidated Statement of Cash Flows')
+        _section(story,s,'Direct-method working draft',[['Activity','SGD']]+
+            [[key,money_str(result['cashflows'].get(key,0))] for key in ('Operating','Investing','Financing','Unallocated')]+
+            [['Opening cash and bank',money_str(result['ledger_open'])],['Closing cash and bank',money_str(result['ledger_end'])]],
+            [inner-46*mm,46*mm])
+        _paragraph(story,s,'Reviewed transfers between registered bank accounts are excluded from external cash flows. This is an internal working draft, subject to classification and source review.')
     doc.build(story,onFirstPage=_page,onLaterPages=_page)
     return buf.getvalue()
 
 
 def financial_statements_pdf(result):
+    if result['config'].get('entity_type')!='Private limited company':
+        raise ValueError('Corporate UFS requires a private limited company; use management accounts for other entities.')
     buf=io.BytesIO();w,h=A4
     doc=SimpleDocTemplate(buf,pagesize=A4,leftMargin=19*mm,rightMargin=19*mm,
                          topMargin=23*mm,bottomMargin=20*mm,title='Unaudited Financial Statements - Draft')
@@ -360,6 +372,15 @@ def xlsx_report(result):
     if result.get('multi_bank'):
         sheet('Bank Accounts',[['Code','Name','Opening statement','Movement','Closing statement','Opening ledger','Closing ledger','Difference']]+
             [[b['code'],b['name']]+[b[k] if b[k] is not None else 'Not provided' for k in ('opening','movement','closing','ledger_open','ledger_close','difference')] for b in result['bank_reconciliations']], [14,40,22,22,22,22,22,22])
+        sheet('Statement Sources',[['Bank code','Bank','Masked account','File','SHA-256','Period start','Period end','Opening','Closing','Coverage reviewer','Review evidence']]+
+            [[m['code'],m.get('bank',''),m.get('masked_account',''),s.get('source',''),s.get('sha256',''),s.get('period_start',''),s.get('period_end',''),
+              money(s['opening']) if s.get('opening') is not None else 'Not provided',money(s['closing']) if s.get('closing') is not None else 'Not provided',
+              m.get('coverage_review',{}).get('reviewer','Manual registry'),m.get('coverage_review',{}).get('evidence','')]
+             for m in c.get('bank_accounts',[]) for s in m.get('statements',[])],[14,18,20,55,68,18,18,22,22,28,60])
+        sheet('Internal Transfers',[['Pair ID','Bank code','Source reference','Date','Deposit','Withdrawal','Evidence','Reviewer','Approval evidence']]+
+            [[row['transfer_id'],row.get('bank_account_code',''),row.get('reference',''),row.get('date',''),money(row.get('deposit')),money(row.get('withdrawal')),row.get('evidence_ref',''),
+              c.get('transfer_reviews',{}).get(row['transfer_id'],{}).get('reviewer','Manual pair assignment'),c.get('transfer_reviews',{}).get(row['transfer_id'],{}).get('evidence','')]
+             for row in p.bank if row.get('transfer_id')],[30,14,36,18,22,22,28,28,60])
     cf=sheet('Cash Flows',[['Classification','SGD']]+[[key,result['cashflows'].get(key,0)]
         for key in ('Operating','Investing','Financing','Unallocated')]+
         [['Opening bank',result['ledger_open']],['Closing bank',result['ledger_end']]], [40,24])
@@ -379,7 +400,7 @@ def xlsx_report(result):
     bankcols=['date','description','reference','deposit','withdrawal','account_code','evidence_ref','notes']
     bankwidths=[17,64,30,20,20,18,24,40]
     if result.get('multi_bank'):
-        bankcols+=['bank_account_code','transfer_id']; bankwidths += [22,26]
+        bankcols+=['bank_account_code','transfer_id','source_sha256','source_row','source_reference']; bankwidths += [22,26,68,16,32]
     sources('Source Bank',p.bank,bankcols,bankwidths,numeric=('deposit','withdrawal'))
     sources('Source Claims',p.claims,['claim_id','date','director','merchant','description','amount','expense_account','evidence_ref','notes'],[20,17,32,38,60,20,20,25,35],numeric=('amount',))
     sources('Source Journals',p.journals,['journal_id','date','account_code','debit','credit','description','evidence_ref'],[22,17,17,20,20,70,30],numeric=('debit','credit'))

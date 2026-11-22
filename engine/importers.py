@@ -33,6 +33,7 @@ class SourceDocument:
     text_excerpt: str = ''
     pages: int = 0
     notes: tuple[str, ...] = ()
+    text_pages: tuple[str, ...] = ()
 
 
 def _s(v):
@@ -66,7 +67,7 @@ def inspect_document(filename, file_bytes):
     if not file_bytes: raise ValueError('File is empty.')
     if len(file_bytes)>MAX_FILE_BYTES: raise ValueError('Maximum document size is 25 MB.')
     ext=filename.rsplit('.',1)[-1].lower()
-    tables=[]; text=''; pages=0; notes=[]
+    tables=[]; text=''; pages=0; notes=[]; text_pages=[]
     if ext=='csv':
         content=_decode_csv(file_bytes)
         try: dialect=csv.Sniffer().sniff(content[:8192], delimiters=',;\t|')
@@ -107,6 +108,7 @@ def inspect_document(filename, file_bytes):
                 notes.append(f'PDF has {pages} pages; only first {MAX_PDF_PAGES} inspected.')
             for pno,page in enumerate(pdf.pages[:MAX_PDF_PAGES],start=1):
                 page_text=page.extract_text() or ''
+                text_pages.append(page_text)
                 if len(text)<250000: text+=(page_text+'\n')[:250000-len(text)]
                 for i,table in enumerate(page.extract_tables() or [],start=1):
                     cleaned=_clean_rows(table)
@@ -119,7 +121,7 @@ def inspect_document(filename, file_bytes):
         else:
             notes.append('PDF-extracted tables may merge/split cells. Review every row before importing.')
     else: raise ValueError(f'Unsupported file type: .{ext}')
-    return SourceDocument(filename,hashlib.sha256(file_bytes).hexdigest(),tables,text,pages,tuple(notes))
+    return SourceDocument(filename,hashlib.sha256(file_bytes).hexdigest(),tables,text,pages,tuple(notes),tuple(text_pages))
 
 
 def fields(table, header_row=1):

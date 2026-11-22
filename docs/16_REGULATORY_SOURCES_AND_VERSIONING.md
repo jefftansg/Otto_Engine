@@ -88,3 +88,7 @@ The obsolete-upload/history removal change introduces no regulatory, framework, 
 ## OCBC extraction fix — 21 November 2026
 
 OCBC extraction-format fix: no change to regulatory authorities, frameworks, filing rules, dependencies or licensing. It improves source-format recognition only.
+
+### 22 November 2026 — multi-bank review candidate
+
+The local SGD identification/review/reconciliation implementation changes no regulatory authority, framework election, filing rule, external engagement, dependency or licensing policy. It makes no new compliance determination. Existing framework eligibility and official-source version review remain human acceptance dependencies; test passes do not approve financial statements. Foreign currency, overdraft and complex transfer accounting are deferred rather than assigned an inferred policy. Engine release version remains 1.3.1.

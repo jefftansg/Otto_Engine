@@ -44,3 +44,7 @@ Accept unordered mixed bank statements and books, prior-year financial statement
 ## Planned Otto Auto intake (21 November 2026)
 
 Accept unordered bank statements, prior-year accounts, bookkeeping files and templates in one batch. Identify account, company, dates, opening/closing balances and monthly gaps with field-level source provenance. Detect overlaps, duplicates, inaccessible scans and altered demonstration statements; do not use the latter as genuine evidence. Current extraction implementation is unchanged. See [Otto Auto specification](25_AI_FIRST_AUTO_EXPERIENCE.md).
+
+## Unreleased local multi-bank intake — 22 November 2026
+
+`engine/bank_intake.py` uses conservative DBS/OCBC/UOB header patterns, normalised account-number hashes and masked displays, explicit date ranges, labelled balances and per-account coverage. It does not infer periods from filenames or group by matching last-four digits. Readable PDF field provenance includes a source page/excerpt where located; original text stays local. Identical content is excluded, synthetic/demo evidence cannot establish actual coverage, and source conflicts/gaps/overlaps remain exceptions. Account-source approval and transaction staging are separate explicit reviewer actions. Mapped rows retain the original bank reference and file hash/row ordinal, stay unclassified until reviewed and cannot be appended twice. Unsupported layouts use manual source review; no OCR or cloud processing is introduced. [Usage, limits and acceptance](28_MULTI_BANK_SGD_PILOT.md).

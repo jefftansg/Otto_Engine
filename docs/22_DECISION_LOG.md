@@ -94,3 +94,7 @@ Approved product direction, implementation planned: improve on the current cumbe
 ## Decision 018 — report consistency outranks workflow polish (21 November 2026)
 
 Product priority clarified: matching the previously approved financial-report layouts, font sizes, whitespace, table formatting and pagination is more important than merely reducing data-entry steps. Choose template-first generation with an immutable approved style/version; require independent numeric and visual acceptance. No claim of exact match until historical examples received and owner signs off. Preserve current v1.3.1 baseline. See [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md).
+
+## Decision 019 — review-first SGD multi-bank candidate (22 November 2026)
+
+User authorised evaluation/fixes to development/multi-bank-sgd and PR #21, then local automatic identification/grouping/per-account coverage and reviewer-approved suggestions. Use institution plus full-number-derived hash rather than masked suffix for grouping, explicit source review rather than automatic posting, and stable source-linked IDs. Preserve independent account reconciliation, review history, legacy ZIP/report output and Lighthouse StudioWorks' internal service model. Keep unsupported timing/FX/overdraft policies unresolved, pilot isolated from legacy editors, release label unchanged and PR unmerged until acceptance. Wider integration and the separate OTTO-FS-001–006 work remain dependencies. Engineering evidence: [verification record](milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md).

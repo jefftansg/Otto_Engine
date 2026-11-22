@@ -220,7 +220,7 @@ def consolidate_statement_balances(summaries,fy_start,fy_end):
             errors.append('Statement period extends beyond the financial year; boundary-day balances need additional transaction review.')
         for a,b in zip(sorted_rows,sorted_rows[1:]):
             pa=date.fromisoformat(a['period_end']);pb=date.fromisoformat(b['period_start'])
-            if pb != pa+timedelta(days=1):errors.append(f'Missing or overlapping statement dates: {a["source"]} → {b["source"]}')
+            if (pb-pa).days != 1:errors.append(f'Missing or overlapping statement dates: {a["source"]} → {b["source"]}')
             if Decimal(a['closing']) != Decimal(b['opening']):errors.append(f'Balance discontinuity: {a["source"]} closing does not equal {b["source"]} opening.')
     return dict(ready=not errors,errors=errors,rows=sorted_rows,
                 opening=sorted_rows[0].get('opening'),closing=sorted_rows[-1].get('closing'))

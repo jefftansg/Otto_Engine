@@ -10,7 +10,14 @@ def run(source,out):
     r=generate(package)
     dest=Path(out);dest.mkdir(parents=True,exist_ok=True)
     (dest/'Management_Accounts_DRAFT.pdf').write_bytes(management_pdf(r))
-    (dest/'Unaudited_FS_DRAFT.pdf').write_bytes(financial_statements_pdf(r))
+    if package.config.get('entity_type')=='Private limited company':
+        (dest/'Unaudited_FS_DRAFT.pdf').write_bytes(financial_statements_pdf(r))
+    elif (dest/'Unaudited_FS_DRAFT.pdf').exists():
+        # Retain the previous file without presenting it as this entity's output.
+        previous=dest/'Unaudited_FS_PREVIOUS_ENTITY.pdf';index=1
+        while previous.exists():
+            previous=dest/f'Unaudited_FS_PREVIOUS_ENTITY_{index}.pdf';index+=1
+        (dest/'Unaudited_FS_DRAFT.pdf').replace(previous)
     (dest/'Financial_Workpapers_DRAFT.xlsx').write_bytes(xlsx_report(r))
     (dest/'Client_Input_Package.zip').write_bytes(package.to_zip())
     print(f"Generated draft outputs in {dest}; {len(r['errors'])} blocking error(s), {len(r['warnings'])} review item(s)")

@@ -1,35 +1,51 @@
 # Multi-bank SGD support — development pilot (22 November 2026)
 
-**Status:** code candidate on development branch, not production-ready. No version increment, no accounting approval, no new test-pass claim. This branch is stacked on PR #20 (financial statement completeness).
+**Status:** reviewed engineering candidate for PR #21, stacked on PR #20. Not production-approved. Release version stays **1.3.1**; do not merge or release until remaining acceptance gates below are satisfied. Otto remains Lighthouse StudioWorks' internal bookkeeping, management-accounts and draft-UFS engine.
 
-## What the pilot implements
-- Explicit opt-in on a blank client, or restore of a workspace with a bank registry; the old Guided/Advanced single-account screens are bypassed to prevent data loss.
-- One company, multiple SGD bank control accounts using codes 1000–1099 (maximum 100). Private workspace chart of accounts, never global mutation. Account names should be privacy-safe.
-- Account-specific reviewed opening/closing statement balances and explicit manual confirmation of period coverage. Bank rows have a mandatory account code and source reference unique within the account. Separate reconciliations detect offsetting variances even when consolidated totals agree.
-- Explicit paired internal transfers: two same-date equal/opposite amounts, distinct registered accounts, common reviewer-assigned transfer ID, both counter-accounts TRANSFER, source references and evidence IDs. Post one balanced two-line journal; exclude from external cash flows and P&L. Unmatched, ambiguous, cross-date or fee-netted transfers block reporting. No heuristic auto-posting.
-- Consolidated ledger, draft PDF individual bank reconciliation table and XLSX Bank Accounts tab. Source account and transfer IDs survive ZIP round trips. Ordinary legacy workspaces retain their existing CSV format.
-- Manual-entry pilot screen; report download is blocked when ledger errors exist. No automated report approval.
+## Implemented workflow
 
-## Workspace contract
-In company.json, add:
+1. Start a blank client and expand **Experimental: multiple SGD bank accounts → Enable multi-bank pilot**, or restore a pilot workspace ZIP. Existing single-account workspaces are not silently migrated. Company identity and reporting dates come first.
+2. Add originals at **Identify and group bank statements → Bank statements — PDF, CSV or Excel**. Processing is local. Limit: 25 MB/file, 50 files/100 MB per batch. Keep originals separately; ZIPs save accounting data, source fingerprints, extracted summaries and review history, not original PDFs.
+3. Review the inventory and source fields. Conservative DBS/OCBC/UOB header recognition identifies institution, full-number-derived account identity, masked account, explicit currency, account holder, labelled balances and exact statement periods. Supported structured CSV/Excel exports and readable PDF text are candidates; bank name alone does not guarantee layout support. PDF provenance includes page and excerpt when the field is located. Unknown currency or owner requires original-source confirmation; conflicting identities/company/currencies, unsupported currency, masked-only account numbers and ambiguous balances cannot be approved.
+4. Groups use institution plus a hash of the normalised full account number. Matching last-four digits never merge distinct accounts. Exact file copies are excluded by content hash. Each account gets its own reporting-month map, exact date boundaries, gap/overlap and balance-continuity checks. Previous-period evidence may corroborate opening balances but never supplies current-year coverage. Fictional/demo documents never establish actual coverage.
+5. **Approve account identity and coverage** requires a reviewer name, evidence location, confirmed company/reporting dates and explicit original-source confirmation of account/company/SGD currency/coverage/balances. Map each group to a unique control code 1000–1099. Linking an existing manual account with recorded rows requires a separate check. Approval creates metadata only: supported opening journals remain required, with no invented counterpart or balancing plug.
+6. Inspect proposed transaction rows, source references and totals. **Approve and stage proposed transactions** needs a separate explicit original-source transaction review. Reliable mapped rows retain file hash, row ordinal and original bank reference, receive stable source IDs and remain unclassified (9999). Mismatched totals, unsupported extraction, warnings and manual-row overlap block batch import. For unsupported layouts or already-recorded rows, manually verify every row against originals and use **Approve existing rows after manual source review**. Net movement agreement alone does not establish gross transaction completeness. Reimporting approved sources does not append duplicates.
+7. Review **Bank transactions**, supported opening/adjusting journals, claims, receivables and evidence. Categories require review. Registry edits preserve hidden provenance; used accounts cannot be removed/renumbered. Source-approved balances require re-analysis rather than a manual override. Company/date or source-row changes invalidate the relevant approvals. Prior replaced review records remain in workspace history.
+8. **Review suggested internal transfers** proposes same-date, equal opposite SGD movements between distinct accounts, with references and evidence. Analysis never changes books. Multiple possible partners are labelled ambiguous and cannot be approved. **Approve this transfer pair** requires reviewer/evidence and confirmation of both originals. Approval links the two original rows without changing dates or amounts, posts one balanced two-line bank journal, and excludes the movement from external cash flows and profit. Editing source facts makes that approval stale. Cross-date/cross-year transfers, fee-netted transfers, one-to-many settlements, FX and overdrafts remain unsupported; record bank charges separately.
+9. Inspect independent bank reconciliations and blocking errors. Accounts cannot offset each other's differences. Download draft MA PDF, company UFS PDF and Excel only after engineering validation passes. Arithmetic success is not accounting or director approval. Sole proprietors receive MA/workpapers, not corporate UFS.
+10. **Save pilot workspace ZIP** retains all accounts, source row identities, transfer links, approval metadata and prior-review history. Re-upload originals when re-analysis is necessary. Returning to the legacy screen is not a migration procedure.
+
+## Accounting and export contract
+
+`company.json` retains the explicit registry:
+
 ```json
 "bank_accounts": [
   {"code":"1000","name":"Bank A","currency":"SGD","opening":"1000","closing":"1200","confirmed":true,"coverage_confirmed":true},
   {"code":"1001","name":"Bank B","currency":"SGD","opening":"500","closing":"600","confirmed":true,"coverage_confirmed":true}
 ]
 ```
-Only use true following review of the statement evidence. Add bank_account_code and transfer_id to bank.csv. Existing date, reference, deposit, withdrawal, account_code and evidence_ref remain. For opening cash, enter supported opening journals dated before FY start; no invented counterpart or auto-balancing plug. Current-period manual cash postings are blocked in this pilot. Configure directors in the workspace separately if needed; dedicated director setup, bulk CSV editing and richer UI are follow-up work.
 
-## Synthetic acceptance ledger
-Bank A opens 1,000, receives customer revenue 500, transfers 300 to Bank B, closes 1,200. Bank B opens 500, receives internal transfer 300, pays operating expense 200, closes 600. Consolidated opening 1,500, operating net cash 300, closing 1,800, profit 300, financing/investing zero. The same bank reference can exist across accounts, not twice in one account. The tests also cover offsetting reconciliation errors, missing/mismatched transfer legs, duplicate references, unsupported currency, manual cash and missing registry, legacy global chart isolation, ZIP round trip and draft report signatures.
+The above manual flags require actual source review; they are not automated source-coverage certification. Newly source-reviewed accounts additionally store `managed_intake`, `account_key`, `bank`, `masked_account`, `statements`, `coverage_review` and `transactions_review`. Review records bind account, current company/reporting context, source summaries and row facts. `bank_source_imports`, `bank_import_reviews`, `transfer_reviews` and `bank_review_history` preserve import/review state. Do not manually manufacture approval records.
 
-## Remaining P0 development
-1. Automatically extract bank identity, masked account number, currency, periods and source locations from supported DBS/OCBC/UOB statement formats. Confirm identity and grouping per account; don't guess.
-2. Validate exact statement coverage, date continuity, opening/closing arithmetic, duplicate imports and bank-specific transaction identity automatically per account. Manual confirmation in pilot is NOT equivalent.
-3. Propose potential transfer candidates with explicit reviewer approval, not automatic posting. Support cross-date cash in transit, separate bank charges, one-to-many settlement and reversals only after accounting policy review. Handle cross-year cutoffs.
-4. Support existing client conversion with backup, opening evidence, duplicate/idempotency controls and legacy restoration. Integrate into Guided and Auto (shared ledger; no loss of evidence).
-5. Complete per-account evidence and review trails, cash/equivalent and bank-overdraft presentation, MA cash flow statement, equity, comparatives and framework checks per OTTO-FS-001–006. Foreign currency/FX is later scope.
-6. Execute entire regression suite and new tests, inspect every rendered output against independent numerical and visual fixtures, verify Mac/browser pilot and obtain accounting/product-owner acceptance. Do not treat signature checks as layout approval.
+Multi-bank `bank.csv` adds `bank_account_code`, `transfer_id`, `source_sha256`, `source_row`, `source_reference`; ordinary legacy CSVs retain their eight original columns. Reference uniqueness is per account. Transfer IDs and bank source references produce stable journal identities across row reorder and ZIP restore. Global chart dictionaries are deeply isolated per generated result. Current-period manual cash journals remain blocking errors in the pilot.
 
-## Traceability
-OTTO-BANK-002 and OTTO-FS-001: partial candidate. TEST-OTTO-BANK-002: pilot synthetic tests in tests/test_multi_bank.py; full multi-account intake/coverage and cutoff acceptance remain open. Existing M0 acceptance remains a dependency. 
+MA adds individual account reconciliation and consolidated cash-flow schedules. PDF source/journal IDs wrap within existing table geometry. Excel adds Bank Accounts, Statement Sources and Internal Transfers workpapers with source/reviewer links. Single-account sample PDF text/font/position and Excel sheet/cell/formula equality against the original PR head were checked; this is regression evidence, not owner approval of historical master-template fidelity.
+
+## Acceptance evidence and remaining gates
+
+The untouched PR head `19f167f` passed **116 tests**. The revised candidate's full existing/new suite, environment, numerical fixtures, PDF rendering and UI scope are recorded in [multi-bank verification](milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md). Synthetic evidence never establishes a real client's completeness.
+
+| Gate | Candidate result / remaining work |
+| --- | --- |
+| Per-bank reconciliations and consolidation | Verified synthetic: A opens 1,000, receives 500, transfers 300, closes 1,200; B opens 500, receives 300, pays 200, closes 600. Consolidated opening 1,500, operating flow/profit 300, closing 1,800; investing/financing zero. Offsetting errors remain blocking. |
+| Identification / grouping / coverage | Conservative supported-format tests and read-only OCBC check executed. Wider DBS/UOB production-layout evidence and owner UAT remain required. No scan/OCR support. |
+| Transfer suggestions | Review-only, ambiguity, stale approval, amount/date mismatch, duplicate rejection and restore cases verified. Timing differences and complex settlements remain blocked/unsupported. |
+| Restore / legacy | Source metadata/reviews persist; duplicate retry is idempotent; single-account regressions pass. Automated conversion of historical clients is not implemented. |
+| Report accuracy / presentation | Numeric PDF/XLSX assertions, all-page PDF geometry/render inspection and legacy sample equality executed. Native Excel print inspection and approved-master/owner fidelity sign-off remain outstanding. |
+| Product / accounting acceptance | Not granted by tests. Framework eligibility, full disclosures, comparatives, equity and authorisation requirements in OTTO-FS-001–006 remain separate dependencies. No compliance or final-report claim. |
+| Deployment / release | PR remains draft/unmerged, engine label stays 1.3.1. CI must pass on the revised PR; no release increment or production rollout. |
+
+## Follow-up scope
+
+Existing-client conversion needs backup, mapping and opening-evidence acceptance before activation. The pilot bypasses single-account editors to prevent data loss; full Guided/Auto integration is still pending. Dedicated director setup and richer editing, cross-date/cutoff policies, bank overdrafts, FX, complex transfers and complete financial-statement/template acceptance remain open. No external SaaS/licensing or audit/filing workflow is introduced.

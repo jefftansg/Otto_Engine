@@ -106,7 +106,9 @@ with st.sidebar:
             st.rerun()
     st.divider()
     st.markdown('**Working mode**')
-    if st.session_state.get('app_mode','Guided')=='Advanced':
+    if 'bank_accounts' in p.config:
+        st.caption('Multi-bank SGD pilot. Use account review, transaction records and transfer suggestions in the main workspace.')
+    elif st.session_state.get('app_mode','Guided')=='Advanced':
         st.warning('Professional accounting controls are open. Changes update the same company workspace.')
         if st.button('← Return to Guided Mode',width='stretch',type='primary'):
             st.session_state['app_mode']='Guided'
@@ -121,8 +123,12 @@ with st.sidebar:
                 st.rerun()
     st.divider()
     st.markdown('**How it works**')
-    st.caption('Company → Documents → Bank → Other records → Reports')
-    st.caption('PDF, Excel and CSV files are added in Guided Mode. The saved-workspace ZIP above is only for reopening existing work.')
+    if 'bank_accounts' in p.config:
+        st.caption('Company → Identify statements → Review accounts and rows → Reconcile → Draft reports')
+        st.caption('Add bank originals at Identify and group bank statements. Restore saved accounting data using the ZIP control above.')
+    else:
+        st.caption('Company → Documents → Bank → Other records → Reports')
+        st.caption('PDF, Excel and CSV files are added in Guided Mode. The saved-workspace ZIP above is only for reopening existing work.')
     with st.expander('Privacy and service limits'):
         st.caption('Files are processed locally in the running application. Keep original financial documents separately; source files are not embedded in the saved ZIP.')
         st.caption('Bookkeeping, management accounts and draft unaudited statements only. No corporate tax, GST or ACRA/XBRL filing. No ACRA certification.')
@@ -176,7 +182,7 @@ if 'bank_accounts' in p.config:
     st.stop()
 if not any((p.bank,p.claims,p.journals,p.invoices,p.evidence)) and not p.config.get('bank_balances_confirmed'):
     with st.expander('Experimental: multiple SGD bank accounts'):
-        st.caption('Start a separate manual-entry pilot on a blank client. Existing single-account workspaces are not migrated automatically.')
+        st.caption('Start a separate local review pilot on a blank client. Existing single-account workspaces are not migrated automatically.')
         if st.button('Enable multi-bank pilot',key='enable_multi_bank'):
             p.config['bank_accounts']=[]
             st.rerun()

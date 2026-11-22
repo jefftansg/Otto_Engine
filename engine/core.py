@@ -13,7 +13,7 @@ from collections import defaultdict
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
-from .multi_bank import registry, transfer_pairs
+from .multi_bank import registry, transfer_pairs, transfer_journal_id, bank_journal_id
 
 D = Decimal
 CENT = D('0.01')
@@ -48,7 +48,9 @@ ALLOWED_FILES = ('company.json','bank.csv','claims.csv','journals.csv','invoices
 
 def money(value, label='amount') -> Decimal:
     if isinstance(value, Decimal):
-        return value.quantize(CENT, rounding=ROUND_HALF_UP)
+        if not value.is_finite():raise ValueError(label+' must be finite')
+        try:return value.quantize(CENT, rounding=ROUND_HALF_UP)
+        except InvalidOperation as exc:raise ValueError('Invalid '+label+': amount is outside supported precision') from exc
     raw = str(value if value is not None else '').strip().replace(',','')
     if raw in ('', '-', '—'): return D('0.00')
     if raw.startswith('(') and raw.endswith(')'): raw = '-' + raw[1:-1]
@@ -119,7 +121,7 @@ class Package:
           'evidence.csv':['evidence_ref','document_type','source_file','remarks','review_status'],
         }
         if 'bank_accounts' in self.config or any('bank_account_code' in r or 'transfer_id' in r for r in self.bank):
-            columns['bank.csv'] += ['bank_account_code','transfer_id']
+            columns['bank.csv'] += ['bank_account_code','transfer_id','source_sha256','source_row','source_reference']
         bio=io.BytesIO()
         with zipfile.ZipFile(bio,'w',compression=zipfile.ZIP_DEFLATED) as z:
             z.writestr('company.json',json.dumps(self.config,indent=2,ensure_ascii=False))
@@ -139,6 +141,9 @@ def generate(pkg:Package):
     multi = registered is not None
     cash_codes = set(registered) if multi else {'1000'}
     bank_movements = defaultdict(lambda:D('0'))
+    if multi:
+        from .bank_intake import transaction_review_errors,context
+        for meta in registered.values():errors.extend('Bank '+meta['code']+': '+message for message in transaction_review_errors(meta,cfg,pkg.bank))
     if not cfg.get('company_name') or not cfg.get('uen'): errors.append('Company name and UEN must be populated.')
     try:
         start=parse_date(cfg['fy_start']); end=parse_date(cfg['fy_end'])
@@ -158,7 +163,7 @@ def generate(pkg:Package):
         if item.get('review_status','').lower() not in ('reviewed','verified','approved'):
             warnings.append('Evidence not reviewed: '+(ref or '(unidentified)'))
 
-    pairs = transfer_pairs(pkg.bank, registered, start, end, parse_date, money, errors) if multi else {}
+    pairs = transfer_pairs(pkg.bank, registered, start, end, parse_date, money, errors,cfg.get('transfer_reviews',{}),context(cfg)) if multi else {}
     # Preflight duplicate source references across each bank before pairing.
     from collections import Counter
     refs = Counter((str(r.get('bank_account_code','')).strip(), str(r.get('reference','')).strip()) for r in pkg.bank) if multi else Counter()
@@ -193,7 +198,7 @@ def generate(pkg:Package):
                     errors.append(f'Bank row {i}: unresolved transfer; not posted.')
                     continue
                 # Each bank leg has its own source evidence but shares one journal.
-                jid=f'TRANSFER-{min(i,pairs[i]):04d}'
+                jid=transfer_journal_id(str(r.get('transfer_id','')).strip())
                 bank_movements[bank_code] += credit-debit
                 entries.append(_entry(jid,dt,bank_code,credit,debit,r.get('description',''),'Bank transfer',r.get('evidence_ref','')))
                 continue
@@ -206,7 +211,7 @@ def generate(pkg:Package):
             if code not in coa: errors.append(f'Bank row {i}: unknown account {code}.'); continue
             if code in cash_codes or code=='1000': errors.append(f'Bank row {i}: counter-account cannot also be the bank account.'); continue
             if code=='9999': errors.append(f'Bank row {i}: unresolved classification (suspense).')
-            jid=f'BANK-{i:04d}'
+            jid=bank_journal_id(bank_code,ref) if multi else f'BANK-{i:04d}'
             desc=r.get('description','')
             ev=r.get('evidence_ref','')
             bank_movements[bank_code] += credit-debit

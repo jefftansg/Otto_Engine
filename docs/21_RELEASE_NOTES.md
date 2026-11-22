@@ -90,3 +90,7 @@ Verification for this follow-up: `python -m unittest discover -s tests -v` — 1
 ## OCBC extraction fix — 21 November 2026
 
 v1.3.1 parser follow-up: recognise OCBC BALANCE B/F, BALANCE C/F and complete date headings beside BUSINESS GROWTH ACCOUNT or on a separate line. No values inferred from filenames or transaction totals. Full unittest suite: 109 passed, no failures or skips, local Python 3.9 / M0 pinned environment. Read-only local validation of 11 user-provided statements passed summary extraction and adjacent balance continuity; client files/data were not added to source or fixtures. November fictional material was excluded from this continuity validation. No live posting or balance approval was performed.
+
+## Unreleased development candidate — multi-bank SGD review (22 November 2026)
+
+PR #21 receives defect corrections, conservative local bank identity/grouping and exact per-account coverage, reviewer-approved source staging and transfer suggestions, stable source/journal identities, source-preserving ZIP restore and PDF/Excel workpapers. Multi-bank MA adds consolidated cash flows; legacy sample PDF/Excel regression equality is verified. Full test/render/UI evidence and limits: [verification](milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md), [pilot contract](28_MULTI_BANK_SGD_PILOT.md). **Not a release, not merged, version unchanged at 1.3.1.** Owner/accountant acceptance, wider formats, full FS/template gates and CI on the revised head remain prerequisites. Lighthouse StudioWorks' internal service scope is unchanged.

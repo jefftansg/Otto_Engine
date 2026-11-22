@@ -109,3 +109,7 @@ Detailed acceptance vectors: [Complete financial statements and reporting readin
 ## Multi-bank pilot traceability
 
 OTTO-BANK-002 / TEST-OTTO-BANK-002: partial candidate; synthetic cases in tests/test_multi_bank.py, with independent balances and transfers. Automated account extraction, coverage and cutoff cases, regression execution and UAT pending. [Pilot specification](28_MULTI_BANK_SGD_PILOT.md).
+
+## Multi-bank review candidate — 22 November 2026
+
+OTTO-BANK-002 / TEST-OTTO-BANK-002 now has an engineering candidate for conservative local account identification/grouping, per-account source coverage, reviewed transaction staging, reviewer-approved transfer suggestions, isolated reconciliations and persistent source/review metadata. Full regression and numeric/geometry evidence is in [verification record](milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md). Status remains **partial candidate**, not production acceptance: complex cutoffs, wider formats, migration/Guided-Auto integration and owner/accounting acceptance remain open. OTTO-FS-001 MA cash-flow schedule gains multi-bank evidence; this does not close OTTO-FS-001–006, comparatives or master-template acceptance. OTTO-SVC-001/002 internal Lighthouse service model is preserved. [Current pilot contract](28_MULTI_BANK_SGD_PILOT.md) supersedes the earlier manual-only scope description.
