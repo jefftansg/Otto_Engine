@@ -144,3 +144,7 @@ The development branch adds an explicit manual-entry multi-bank pilot, per-accou
 ## Unreleased multi-bank SGD review candidate
 
 The development pilot supports local supported-format bank identification/grouping, independent source coverage and bank reconciliation, reviewed transaction staging and explicit transfer suggestions. It remains Lighthouse StudioWorks' internal preparation engine. Existing single-account workspaces retain their workflow; migration is not automatic. See [pilot usage and acceptance gates](docs/28_MULTI_BANK_SGD_PILOT.md) and [verification evidence](docs/milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md). PR #21 remains unmerged and the release label remains **1.3.1**; engineering test success does not approve UFS or template fidelity.
+
+## Synthetic document testing (unreleased development feature)
+
+The proposed [Synthetic Test Mode](docs/30_SYNTHETIC_TEST_MODE.md) allows explicitly labelled fictional company profiles and bank statements to exercise Otto Auto's extraction, per-account coverage, draft reports and reconciliations **only in a separate blank test workspace**. Normal client intake retains its authenticity safeguards. Synthetic PDFs and Excel outputs are visibly marked **NOT FOR CLIENT USE**. On the `fix/synthetic-fixture-test-mode` development branch, open the sidebar test-mode control before uploading the v3 demo pack. Not implemented on `main`; no release/production acceptance is claimed.
