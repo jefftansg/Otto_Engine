@@ -94,7 +94,7 @@ def propose_rows(doc):
             errors.append('Daily source line '+str(idx+1)+': amount and running balance are ambiguous.');continue
         posted=_date(m.group(1));amount,balance=values
         if not posted or not profile['period_start']<=posted<=profile['period_end']:
-            errors.append('Daily posting date is outside the selected/verified statement period; review the posting/value-date basis without silently backdating.');continue
+            errors.append('Transaction date needs review: posting date '+str(posted or m.group(1))+' is outside '+profile['period_start']+' to '+profile['period_end']+'. The bank may use a different posting/value-date basis. Check this row in the original; obtain an export covering its posting date or use manual review with a documented date decision. Automatic import is paused; no dates were changed.');continue
         description=re.sub(r'\s+\(?-?[\d,]+\.\d{2}\)?\s+\(?-?[\d,]+\.\d{2}\)?\s*$','',m.group(2)).strip()
         details=[]
         for following in lines[idx+1:]:

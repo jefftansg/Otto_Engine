@@ -121,3 +121,8 @@ Use **1.4.0-dev.1** for the current candidate, following explicit user instructi
 ### 23 November 2026 — apply bank checks only to bank sources
 
 Route extracted company profiles before bank identification and label non-bank fields Not applicable. Keep profile identity conflicts, duplicates and unreadable-source review; preserve exact bank grouping/revisions and all explicit approval gates. Candidate advances to 1.4.0-dev.2 for a distinguishable download. See docs/32.
+
+
+### 23 November 2026 — source references are automatic, approvals remain explicit
+
+Use analysed original filenames/fingerprints for uploaded-source evidence. Require written evidence for missing-original/manual row review; preserve all financial and stale-revision checks. Save preparation notes separately from approval metadata. Explain posting/export date exceptions without changing date policy or cascading empty-row/net warnings. Candidate 1.4.0-dev.3; see docs/33.

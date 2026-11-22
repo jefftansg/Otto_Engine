@@ -117,3 +117,8 @@ The user authorised a distinct version after older v1.3.1 folders caused confusi
 ### 23 November 2026 — 1.4.0-dev.2 Bizfile routing correction
 
 Separate follow-up to merged PR #21: company profiles/supporting records are no longer subjected to bank-statement identity requirements in mixed intake. Bank checks remain strict for bank sources. See [details and evidence](32_COMPANY_PROFILE_INTAKE_FIX.md).
+
+
+### 23 November 2026 — 1.4.0-dev.3 source-review usability
+
+Uploaded statements automatically supply evidence references; optional review notes replace mandatory location retyping. Explicit approvals and financial checks remain. Added exact account-rejection reasons and Save review notes and continue without approval. Date exceptions identify the actual date/period and avoid two secondary warnings after extraction fails. See docs/33_SOURCE_REVIEW_USABILITY.md.

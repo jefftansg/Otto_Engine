@@ -136,3 +136,8 @@ Current build is **1.4.0-dev.1** (user-authorised). UI/launcher/source packager 
 ### Mixed-source document routing
 
 Bizfile/company profiles must not require bank identity: implemented in engine/bank_intake.py and bank_intake_ui.py; five synthetic cases in tests/test_bank_document_routing.py plus full regressions. Company mismatches remain reviewed; bank coverage/approval controls unchanged. See docs/32, candidate 1.4.0-dev.2.
+
+
+### Review usability and evidence provenance
+
+Automatic uploaded filename/hash evidence, precise approval reasons and unapproved review notes: engine/bank_intake.py and bank_intake_ui.py. Eight new synthetic tests in tests/test_review_evidence.py cover rejection, source integrity, import/ZIP preservation and UI. Existing OCBC cutoff tests still apply; no date-policy change. See docs/33 and candidate 1.4.0-dev.3.
