@@ -92,3 +92,16 @@ OTTO-AUTO-001 → TEST-OTTO-AUTO-001 (upload); 002 → 002 (provenance); 003 →
 ## Template-fidelity requirements (all Planned / visually untested, 21 November 2026)
 
 OTTO-DES-001–009 map to TEST-OTTO-DES-001–009 in [Report Design System](26_REPORT_DESIGN_SYSTEM_AND_TEMPLATE_FIDELITY.md). Priority P0. OTTO-REP-002 remains Blocked: prior user-approved report examples unavailable in reviewed repo. Gate requires owner-approved golden-master outputs, not PDF file signatures.
+
+## P0 complete financial statements (22 November 2026)
+
+| Requirement | Test | Baseline state | Milestone |
+| --- | --- | --- | --- |
+| OTTO-FS-001 cash flow | TEST-OTTO-FS-001 | Partial; existing summary, expanded acceptance unexecuted | M3/M6 |
+| OTTO-FS-002 equity | TEST-OTTO-FS-002 | Partial; existing simplified roll-forward | M6 |
+| OTTO-FS-003 comparatives | TEST-OTTO-FS-003 | Planned | M6 |
+| OTTO-FS-004 completeness | TEST-OTTO-FS-004 | Planned | M6 |
+| OTTO-FS-005 shared export/layout | TEST-OTTO-FS-005 | Partial; template references still required | M6 |
+| OTTO-FS-006 authorisation gate | TEST-OTTO-FS-006 | Planned; existing draft controls only | M6/M7 |
+
+Detailed acceptance vectors: [Complete financial statements and reporting readiness](27_FINANCIAL_STATEMENT_COMPLETENESS.md). None of the new acceptance cases have been executed; baseline evidence remains unchanged.
