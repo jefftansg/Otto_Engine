@@ -18,7 +18,7 @@ MAX_BYTES=100*1024*1024
 
 
 def context(config):
-    return fingerprint({k:config.get(k) for k in ('company_name','uen','fy_start','fy_end','fy_confirmed','currency')})
+    return fingerprint({k:config.get(k) for k in ('company_name','uen','fy_start','fy_end','fy_confirmed','currency','synthetic_test_mode')})
 
 
 def name_key(name):return re.sub('[^A-Z0-9]','',str(name or '').upper())
@@ -153,8 +153,18 @@ def analyse_documents(files,config,inspect=inspect_document):
         seen[actual]=f['name']
         try:
             doc=inspect(f['name'],f['bytes']);row=identify(doc);documents[actual]=doc
-            row['status']='Needs review' if row['errors'] else 'Identified - reviewer confirmation required'
-            if row['account_key'] and not row['demo']:groups[row['account_key']].append(row)
+            test_mode=config.get('synthetic_test_mode') is True
+            if row['demo'] and test_mode:
+                # In a separately opted-in sandbox, exercise bank parsing and reconciliation.
+                # This changes only the test workflow; these documents are never authentic evidence.
+                row['errors']=[e for e in row['errors'] if e!='Fictional/demonstration evidence cannot establish actual bank coverage.']
+                row['status']='SYNTHETIC TEST ONLY - reviewer confirmation required'
+            elif not row['demo'] and test_mode and row['account_key']:
+                row['errors'].append('Only explicitly labelled synthetic bank fixtures can be used in Synthetic Test Mode.')
+                row['status']='Excluded real-looking source from test workspace'
+            else:
+                row['status']='Needs review' if row['errors'] else 'Identified - reviewer confirmation required'
+            if row['account_key'] and (not row['demo'] or test_mode) and not (test_mode and not row['demo']):groups[row['account_key']].append(row)
         except Exception as exc:row=dict(name=f['name'],sha256=actual,status='Unreadable / unsupported',errors=[str(exc)],provenance=[])
         inventory.append(row)
     results=[]
@@ -181,6 +191,8 @@ def coverage_payload(meta,config):
 
 
 def validate_managed_account(meta,config):
+    if meta.get('synthetic_test_source') and not config.get('synthetic_test_mode'):
+        return ['Synthetic source approval cannot be used in a normal client workspace.']
     if not meta.get('managed_intake'):return []
     from .core import money
     errors=[];record=meta.get('coverage_review') or {}
@@ -214,9 +226,11 @@ def approve_account(pkg,analysis,key,code,revision,reviewer,evidence,confirmed=F
     if old and not old.get('account_key') and any(str(r.get('bank_account_code'))==str(code) for r in pkg.bank) and not link_existing:return False
     meta=dict(old or {},code=str(code),name=(old or {}).get('name') or group['bank']+' '+group['masked_account'],currency='SGD',
               bank=group['bank'],account_key=key,masked_account=group['masked_account'],opening=group['coverage']['opening'],closing=group['coverage']['closing'],
-              confirmed=True,coverage_confirmed=True,managed_intake=True,statements=deepcopy([r['summary'] for r in group['sources']]))
+              confirmed=True,coverage_confirmed=True,managed_intake=True,
+              synthetic_test_source=any(r['demo'] for r in group['sources']),
+              statements=deepcopy([r['summary'] for r in group['sources']]))
     meta['coverage_review']=dict(reviewer=reviewer.strip(),evidence=evidence.strip(),at=datetime.now(timezone.utc).isoformat(timespec='seconds'),
-        hash=fingerprint(coverage_payload(meta,pkg.config)),method='Source identification and exact per-account coverage; currency/company confirmed by reviewer')
+        hash=fingerprint(coverage_payload(meta,pkg.config)),method=('SYNTHETIC TEST ONLY: checked fixture continuity, not bank authenticity' if pkg.config.get('synthetic_test_mode') else 'Source identification and exact per-account coverage; currency/company confirmed by reviewer'))
     # Source changes require fresh transaction evidence review.
     if not old or old.get('coverage_review',{}).get('hash')!=meta['coverage_review']['hash']:meta.pop('transactions_review',None)
     values=[deepcopy(r) for r in pkg.config['bank_accounts'] if str(r.get('code'))!=str(code)]+[meta]
@@ -250,7 +264,7 @@ def review_recorded_rows(pkg,code,reviewer,evidence,confirmed=False):
     if meta.get('transactions_review'):
         pkg.config.setdefault('bank_review_history',[]).append(dict(code=str(code),kind='transactions',record=deepcopy(meta['transactions_review'])))
     meta['transactions_review']=dict(reviewer=reviewer.strip(),evidence=evidence.strip(),hash=account_row_hash(pkg.bank,code),
-         coverage_hash=meta['coverage_review']['hash'],method='Manual original-source transaction review',at=datetime.now(timezone.utc).isoformat(timespec='seconds'))
+         coverage_hash=meta['coverage_review']['hash'],method=('Synthetic fixture transaction review' if pkg.config.get('synthetic_test_mode') else 'Manual original-source transaction review'),at=datetime.now(timezone.utc).isoformat(timespec='seconds'))
     return True
 
 
@@ -312,7 +326,9 @@ def approve_import(pkg,analysis,key,revision,reviewer,evidence,confirmed=False):
         ref=row['evidence_ref']
         if not any(e.get('evidence_ref')==ref for e in candidate.evidence):
             name=next(g['summary']['source'] for group in analysis['groups'] for g in group['sources'] if g['sha256']==row['source_sha256'])
-            candidate.evidence.append(dict(evidence_ref=ref,document_type='Bank statement',source_file=name,review_status='Reviewed',remarks='Reviewer '+reviewer.strip()+'; SHA-256 '+row['source_sha256']))
+            candidate.evidence.append(dict(evidence_ref=ref,document_type='Synthetic bank test fixture' if pkg.config.get('synthetic_test_mode') else 'Bank statement',
+                source_file=name,review_status='Synthetic test' if pkg.config.get('synthetic_test_mode') else 'Reviewed',
+                remarks=('NOT AUTHENTIC BANK EVIDENCE; ' if pkg.config.get('synthetic_test_mode') else '')+'Reviewer '+reviewer.strip()+'; SHA-256 '+row['source_sha256']))
     if not review_recorded_rows(candidate,meta['code'],reviewer,evidence,True):return False
     candidate.config.setdefault('bank_import_reviews',[]).append(dict(revision=revision,code=meta['code'],source_hashes=hashes,reviewer=reviewer.strip(),evidence=evidence.strip(),count=len(proposal['rows'])))
     pkg.config=candidate.config;pkg.bank=candidate.bank;pkg.evidence=candidate.evidence
