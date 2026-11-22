@@ -80,10 +80,11 @@ class OcbcDailyTests(unittest.TestCase):
         item,doc=source();doc.text_excerpt=doc.text_excerpt.replace('20 Jan 2026 REF2 RECEIPT 70.00 160.00','')
         self.assertEqual(propose_bank_rows(doc)[0],[]);self.assertTrue(propose_bank_rows(doc)[1])
 
-    def test_post_date_value_date_cutoff_needs_review_not_automatic_backdating(self):
+    def test_later_posting_retains_original_date_and_reconciles(self):
         item,doc=source();doc.text_excerpt=doc.text_excerpt.replace('31 Jan 2026 REF3','01 Feb 2026 REF3')
-        rows,errors=propose_bank_rows(doc);self.assertEqual(rows,[])
-        self.assertTrue(any('posting/value-date' in e for e in errors))
+        rows,errors=propose_bank_rows(doc);self.assertEqual(errors,[])
+        self.assertEqual(rows[-1]['date'],'2026-02-01')
+        self.assertIn('posted after the selected export end',rows[-1]['notes'])
 
     def test_overdraft_notation_and_bad_running_balances_are_not_guessed(self):
         for change in ('145.00 31-Jan-2026','REF2 RECEIPT 70.00 160.00'):

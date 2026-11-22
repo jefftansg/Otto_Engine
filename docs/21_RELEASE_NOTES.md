@@ -122,3 +122,8 @@ Separate follow-up to merged PR #21: company profiles/supporting records are no 
 ### 23 November 2026 — 1.4.0-dev.3 source-review usability
 
 Uploaded statements automatically supply evidence references; optional review notes replace mandatory location retyping. Explicit approvals and financial checks remain. Added exact account-rejection reasons and Save review notes and continue without approval. Date exceptions identify the actual date/period and avoid two secondary warnings after extraction fails. See docs/33_SOURCE_REVIEW_USABILITY.md.
+
+
+### 23 November 2026 — 1.4.0-dev.4 late monthly postings
+
+User-authorised acceptance of OCBC daily-detail postings after monthly export end, retaining original dates. Financial-year, printed totals/counts, running balances and explicit review remain; cross-source possible-repeat checks prevent silent duplicate posting. No added source coverage from later posting dates. Full local suite: 214 pass, no skips. See docs/34.

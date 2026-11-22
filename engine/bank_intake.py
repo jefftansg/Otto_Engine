@@ -351,11 +351,24 @@ def staged_rows(pkg,analysis,key):
         if summary.get('opening') is None or summary.get('closing') is None or money(summary['opening'])+net!=money(summary['closing']):
             errors.append(doc.name+': extracted transactions do not tie to statement movement.')
         for idx,r in enumerate(proposed,1):
-            if not summary['period_start']<=r['date']<=summary['period_end']:errors.append(doc.name+': row date is outside its statement period.')
+            if not pkg.config['fy_start']<=r['date']<=pkg.config['fy_end']:
+                errors.append(doc.name+': posting date '+r['date']+' is outside the confirmed financial year '+pkg.config['fy_start']+' to '+pkg.config['fy_end']+'. Review the year-end cutoff.')
+            if not summary.get('daily_profile') and not summary['period_start']<=r['date']<=summary['period_end']:
+                errors.append(doc.name+': row date is outside its statement period.')
             row=dict(r,bank_account_code=meta['code'],account_code='9999',transfer_id='',source_sha256=doc.sha256,
                      source_row=str(idx),source_reference=str(r.get('source_reference') or r.get('reference') or ''),reference='SRC-'+doc.sha256[:16]+'-'+str(idx),
                      evidence_ref='DOC-'+doc.sha256[:12].upper())
             rows.append(row)
+    # Overlapping posting dates can repeat in separate exports. Flag a possible repeat,
+    # never silently drop a row or count it twice. Account scope and source reference matter.
+    seen={}
+    for row in [r for r in pkg.bank if str(r.get('bank_account_code'))==meta['code']]+rows:
+        if not row.get('source_reference') or not row.get('source_sha256'):continue
+        fact=(row['date'],row['source_reference'],str(money(row.get('deposit'))),str(money(row.get('withdrawal'))))
+        prior=seen.get(fact)
+        if prior and prior!=row['source_sha256']:
+            errors.append('Possible repeated bank transaction across statement files on '+row['date']+'. Review the matching bank reference and amounts before import.')
+        seen[fact]=row['source_sha256']
     old={str(r.get('reference')) for r in pkg.bank if str(r.get('bank_account_code'))==meta['code']}
     if any(r['reference'] in old for r in rows):errors.append('A proposed source row was already recorded; do not duplicate it.')
     if any(str(r.get('bank_account_code'))==meta['code'] and not r.get('source_sha256') for r in pkg.bank) and rows:

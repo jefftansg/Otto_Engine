@@ -65,17 +65,17 @@ class SourceEvidenceTests(unittest.TestCase):
         before=deepcopy(p.config);p.config['uen']='CHANGED';changed=deepcopy(p.config)
         self.assertFalse(save_account_review_draft(p,a,g['key'],'1000','','stale'));self.assertEqual(p.config,changed)
 
-    def test_date_root_cause_does_not_create_empty_row_and_balance_cascade(self):
+    def test_late_posting_is_allowed_inside_the_confirmed_financial_year(self):
         f,doc=source();doc.text_excerpt=doc.text_excerpt.replace('31 Jan 2026 REF3','01 Feb 2026 REF3')
         p=package();p.config.update(company_name='EXAMPLE WORKS PTE. LTD.',fy_start='2026-01-01',fy_end='2026-01-31')
         a=analyse_documents([f],p.config,lambda n,b:doc);g=a['groups'][0]
         self.assertTrue(approve_account(p,a,g['key'],'1000',g['revision'],'R','',True))
-        proposed=staged_rows(p,a,g['key']);self.assertEqual(proposed['rows'],[])
-        self.assertEqual(len(proposed['errors']),1)
-        message=proposed['errors'][0]
-        self.assertIn('2026-02-01',message);self.assertIn('2026-01-31',message)
-        self.assertNotIn('do not tie',message);self.assertNotIn('no reliable transaction rows',message)
+        proposed=staged_rows(p,a,g['key'])
+        self.assertEqual(len(proposed['rows']),3)
+        self.assertTrue(any('outside the confirmed financial year' in e for e in proposed['errors']))
         self.assertFalse(approve_import(p,a,g['key'],proposed['revision'],'R','',True))
+        self.assertEqual(p.bank,[])
+
 
 class SourceReviewUITests(unittest.TestCase):
     def app(self):

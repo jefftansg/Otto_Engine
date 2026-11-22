@@ -141,3 +141,8 @@ Bizfile/company profiles must not require bank identity: implemented in engine/b
 ### Review usability and evidence provenance
 
 Automatic uploaded filename/hash evidence, precise approval reasons and unapproved review notes: engine/bank_intake.py and bank_intake_ui.py. Eight new synthetic tests in tests/test_review_evidence.py cover rejection, source integrity, import/ZIP preservation and UI. Existing OCBC cutoff tests still apply; no date-policy change. See docs/33 and candidate 1.4.0-dev.3.
+
+
+### Monthly export versus bank posting date
+
+Later postings accepted for supported OCBC daily statements with unchanged dates, full printed reconciliation, financial-year import cutoffs and cross-source possible-repeat review. engine/ocbc_daily.py and engine/bank_intake.py; five new tests in tests/test_late_posting.py and updated cutoff regressions. Full suite 214 pass. Scope/limits: docs/34, candidate 1.4.0-dev.4.
