@@ -91,3 +91,8 @@ Auto, Guided and Advanced read the same deterministic package. Multi-bank catego
 ## OCBC daily-details source controls — 22 November 2026
 
 Account holders are header facts; transaction counterparties never identify the reporting entity. A scoped Ledger Balance proposal must tie opening plus printed credits less debits; staging also checks gross counts/totals and running balances. Selected future To dates cannot extend verified coverage past print date. Posting/value-date differences require review rather than silent date substitution. No new recognition, cutoff or overdraft policy is introduced. [Evidence](30_OCBC_DAILY_HEADER_FIX.md).
+
+
+### User-authorised source-import date handling (23 November 2026)
+
+Supported OCBC daily-detail statements may include postings after a selected monthly export end. Retain the original posting dates, require printed counts/totals/running balances and apply the confirmed financial-year cutoff at import. A later posting does not extend source coverage. Flag possible repeats across files and preserve explicit review. This import rule does not change accrual recognition or automatically create date adjustments. See docs/34_LATE_BANK_POSTING_DATES.md.

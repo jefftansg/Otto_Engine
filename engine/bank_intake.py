@@ -10,7 +10,7 @@ from decimal import Decimal
 from hashlib import sha256
 import re
 from .importers import inspect_document
-from .autofill import (extract_bank_statement,consolidate_statement_balances,propose_bank_rows,DATE_RX,_date)
+from .autofill import (extract_acra_profile,extract_bank_statement,consolidate_statement_balances,propose_bank_rows,DATE_RX,_date)
 from .multi_bank import fingerprint,row_facts,pair_hash
 from .bank_headers import header_lines,account_holder
 
@@ -152,9 +152,25 @@ def analyse_documents(files,config,inspect=inspect_document):
             inventory.append(dict(name=f['name'],sha256=actual,status='Excluded exact duplicate',errors=['Identical content to '+seen[actual]],provenance=[]));continue
         seen[actual]=f['name']
         try:
-            doc=inspect(f['name'],f['bytes']);row=identify(doc);documents[actual]=doc
-            row['status']='Needs review' if row['errors'] else 'Identified - reviewer confirmation required'
-            if row['account_key'] and not row['demo']:groups[row['account_key']].append(row)
+            doc=inspect(f['name'],f['bytes']);documents[actual]=doc
+            profile=extract_acra_profile(doc) if f['name'].lower().endswith('.pdf') else dict(detected=False)
+            if profile.get('detected'):
+                fields=profile['fields'];errors=[]
+                if ((config.get('uen') and fields.get('uen') and config['uen'].strip().upper()!=fields['uen'].strip().upper()) or
+                    (config.get('company_name') and fields.get('company_name') and name_key(config['company_name'])!=name_key(fields['company_name']))):
+                    errors.append('Company profile differs from the current workspace; review company identity.')
+                row=dict(name=doc.name,sha256=actual,type='Company profile',status='Review proposed company fields',
+                         company=fields.get('company_name'),errors=errors,
+                         provenance=[dict(field=k,value=v,sha256=actual) for k,v in fields.items()])
+            else:
+                row=identify(doc)
+                if row['bank'] or row['account_key'] or extract_bank_statement(doc).get('detected'):
+                    row['type']='Bank statement'
+                    row['status']='Needs review' if row['errors'] else 'Identified - reviewer confirmation required'
+                    if row['account_key'] and not row['demo']:groups[row['account_key']].append(row)
+                else:
+                    row=dict(name=doc.name,sha256=actual,type='Supporting record / template',
+                             status='Retained for manual mapping',errors=[],provenance=[])
         except Exception as exc:row=dict(name=f['name'],sha256=actual,status='Unreadable / unsupported',errors=[str(exc)],provenance=[])
         inventory.append(row)
     results=[]
@@ -203,19 +219,67 @@ def validate_managed_account(meta,config):
     return errors
 
 
-def approve_account(pkg,analysis,key,code,revision,reviewer,evidence,confirmed=False,link_existing=False):
-    if not confirmed or not reviewer.strip() or not evidence.strip() or analysis['context']!=context(pkg.config) or not pkg.config.get('company_name') or not pkg.config.get('uen') or not pkg.config.get('fy_confirmed'):return False
+def uploaded_review_sources(analysis,key):
+    """Use current parsed originals only; saved source summaries are not originals."""
+    group=next((g for g in analysis.get('groups',[]) if g['key']==key),None)
+    if not group or not group['sources']:return []
+    refs=[]
+    for source in group['sources']:
+        doc=analysis.get('documents',{}).get(source['sha256'])
+        if doc is None or doc.sha256!=source['sha256']:return []
+        refs.append(dict(name=source['name'],sha256=source['sha256']))
+    return refs
+
+
+def source_review_evidence(analysis,key,note=''):
+    refs=uploaded_review_sources(analysis,key)
+    if not refs:return note.strip()
+    evidence='Uploaded statements: '+'; '.join(r['name']+' [SHA-256 '+r['sha256']+']' for r in refs)
+    return evidence+(' | Reviewer note: '+note.strip() if note.strip() else '')
+
+
+def account_approval_errors(pkg,analysis,key,code,revision,reviewer,evidence,confirmed=False,link_existing=False):
+    errors=[];cfg=pkg.config
+    if not cfg.get('company_name') or not cfg.get('uen'):errors.append('Complete the company name and UEN in company setup.')
+    if not cfg.get('fy_confirmed'):errors.append('Confirm the company reporting dates in company setup.')
+    if analysis['context']!=context(cfg):errors.append('Company or reporting dates changed. Refresh the statement review.')
+    if not reviewer.strip():errors.append('Enter the reviewer name.')
+    if not source_review_evidence(analysis,key,evidence):errors.append('Original statements are unavailable. Re-upload them, or enter a note identifying the originals you reviewed.')
+    if not confirmed:errors.append('Confirm that you checked the company, account, currency, coverage and balances.')
     group=next((g for g in analysis['groups'] if g['key']==key),None)
-    if not group or group['revision']!=revision or group['errors'] or not group['coverage']['ready'] or group['currency'] not in (None,'SGD'):return False
-    if not re.fullmatch(r'10[0-9]{2}',str(code)) or 'bank_accounts' not in pkg.config:return False
+    if not group:errors.append('This statement group is no longer available. Refresh the source review.')
+    else:
+        if group['revision']!=revision:errors.append('The statement set changed. Review the current originals again.')
+        errors.extend(group['errors'])
+        if not group['coverage']['ready'] and not group['errors']:errors.append('Statement coverage or balances are incomplete. Review the missing periods and balances shown above.')
+        if group['currency'] not in (None,'SGD'):errors.append('Only SGD statements can be approved in this workflow.')
+    if not re.fullmatch(r'10[0-9]{2}',str(code)):errors.append('Enter a bank control code from 1000 to 1099.')
+    if 'bank_accounts' not in cfg:errors.append('Open bank-account review before approving this account.')
+    accounts=cfg.get('bank_accounts',[])
+    old=next((r for r in accounts if str(r.get('code'))==str(code)),None)
+    if any(r.get('account_key')==key and str(r.get('code'))!=str(code) for r in accounts):errors.append('This bank account already uses another control code. Use its existing code.')
+    if old and old.get('account_key') and old['account_key']!=key:errors.append('This control code belongs to a different bank account. Choose an unused code.')
+    if old and not old.get('account_key') and any(str(r.get('bank_account_code'))==str(code) for r in pkg.bank) and not link_existing:
+        errors.append('Confirm that the existing manually entered rows belong to this account.')
+    return list(dict.fromkeys(errors))
+
+
+def save_account_review_draft(pkg,analysis,key,code,reviewer,note):
+    group=next((g for g in analysis.get('groups',[]) if g['key']==key),None)
+    if not group or analysis['context']!=context(pkg.config):return False
+    pkg.config.setdefault('bank_review_drafts',{})[key]=dict(code=str(code),reviewer=reviewer.strip(),note=note.strip(),
+        source_revision=group['revision'],status='Preparation notes only — not approved',at=datetime.now(timezone.utc).isoformat(timespec='seconds'))
+    return True
+
+
+def approve_account(pkg,analysis,key,code,revision,reviewer,evidence,confirmed=False,link_existing=False):
+    if account_approval_errors(pkg,analysis,key,code,revision,reviewer,evidence,confirmed,link_existing):return False
+    group=next(g for g in analysis['groups'] if g['key']==key)
     old=next((r for r in pkg.config['bank_accounts'] if str(r.get('code'))==str(code)),None)
-    if any(r.get('account_key')==key and str(r.get('code'))!=str(code) for r in pkg.config['bank_accounts']):return False
-    if old and old.get('account_key') and old['account_key']!=key:return False
-    if old and not old.get('account_key') and any(str(r.get('bank_account_code'))==str(code) for r in pkg.bank) and not link_existing:return False
     meta=dict(old or {},code=str(code),name=(old or {}).get('name') or group['bank']+' '+group['masked_account'],currency='SGD',
               bank=group['bank'],account_key=key,masked_account=group['masked_account'],opening=group['coverage']['opening'],closing=group['coverage']['closing'],
               confirmed=True,coverage_confirmed=True,managed_intake=True,statements=deepcopy([r['summary'] for r in group['sources']]))
-    meta['coverage_review']=dict(reviewer=reviewer.strip(),evidence=evidence.strip(),at=datetime.now(timezone.utc).isoformat(timespec='seconds'),
+    meta['coverage_review']=dict(reviewer=reviewer.strip(),evidence=source_review_evidence(analysis,key,evidence),sources=uploaded_review_sources(analysis,key),at=datetime.now(timezone.utc).isoformat(timespec='seconds'),
         hash=fingerprint(coverage_payload(meta,pkg.config)),method='Source identification and exact per-account coverage; currency/company confirmed by reviewer')
     # Source changes require fresh transaction evidence review.
     if not old or old.get('coverage_review',{}).get('hash')!=meta['coverage_review']['hash']:meta.pop('transactions_review',None)
@@ -280,17 +344,31 @@ def staged_rows(pkg,analysis,key):
         if doc is None:errors.append('Original source is unavailable: '+summary['source']);continue
         proposed,warnings=propose_bank_rows(doc)
         errors.extend(doc.name+': '+str(w) for w in warnings)
+        if warnings and not proposed:continue
         if not proposed and money(summary.get('opening'))!=money(summary.get('closing')):
             errors.append(doc.name+': no reliable transaction rows; use manual mapping/review.')
         net=sum((money(r.get('deposit'))-money(r.get('withdrawal')) for r in proposed),Decimal('0'))
         if summary.get('opening') is None or summary.get('closing') is None or money(summary['opening'])+net!=money(summary['closing']):
             errors.append(doc.name+': extracted transactions do not tie to statement movement.')
         for idx,r in enumerate(proposed,1):
-            if not summary['period_start']<=r['date']<=summary['period_end']:errors.append(doc.name+': row date is outside its statement period.')
+            if not pkg.config['fy_start']<=r['date']<=pkg.config['fy_end']:
+                errors.append(doc.name+': posting date '+r['date']+' is outside the confirmed financial year '+pkg.config['fy_start']+' to '+pkg.config['fy_end']+'. Review the year-end cutoff.')
+            if not summary.get('daily_profile') and not summary['period_start']<=r['date']<=summary['period_end']:
+                errors.append(doc.name+': row date is outside its statement period.')
             row=dict(r,bank_account_code=meta['code'],account_code='9999',transfer_id='',source_sha256=doc.sha256,
                      source_row=str(idx),source_reference=str(r.get('source_reference') or r.get('reference') or ''),reference='SRC-'+doc.sha256[:16]+'-'+str(idx),
                      evidence_ref='DOC-'+doc.sha256[:12].upper())
             rows.append(row)
+    # Overlapping posting dates can repeat in separate exports. Flag a possible repeat,
+    # never silently drop a row or count it twice. Account scope and source reference matter.
+    seen={}
+    for row in [r for r in pkg.bank if str(r.get('bank_account_code'))==meta['code']]+rows:
+        if not row.get('source_reference') or not row.get('source_sha256'):continue
+        fact=(row['date'],row['source_reference'],str(money(row.get('deposit'))),str(money(row.get('withdrawal'))))
+        prior=seen.get(fact)
+        if prior and prior!=row['source_sha256']:
+            errors.append('Possible repeated bank transaction across statement files on '+row['date']+'. Review the matching bank reference and amounts before import.')
+        seen[fact]=row['source_sha256']
     old={str(r.get('reference')) for r in pkg.bank if str(r.get('bank_account_code'))==meta['code']}
     if any(r['reference'] in old for r in rows):errors.append('A proposed source row was already recorded; do not duplicate it.')
     if any(str(r.get('bank_account_code'))==meta['code'] and not r.get('source_sha256') for r in pkg.bank) and rows:
@@ -301,6 +379,7 @@ def staged_rows(pkg,analysis,key):
 
 def approve_import(pkg,analysis,key,revision,reviewer,evidence,confirmed=False):
     proposal=staged_rows(pkg,analysis,key)
+    evidence=source_review_evidence(analysis,key,evidence)
     if not confirmed or not reviewer.strip() or not evidence.strip() or proposal['revision']!=revision or proposal['errors'] or not proposal['rows']:return False
     # Work on a copy so all rejection paths preserve original books and review metadata.
     candidate=deepcopy(pkg);meta=next(m for m in candidate.config['bank_accounts'] if m.get('account_key')==key)

@@ -93,8 +93,8 @@ def propose_rows(doc):
         if len(values)!=2:
             errors.append('Daily source line '+str(idx+1)+': amount and running balance are ambiguous.');continue
         posted=_date(m.group(1));amount,balance=values
-        if not posted or not profile['period_start']<=posted<=profile['period_end']:
-            errors.append('Daily posting date is outside the selected/verified statement period; review the posting/value-date basis without silently backdating.');continue
+        if not posted or posted<profile['period_start'] or posted>profile['printed_on']:
+            errors.append('Transaction posting date '+str(posted or m.group(1))+' is invalid, precedes the export start, or is later than the statement print date. Review the original.');continue
         description=re.sub(r'\s+\(?-?[\d,]+\.\d{2}\)?\s+\(?-?[\d,]+\.\d{2}\)?\s*$','',m.group(2)).strip()
         details=[]
         for following in lines[idx+1:]:
@@ -115,7 +115,7 @@ def propose_rows(doc):
             rows.append(dict(date=r['date'],description=r['description'],reference='OCBC-'+doc.sha256[:10]+'-'+str(r['line']),
                 deposit=str(r['amount']) if change>0 else '',withdrawal=str(r['amount']) if change<0 else '',account_code='9999',
                 evidence_ref='DOC-'+doc.sha256[:10].upper(),source_reference=r['source_reference'],
-                notes='Review-only OCBC daily details; printed counts/totals and running balances checked. Posting date retained; source line '+str(r['line'])+'.'))
+                notes='Review-only OCBC daily details; printed counts/totals and running balances checked. Posting date retained; source line '+str(r['line'])+'.'+(' Bank posted after the selected export end '+profile['period_end']+'; original posting date retained.' if r['date']>profile['period_end'] else '')))
             previous=r['balance'];last_date=r['date']
         if not ok:continue
         credits=sum((Decimal(r['deposit'] or '0') for r in rows),Decimal('0'));debits=sum((Decimal(r['withdrawal'] or '0') for r in rows),Decimal('0'))

@@ -76,3 +76,13 @@ Auto document upload appears below the sidebar version label, before Your client
 ### Unreleased sidebar progress (22 November 2026)
 
 Auto displays preparation progress, current stage and next action above its sidebar uploader. Setup confirmation advances blank bank workspaces to account review; source removal is available before setup. Exact labels and stage criteria: [Auto progress and upload controls](31_AUTO_PROGRESS_AND_UPLOAD_CONTROLS.md).
+
+
+### Client clarification Excel exchange
+
+Auto and single-account Guided can prepare/download a client workbook, preview returned replies and save answers only after reviewer approval. Client replies appear beside category review; classification and posting stay separate. Save the workspace ZIP after preparing the request. Exact labels and limits: docs/35_CLIENT_CLARIFICATION_WORKBOOK.md.
+
+
+### Direct reply entry
+
+Open Enter client replies directly in Otto, choose a reply category/option or Other / type manually, enter any explanation and save with the recorder name. Pending query grids share the Excel answer/history store. Known categories become proposals only; financial category approval remains separate. No new navigation tabs. See docs/36_DIRECT_CLIENT_REPLIES.md.

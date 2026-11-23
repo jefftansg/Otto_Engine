@@ -131,3 +131,28 @@ OTTO-AUTO-001/002 and OTTO-BANK-002 gain header-only identity and scoped daily-e
 ### Candidate build identity — 23 November 2026
 
 Current build is **1.4.0-dev.1** (user-authorised). UI/launcher/source packager share `VERSION`; prerelease ZIPs include matching Quick Start, release notes and source manifest. Branding/AppTest regression and archive integrity/manifest validation cover this change. Historical 1.3.1 references remain release history; PR21 is still draft/unmerged.
+
+
+### Mixed-source document routing
+
+Bizfile/company profiles must not require bank identity: implemented in engine/bank_intake.py and bank_intake_ui.py; five synthetic cases in tests/test_bank_document_routing.py plus full regressions. Company mismatches remain reviewed; bank coverage/approval controls unchanged. See docs/32, candidate 1.4.0-dev.2.
+
+
+### Review usability and evidence provenance
+
+Automatic uploaded filename/hash evidence, precise approval reasons and unapproved review notes: engine/bank_intake.py and bank_intake_ui.py. Eight new synthetic tests in tests/test_review_evidence.py cover rejection, source integrity, import/ZIP preservation and UI. Existing OCBC cutoff tests still apply; no date-policy change. See docs/33 and candidate 1.4.0-dev.3.
+
+
+### Monthly export versus bank posting date
+
+Later postings accepted for supported OCBC daily statements with unchanged dates, full printed reconciliation, financial-year import cutoffs and cross-source possible-repeat review. engine/ocbc_daily.py and engine/bank_intake.py; five new tests in tests/test_late_posting.py and updated cutoff regressions. Full suite 214 pass. Scope/limits: docs/34, candidate 1.4.0-dev.4.
+
+
+### Client clarification Excel round trip
+
+Implemented in engine/clarification_workbook.py and clarification_ui.py, with Auto/legacy Guided integration. Fourteen synthetic tests in tests/test_clarification_workbook.py cover scoped request matching, source integrity, partial/sorted/idempotent response imports, explicit review, ledger preservation, ZIPs and UI. Build 1.4.0-dev.5; exact checks/limits in docs/35.
+
+
+### Direct client replies and dropdown/manual choices
+
+Implemented in engine/client_replies.py, clarification_ui.py and auto.py. Eight new synthetic engine/UI tests cover direct/manual replies, incomplete statuses, answer history/restore, revision rejection, Excel interoperability and separate financial-category approval; full suite 236 pass. Build 1.4.0-dev.6; details docs/36.

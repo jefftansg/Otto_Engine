@@ -116,3 +116,28 @@ Keep the upload drop box and compact progress/current/next panel together in the
 ### 23 November 2026 — distinguish development builds from stable releases
 
 Use **1.4.0-dev.1** for the current candidate, following explicit user instruction to change numbering. `VERSION` is the shared source for UI, launcher and archive identity; increment the dev counter for subsequent candidates. Stable historical v1.3.1 is retained. No automatic final-version promotion, merge, accounting or template approval.
+
+
+### 23 November 2026 — apply bank checks only to bank sources
+
+Route extracted company profiles before bank identification and label non-bank fields Not applicable. Keep profile identity conflicts, duplicates and unreadable-source review; preserve exact bank grouping/revisions and all explicit approval gates. Candidate advances to 1.4.0-dev.2 for a distinguishable download. See docs/32.
+
+
+### 23 November 2026 — source references are automatic, approvals remain explicit
+
+Use analysed original filenames/fingerprints for uploaded-source evidence. Require written evidence for missing-original/manual row review; preserve all financial and stale-revision checks. Save preparation notes separately from approval metadata. Explain posting/export date exceptions without changing date policy or cascading empty-row/net warnings. Candidate 1.4.0-dev.3; see docs/33.
+
+
+### 23 November 2026 — monthly export end is not a posting-date ceiling
+
+User explicitly requested ignoring a later posting date as a reason to reject monthly exports. Apply this to supported OCBC daily details, preserve original dates, print-date bounds and financial-year cutoff, and flag potential repeats across source files. Retain source coverage periods and reconciliations; no automatic backdating. Candidate 1.4.0-dev.4; docs/34.
+
+
+### 23 November 2026 — collect facts in Excel, retain accounting approval in Otto
+
+Client workbook asks for explanations and plain-language money types without accounting codes. Imported replies are untrusted facts until reviewer approval and never directly categorise or post transactions. Preserve immutable source/request matching, existing answers, audit history, local-only processing and separate category/transfer approval. Candidate 1.4.0-dev.5; docs/35.
+
+
+### 23 November 2026 — client replies can be entered in Otto
+
+Use dropdowns plus free text for pending queries and retain common direct/Excel answer history. Saving factual replies is explicit, but financial categories still need their separate approval. Prioritise saved client replies over older inferred suggestions and preserve uncertain/ambiguous cases for review. Custom words do not create accounting accounts. Candidate 1.4.0-dev.6; docs/36.

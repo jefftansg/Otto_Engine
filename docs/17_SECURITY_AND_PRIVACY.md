@@ -45,3 +45,8 @@ Document-first intake and any external AI processor require explicit data handli
 ## Unreleased combined Auto controls
 
 Auto uses local extraction/rules and does not connect an AI provider. Optional external proposal JSON is source/revision validated and needs human approval; the engine does not transmit the request itself. Switching client via new/restore/demo clears staged AI proposals and cached report bundles; uploader keys isolate contexts. Source originals are not embedded in workspaces or committed. Financial export snapshots retain hashes/review metadata and no automatic authorisation. [Verification](29_AUTO_MULTI_BANK_INTEGRATION.md).
+
+
+### Local clarification workbooks
+
+The client workbook deliberately includes the selected unresolved bank transactions and questions for the user to share manually. No sending connector or cloud processing is invoked. Source files are not embedded. Returned workbooks are matched to the saved workspace/request and validated before explicit reviewer approval; formulas, macros/external links and excessive/corrupt content are rejected. Client responses cannot directly change financial rows or classifications. Request/answer history is retained in the workspace ZIP. See docs/35.

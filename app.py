@@ -53,7 +53,7 @@ if st.session_state.is_demo:
     st.warning('You are viewing a FICTIONAL demonstration company. Use **Create blank client** in the sidebar to start with your own company.')
 
 def clear_auto_review_cache():
-    for key in ('auto_ai_proposals','auto_report_bundle'):
+    for key in ('auto_ai_proposals','auto_report_bundle','auto_clarification_export_cache','auto_clarification_notice'):
         st.session_state.pop(key,None)
 
 

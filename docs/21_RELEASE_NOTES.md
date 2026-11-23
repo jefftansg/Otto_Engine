@@ -112,3 +112,28 @@ Added compact five-stage preparation progress/current/next in the Auto sidebar. 
 ### 23 November 2026 — 1.4.0-dev.1 candidate identifier
 
 The user authorised a distinct version after older v1.3.1 folders caused confusion. Current Auto/multi-bank candidate is **1.4.0-dev.1**, read from `VERSION` by the UI and launcher and preserved in source archives/manifests. See RELEASE_NOTES_v1.4.0-dev.1.md and QUICK_START_v1.4.0-dev.1.md. Earlier notes retaining 1.3.1 describe previous candidates. PR #21 stays draft/unmerged; no final release or financial/template approval is implied.
+
+
+### 23 November 2026 — 1.4.0-dev.2 Bizfile routing correction
+
+Separate follow-up to merged PR #21: company profiles/supporting records are no longer subjected to bank-statement identity requirements in mixed intake. Bank checks remain strict for bank sources. See [details and evidence](32_COMPANY_PROFILE_INTAKE_FIX.md).
+
+
+### 23 November 2026 — 1.4.0-dev.3 source-review usability
+
+Uploaded statements automatically supply evidence references; optional review notes replace mandatory location retyping. Explicit approvals and financial checks remain. Added exact account-rejection reasons and Save review notes and continue without approval. Date exceptions identify the actual date/period and avoid two secondary warnings after extraction fails. See docs/33_SOURCE_REVIEW_USABILITY.md.
+
+
+### 23 November 2026 — 1.4.0-dev.4 late monthly postings
+
+User-authorised acceptance of OCBC daily-detail postings after monthly export end, retaining original dates. Financial-year, printed totals/counts, running balances and explicit review remain; cross-source possible-repeat checks prevent silent duplicate posting. No added source coverage from later posting dates. Full local suite: 214 pass, no skips. See docs/34.
+
+
+### 23 November 2026 — 1.4.0-dev.5 client clarification Excel exchange
+
+Export uncategorised transactions and open client questions, receive plain-language answers in green Excel cells, preview replies and save them after explicit review. Ledger amounts, dates, categories, transfers and journals remain unchanged. Stable request matching, source/answer validation, partial/sorted replies, idempotent imports and workspace history included. See docs/35.
+
+
+### 23 November 2026 — 1.4.0-dev.6 direct client replies
+
+Added direct editable pending-query grids with per-transaction reply categories, general reply options, manual text, reply status and saved-answer acknowledgements. Clear client categories produce review-only accounting proposals; unknown/custom/ambiguous replies never invent accounts or transfers. General Not sure replies remain open. Full local suite: 236 pass, no skips. See docs/36.
