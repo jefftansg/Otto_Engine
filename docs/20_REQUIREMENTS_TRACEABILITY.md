@@ -151,3 +151,8 @@ Later postings accepted for supported OCBC daily statements with unchanged dates
 ### Client clarification Excel round trip
 
 Implemented in engine/clarification_workbook.py and clarification_ui.py, with Auto/legacy Guided integration. Fourteen synthetic tests in tests/test_clarification_workbook.py cover scoped request matching, source integrity, partial/sorted/idempotent response imports, explicit review, ledger preservation, ZIPs and UI. Build 1.4.0-dev.5; exact checks/limits in docs/35.
+
+
+### Direct client replies and dropdown/manual choices
+
+Implemented in engine/client_replies.py, clarification_ui.py and auto.py. Eight new synthetic engine/UI tests cover direct/manual replies, incomplete statuses, answer history/restore, revision rejection, Excel interoperability and separate financial-category approval; full suite 236 pass. Build 1.4.0-dev.6; details docs/36.

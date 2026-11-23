@@ -187,5 +187,5 @@ with patch('clarification_ui.st.file_uploader',return_value=SimpleNamespace(getv
         next(c for c in at.checkbox if c.label.startswith('I reviewed these returned answers')).check()
         next(b for b in at.button if b.label=='Approve and save clarification replies').click().run()
         self.assertFalse(at.exception);self.assertTrue(at.session_state['pkg'].config['transaction_clarifications'])
-        self.assertTrue(any('Last import: 2 answers saved by Reviewer.' in c.value for c in at.caption))
+        self.assertTrue(any('Last saved replies: 2 answers saved by Reviewer.' in c.value for c in at.caption))
         self.assertEqual(at.session_state['pkg'].bank,before)

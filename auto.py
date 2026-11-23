@@ -130,26 +130,29 @@ def _inbox(p,records,questions):
 def _categories(p,suggest):
     if not p.bank:return
     st.markdown('#### Review transaction categories')
-    st.caption('Local rule suggestions are shown for review. They are not AI classifications. Incoming money is never automatically treated as revenue.')
+    st.caption('Enter or edit client replies under Enter client replies directly in Otto below. The Client reply column shows saved replies. Category suggestions require your separate approval.')
     choices={value['name']:key for key,value in COA_MAP.items() if key not in ('1000','9999')}
     if any(r.get('transfer_id') for r in p.bank):choices['Internal transfer (reviewed pair)']='TRANSFER'
     unknown='Needs review';revision=bank_revision(p.bank)
     ai=st.session_state.get('auto_ai_proposals',{})
     ai_rows=ai.get('rows',{}) if ai.get('revision')==revision else {}
     from engine.clarification_workbook import transaction_reply
+    from engine.client_replies import suggested_category
     view=[]
     for i,row in enumerate(p.bank):
-        suggested=ai_rows.get(i,{}).get('account_code') or suggest(row)
+        reply=transaction_reply(p,row,i)
+        client_code=suggested_category(reply)
+        suggested=client_code if reply else ai_rows.get(i,{}).get('account_code') or suggest(row)
         saved=row.get('account_code')
         code=saved if saved not in ('','9999',None) else suggested
         view.append(dict(Row=i+1,Date=row.get('date'),Description=row.get('description'),Received=row.get('deposit'),Paid=row.get('withdrawal'),
                          Category='Internal transfer (reviewed pair)' if code=='TRANSFER' and row.get('transfer_id') else COA_MAP.get(code,{}).get('name',unknown),
                          Bank=row.get('bank_account_code','1000'),Reference=row.get('reference',''),
-                         Basis='Imported AI proposal: '+ai_rows[i]['reason'] if i in ai_rows else 'Previously saved' if saved not in ('','9999',None) else 'Local rule suggestion' if suggested else 'Needs evidence',
+                         Basis='Previously saved' if saved not in ('','9999',None) else 'Client reply suggestion — review required' if client_code else 'Client reply needs category review' if reply else 'Imported AI proposal: '+ai_rows[i]['reason'] if i in ai_rows else 'Local rule suggestion' if suggested else 'Needs evidence',
                          Source=row.get('evidence_ref',''),
-                         Client_reply=' | '.join(transaction_reply(p,row,i).get(k,'') for k in ('money_type','answer','document') if transaction_reply(p,row,i).get(k))))
+                         Client_reply=' | '.join(reply.get(k,'') for k in ('money_type','answer','document') if reply.get(k))))
     edited=st.data_editor(view,hide_index=True,width='stretch',disabled=['Row','Date','Description','Received','Paid','Basis','Source','Bank','Reference','Client_reply'],
-                          column_config={'Category':st.column_config.SelectboxColumn(options=[unknown]+list(choices),required=True),'Client_reply':st.column_config.TextColumn('Client reply',width='large')},key='auto_categories_'+revision[:12])
+                          column_config={'Category':st.column_config.SelectboxColumn(options=[unknown]+list(choices),required=True),'Client_reply':st.column_config.TextColumn('Client reply',width='large')},key='auto_categories_'+revision[:12]+'_'+digest(p.config.get('transaction_clarifications',{}))[:8])
     if st.button('Approve and save reviewed categories',key='auto_save_categories'):
         if apply_categories(p,revision,[choices.get(value['Category'],'9999') for value in edited]):
             st.session_state.pop('auto_report_bundle',None);st.rerun()

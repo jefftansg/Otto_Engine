@@ -136,3 +136,8 @@ User explicitly requested ignoring a later posting date as a reason to reject mo
 ### 23 November 2026 — collect facts in Excel, retain accounting approval in Otto
 
 Client workbook asks for explanations and plain-language money types without accounting codes. Imported replies are untrusted facts until reviewer approval and never directly categorise or post transactions. Preserve immutable source/request matching, existing answers, audit history, local-only processing and separate category/transfer approval. Candidate 1.4.0-dev.5; docs/35.
+
+
+### 23 November 2026 — client replies can be entered in Otto
+
+Use dropdowns plus free text for pending queries and retain common direct/Excel answer history. Saving factual replies is explicit, but financial categories still need their separate approval. Prioritise saved client replies over older inferred suggestions and preserve uncertain/ambiguous cases for review. Custom words do not create accounting accounts. Candidate 1.4.0-dev.6; docs/36.

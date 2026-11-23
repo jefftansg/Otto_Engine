@@ -132,3 +132,8 @@ User-authorised acceptance of OCBC daily-detail postings after monthly export en
 ### 23 November 2026 — 1.4.0-dev.5 client clarification Excel exchange
 
 Export uncategorised transactions and open client questions, receive plain-language answers in green Excel cells, preview replies and save them after explicit review. Ledger amounts, dates, categories, transfers and journals remain unchanged. Stable request matching, source/answer validation, partial/sorted replies, idempotent imports and workspace history included. See docs/35.
+
+
+### 23 November 2026 — 1.4.0-dev.6 direct client replies
+
+Added direct editable pending-query grids with per-transaction reply categories, general reply options, manual text, reply status and saved-answer acknowledgements. Clear client categories produce review-only accounting proposals; unknown/custom/ambiguous replies never invent accounts or transfers. General Not sure replies remain open. Full local suite: 236 pass, no skips. See docs/36.

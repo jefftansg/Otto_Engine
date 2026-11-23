@@ -11,7 +11,7 @@ from .core import money
 TX_HEADERS=['Query ID','Date','Bank account','Bank description','Money in (SGD)','Money out (SGD)','Your answer','Money type','Document / receipt reference','Answered by','Response status']
 Q_HEADERS=['Query ID','Question','What to provide','Your answer','Document / receipt reference','Answered by','Response status']
 STATUSES=['Answered','Need more information','Not applicable']
-TYPES=['Sale','Business expense','Loan','Owner funding','Refund','Transfer between own accounts','Other','Not sure']
+TYPES=['Sale','Business expense','Loan','Owner funding','Refund','Transfer between own accounts','Other','Not sure','Bank charges','Office / rent','Marketing','Software subscriptions','Professional fees']
 SHEETS={'Transactions':(TX_HEADERS,6),'Other questions':(Q_HEADERS,3)}
 MAX_ROWS=20000
 
@@ -113,10 +113,10 @@ def prepare_workbook(pkg,questions):
         if pos>5:
             sheet.autofilter(4,0,pos-1,len(headers)-1)
             sheet.data_validation(5,len(headers)-1,pos-1,len(headers)-1,{'validate':'list','source':STATUSES})
-            if name=='Transactions':sheet.data_validation(5,7,pos-1,7,{'validate':'list','source':TYPES})
+            if name=='Transactions':sheet.data_validation(5,7,pos-1,7,{'validate':'list','source':"='_Otto'!$B$1:$B$"+str(len(TYPES))})
         sheet.set_landscape();sheet.set_paper(9);sheet.fit_to_pages(1,0);sheet.repeat_rows(0,4)
         sheet.set_margins(.3,.3,.4,.4);sheet.print_area(0,0,max(5,pos-1),len(headers)-1)
-    meta=book.add_worksheet('_Otto');meta.write_string(0,0,'Otto clarification workbook v1');meta.write_string(1,0,request_id);meta.very_hidden()
+    meta=book.add_worksheet('_Otto');meta.write_string(0,0,'Otto clarification workbook v1');meta.write_string(1,0,request_id);meta.write_column(0,1,TYPES);meta.very_hidden()
     book.close();pkg.config.setdefault('clarification_exports',{})[request_id]=request
     return out.getvalue()
 
@@ -169,6 +169,8 @@ def preview_answers(pkg,data):
                 incoming['status']=incoming['status'] or 'Answered'
                 if incoming['status'] not in STATUSES:raise ValueError('Choose a listed response status in '+where+'.')
                 incoming['status']='Needs answer' if incoming['status']=='Need more information' else incoming['status']
+                if incoming.get('money_type')=='Not sure' or incoming['answer'].casefold() in ('not sure','unknown','do not know',"don't know"):
+                    incoming['status']='Needs answer'
                 current=_current(pkg,key)
                 if incoming==current:continue  # Already imported unchanged reply; do not duplicate history.
                 if current!=request['previous'][key]:raise ValueError('An answer changed in Otto since this workbook was exported: '+where+'. Review it in Otto before replacing it.')
