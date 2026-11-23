@@ -1,6 +1,6 @@
-# Otto Financial Report Engine v1.4.0-dev.4
+# Otto Financial Report Engine v1.4.0-dev.5
 
-**Unreleased development branch:** Otto Auto is the default, with shared multi-bank review, transfer suggestions and provisional reporting. Build version is 1.4.0-dev.4; historical stable release remains 1.3.1; PR #21 is merged into its development base; no final release or accounting approval is implied. See [combined candidate usage and evidence](docs/29_AUTO_MULTI_BANK_INTEGRATION.md).
+**Unreleased development branch:** Otto Auto is the default, with shared multi-bank review, transfer suggestions and provisional reporting. Build version is 1.4.0-dev.5; historical stable release remains 1.3.1; PR #21 is merged into its development base; no final release or accounting approval is implied. See [combined candidate usage and evidence](docs/29_AUTO_MULTI_BANK_INTEGRATION.md).
 
 Otto helps Singapore businesses and their preparers assemble bookkeeping records, management accounts and draft unaudited financial statements (UFS). Lighthouse Studio Works Pte. Ltd. owns the product. **Clear Numbers for a Brighter Tomorrow.**
 
@@ -40,7 +40,7 @@ Startup checks for an incomplete release, unsupported Python and an occupied por
 
 ## Run locally
 
-On macOS, unzip the release, open `START_ON_MAC.command` and keep Terminal open. Open <http://localhost:8501>. The launcher creates a local virtual environment and installs dependencies when needed. See the [current Quick Start](QUICK_START_v1.4.0-dev.4.md) for setup and troubleshooting.
+On macOS, unzip the release, open `START_ON_MAC.command` and keep Terminal open. Open <http://localhost:8501>. The launcher creates a local virtual environment and installs dependencies when needed. See the [current Quick Start](QUICK_START_v1.4.0-dev.5.md) for setup and troubleshooting.
 
 For explicit local setup, use a supported Python 3 environment. Check compatibility with the selected dependency versions.
 
@@ -143,7 +143,7 @@ The development branch adds an explicit manual-entry multi-bank pilot, per-accou
 
 ## Unreleased multi-bank SGD review candidate
 
-The development pilot supports local supported-format bank identification/grouping, independent source coverage and bank reconciliation, reviewed transaction staging and explicit transfer suggestions. It remains Lighthouse StudioWorks' internal preparation engine. Existing single-account workspaces retain their workflow; migration is not automatic. See [pilot usage and acceptance gates](docs/28_MULTI_BANK_SGD_PILOT.md) and [verification evidence](docs/milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md). PR #21 is merged into development/ufs-report-completeness; follow-up fixes remain separately reviewed and the development build is **1.4.0-dev.4**; engineering test success does not approve UFS or template fidelity.
+The development pilot supports local supported-format bank identification/grouping, independent source coverage and bank reconciliation, reviewed transaction staging and explicit transfer suggestions. It remains Lighthouse StudioWorks' internal preparation engine. Existing single-account workspaces retain their workflow; migration is not automatic. See [pilot usage and acceptance gates](docs/28_MULTI_BANK_SGD_PILOT.md) and [verification evidence](docs/milestones/MULTI_BANK_SGD_REVIEW_2026-11-22.md). PR #21 is merged into development/ufs-report-completeness; follow-up fixes remain separately reviewed and the development build is **1.4.0-dev.5**; engineering test success does not approve UFS or template fidelity.
 
 ## Sidebar upload and OCBC daily-details correction
 
@@ -151,4 +151,9 @@ The unreleased candidate keeps Auto document upload near the top of the sidebar.
 
 ## Monthly exports and later bank postings
 
-In **1.4.0-dev.4**, supported OCBC daily-detail exports can contain transactions posted after the selected monthly export end. Original posting dates are retained. Printed balances/counts/totals, confirmed financial-year cutoffs and duplicate checks still apply; later postings do not extend source coverage. See [scope and validation](docs/34_LATE_BANK_POSTING_DATES.md).
+In **1.4.0-dev.5**, supported OCBC daily-detail exports can contain transactions posted after the selected monthly export end. Original posting dates are retained. Printed balances/counts/totals, confirmed financial-year cutoffs and duplicate checks still apply; later postings do not extend source coverage. See [scope and validation](docs/34_LATE_BANK_POSTING_DATES.md).
+
+
+## Excel client clarifications
+
+In Auto, open **Client clarifications - Excel export and import** to prepare an answer workbook for the client and review returned replies. The client fills green cells without accounting codes; your approval saves explanations while financial categories/postings remain separately reviewed. Save the workspace ZIP after preparing the workbook. See [workflow and validation](docs/35_CLIENT_CLARIFICATION_WORKBOOK.md).

@@ -127,3 +127,8 @@ Uploaded statements automatically supply evidence references; optional review no
 ### 23 November 2026 — 1.4.0-dev.4 late monthly postings
 
 User-authorised acceptance of OCBC daily-detail postings after monthly export end, retaining original dates. Financial-year, printed totals/counts, running balances and explicit review remain; cross-source possible-repeat checks prevent silent duplicate posting. No added source coverage from later posting dates. Full local suite: 214 pass, no skips. See docs/34.
+
+
+### 23 November 2026 — 1.4.0-dev.5 client clarification Excel exchange
+
+Export uncategorised transactions and open client questions, receive plain-language answers in green Excel cells, preview replies and save them after explicit review. Ledger amounts, dates, categories, transfers and journals remain unchanged. Stable request matching, source/answer validation, partial/sorted replies, idempotent imports and workspace history included. See docs/35.

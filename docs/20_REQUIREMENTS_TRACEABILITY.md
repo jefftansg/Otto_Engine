@@ -146,3 +146,8 @@ Automatic uploaded filename/hash evidence, precise approval reasons and unapprov
 ### Monthly export versus bank posting date
 
 Later postings accepted for supported OCBC daily statements with unchanged dates, full printed reconciliation, financial-year import cutoffs and cross-source possible-repeat review. engine/ocbc_daily.py and engine/bank_intake.py; five new tests in tests/test_late_posting.py and updated cutoff regressions. Full suite 214 pass. Scope/limits: docs/34, candidate 1.4.0-dev.4.
+
+
+### Client clarification Excel round trip
+
+Implemented in engine/clarification_workbook.py and clarification_ui.py, with Auto/legacy Guided integration. Fourteen synthetic tests in tests/test_clarification_workbook.py cover scoped request matching, source integrity, partial/sorted/idempotent response imports, explicit review, ledger preservation, ZIPs and UI. Build 1.4.0-dev.5; exact checks/limits in docs/35.

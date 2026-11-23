@@ -225,6 +225,8 @@ def _question_panel(pkg, parsed, batch):
     """A client-ready clarification list with actionable answers and downloads."""
     cfg=pkg.config
     questions=build_questions(pkg, parsed, batch)
+    from clarification_ui import render as clarification_exchange
+    clarification_exchange(pkg,questions,prefix='guided')
     answers=cfg.get('clarification_answers',{})
     open_items=outstanding(questions,answers)
     required=[q for q in open_items if q['priority']=='Required']

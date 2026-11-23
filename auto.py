@@ -97,13 +97,15 @@ def _issues(p,a,proposal):
 
 
 def _inbox(p,records,questions):
+    from clarification_ui import render as clarification_exchange
+    clarification_exchange(p,questions)
     active=[r for r in records if r['status']!='Cleared']
     if not active:st.success('No current tracked exceptions. Professional and template approval are still separate.');return
     st.dataframe([dict(Issue=r['title'],Priority=r['severity'],Status=r['status']) for r in active],hide_index=True,width='stretch')
     key=st.selectbox('Exception to resolve',[r['id'] for r in active],format_func=lambda k:next(r['title'] for r in active if r['id']==k),key='auto_exception')
     issue=next(r for r in active if r['id']==key)
     st.write(issue['why'])
-    for detail in issue.get('details',[]):st.write('• '+str(detail))
+    for detail in issue.get('details',[]):st.text('• '+str(detail))
     st.info(issue['question'])
     question=next((q for q in questions if q['id']==issue.get('question_id')),None)
     if question:
@@ -134,6 +136,7 @@ def _categories(p,suggest):
     unknown='Needs review';revision=bank_revision(p.bank)
     ai=st.session_state.get('auto_ai_proposals',{})
     ai_rows=ai.get('rows',{}) if ai.get('revision')==revision else {}
+    from engine.clarification_workbook import transaction_reply
     view=[]
     for i,row in enumerate(p.bank):
         suggested=ai_rows.get(i,{}).get('account_code') or suggest(row)
@@ -143,9 +146,10 @@ def _categories(p,suggest):
                          Category='Internal transfer (reviewed pair)' if code=='TRANSFER' and row.get('transfer_id') else COA_MAP.get(code,{}).get('name',unknown),
                          Bank=row.get('bank_account_code','1000'),Reference=row.get('reference',''),
                          Basis='Imported AI proposal: '+ai_rows[i]['reason'] if i in ai_rows else 'Previously saved' if saved not in ('','9999',None) else 'Local rule suggestion' if suggested else 'Needs evidence',
-                         Source=row.get('evidence_ref','')))
-    edited=st.data_editor(view,hide_index=True,width='stretch',disabled=['Row','Date','Description','Received','Paid','Basis','Source','Bank','Reference'],
-                          column_config={'Category':st.column_config.SelectboxColumn(options=[unknown]+list(choices),required=True)},key='auto_categories_'+revision[:12])
+                         Source=row.get('evidence_ref',''),
+                         Client_reply=' | '.join(transaction_reply(p,row,i).get(k,'') for k in ('money_type','answer','document') if transaction_reply(p,row,i).get(k))))
+    edited=st.data_editor(view,hide_index=True,width='stretch',disabled=['Row','Date','Description','Received','Paid','Basis','Source','Bank','Reference','Client_reply'],
+                          column_config={'Category':st.column_config.SelectboxColumn(options=[unknown]+list(choices),required=True),'Client_reply':st.column_config.TextColumn('Client reply',width='large')},key='auto_categories_'+revision[:12])
     if st.button('Approve and save reviewed categories',key='auto_save_categories'):
         if apply_categories(p,revision,[choices.get(value['Category'],'9999') for value in edited]):
             st.session_state.pop('auto_report_bundle',None);st.rerun()

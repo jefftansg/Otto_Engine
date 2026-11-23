@@ -131,3 +131,8 @@ Use analysed original filenames/fingerprints for uploaded-source evidence. Requi
 ### 23 November 2026 — monthly export end is not a posting-date ceiling
 
 User explicitly requested ignoring a later posting date as a reason to reject monthly exports. Apply this to supported OCBC daily details, preserve original dates, print-date bounds and financial-year cutoff, and flag potential repeats across source files. Retain source coverage periods and reconciliations; no automatic backdating. Candidate 1.4.0-dev.4; docs/34.
+
+
+### 23 November 2026 — collect facts in Excel, retain accounting approval in Otto
+
+Client workbook asks for explanations and plain-language money types without accounting codes. Imported replies are untrusted facts until reviewer approval and never directly categorise or post transactions. Preserve immutable source/request matching, existing answers, audit history, local-only processing and separate category/transfer approval. Candidate 1.4.0-dev.5; docs/35.
